@@ -1,16 +1,12 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
+from services.image_processor import process_uploaded_image
 
 app = FastAPI()
 
 
 @app.post("/upload-image/")
 async def upload_image(file: UploadFile = File(...)):
-    contents = await file.read()
+    result = await process_uploaded_image(file)
 
-    return JSONResponse(content={
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "size_bytes": len(contents),
-        "message": "Image received successfully"
-    })
+    return JSONResponse(content=result)

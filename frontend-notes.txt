@@ -1,0 +1,15 @@
+# Frontend Notes for RxMind
+
+- All UI/UX work is to be handled by the frontend team.
+- The backend logic, data models, and storage are implemented in /src/services, /src/models, and /src/utils.
+- All features must work fully offline. No network calls except for AI/OCR when implemented.
+- See this file for any UI/UX requirements or integration points needed by the backend logic.
+
+## UI/UX Requirements
+- Welcome/Onboarding: Collect and store user metadata (weight, height, sleep schedule, eating times, baseline BP, discharge uploaded boolean).
+- Home/Dashboard: Display daily tasks, allow marking complete/flagged, support new discharge upload (with overwrite warning).
+- Tasks Page: Show all upcoming tasks, support full task editing and creation.
+- Medication Page: Filter and display tasks with type = medication.
+- Compliance Page: Show day-by-day data for graph rendering (data provided by compliance service).
+- Settings Page: If reminders are disabled, show warning (reminder metadata provided by logic).
+- PDF Report: Add a button to generate and share caregiver report (calls pdf service with local data).

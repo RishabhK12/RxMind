@@ -3,6 +3,7 @@ from PIL import Image
 import io
 from .ocr import extract_text_from_image
 from PIL import features
+from .llm import simplify_medical_text
 
 
 async def process_uploaded_image(file: UploadFile) -> dict:
@@ -17,8 +18,10 @@ async def process_uploaded_image(file: UploadFile) -> dict:
             status_code=400, detail="Uploaded file is not a valid image")
 
     extracted_text = extract_text_from_image(image)
+    llm_response = simplify_medical_text(extracted_text)
 
     return {
         "extracted_text": extracted_text,
-        "message": "Image uploaded and text extracted successfully"
+        "llm_summary": llm_response["llm_output"],
+        "message": "Image uploaded, text extracted, and summarized successfully"
     }

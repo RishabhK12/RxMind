@@ -1,8 +1,12 @@
 from google import genai
 import os
 import logging
-# api_key = os.getenv("GEMINI_API_KEY")
-api_key = ""
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+api_key = os.getenv('GEMINI_API_KEY')
 if not api_key:
     raise RuntimeError("GEMINI_API_KEY not found in environment")
 

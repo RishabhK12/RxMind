@@ -1,7 +1,11 @@
+import os
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from services.image_processor import process_uploaded_image
+import logging
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI()
 
 

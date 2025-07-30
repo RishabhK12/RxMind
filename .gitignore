@@ -1,3 +1,66 @@
 __pycache__/
-node_modules
+node_modules/
 instructions.txt
+problems.txt
+# Flutter/Dart
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+pubspec.lock
+build/
+.idea/
+.vscode/
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/Flutter.podspec
+ios/Flutter/ephemeral/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+
+# macOS
+macos/Flutter/ephemeral/
+macos/Pods/
+macos/Runner.xcworkspace/
+
+# Windows
+windows/Flutter/ephemeral/
+windows/Runner/ephemeral/
+
+# Web
+web/.dart_tool/
+web/build/
+
+# Misc
+*.iml
+*.log
+*.tmp
+*.swp
+*.DS_Store
+*.lock
+*.bak
+*.orig
+*.rej
+.env
+.env.*
+.coverage
+.coverage.*
+
+# System
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.Spotlight-V100
+.Trashes
+.fseventsd
+.sublime-workspace
+.sublime-project

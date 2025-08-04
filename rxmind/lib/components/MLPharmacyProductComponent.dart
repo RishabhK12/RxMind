@@ -11,10 +11,12 @@ class MLPharmacyProductComponent extends StatefulWidget {
   static String tag = '/MLPharmacyProductComponent';
 
   @override
-  MLPharmacyProductComponentState createState() => MLPharmacyProductComponentState();
+  MLPharmacyProductComponentState createState() =>
+      MLPharmacyProductComponentState();
 }
 
-class MLPharmacyProductComponentState extends State<MLPharmacyProductComponent> {
+class MLPharmacyProductComponentState
+    extends State<MLPharmacyProductComponent> {
   List<MLMedicationData> listTwo = mlPrescriptionMedicineDataList();
 
   @override
@@ -43,12 +45,13 @@ class MLPharmacyProductComponentState extends State<MLPharmacyProductComponent> 
           ],
         ),
         16.height,
-        StaggeredGridView.countBuilder(
-          scrollDirection: Axis.vertical,
-          physics: ScrollPhysics(),
-          shrinkWrap: true,
+        MasonryGridView.count(
           crossAxisCount: 2,
+          mainAxisSpacing: 16.0,
+          crossAxisSpacing: 16.0,
           itemCount: listTwo.length,
+          shrinkWrap: true,
+          physics: ScrollPhysics(),
           itemBuilder: (context, index) {
             return Container(
               decoration: boxDecorationWithRoundedCorners(
@@ -69,23 +72,31 @@ class MLPharmacyProductComponentState extends State<MLPharmacyProductComponent> 
                         fit: BoxFit.cover,
                       ).cornerRadiusWithClipRRectOnly(topRight: 8, topLeft: 8),
                       Container(
-                        decoration: boxDecorationWithRoundedCorners(backgroundColor: mlColorDarkBlue),
-                        child: Text('-30%', style: secondaryTextStyle(color: white)).paddingOnly(right: 8, left: 8.0),
+                        decoration: boxDecorationWithRoundedCorners(
+                            backgroundColor: mlColorDarkBlue),
+                        child: Text('-30%',
+                                style: secondaryTextStyle(color: white))
+                            .paddingOnly(right: 8, left: 8.0),
                       ).paddingOnly(left: 4.0, bottom: 8)
                     ],
                   ),
                   16.height,
                   Row(
                     children: [
-                      RatingBarWidget(onRatingChanged: (v) {}, rating: 3.5, size: 14).expand(),
+                      RatingBarWidget(
+                              onRatingChanged: (v) {}, rating: 3.5, size: 14)
+                          .expand(),
                       4.width,
                       Text(('4.8 (456)'), style: secondaryTextStyle()),
                     ],
                   ).paddingOnly(left: 10, right: 10),
                   8.height,
-                  Text((listTwo[index].title).validate(), style: boldTextStyle()).paddingOnly(left: 10, right: 10),
+                  Text((listTwo[index].title).validate(),
+                          style: boldTextStyle())
+                      .paddingOnly(left: 10, right: 10),
                   2.height,
-                  Text(('5 ml').validate(), style: secondaryTextStyle()).paddingOnly(left: 10, right: 10),
+                  Text(('5 ml').validate(), style: secondaryTextStyle())
+                      .paddingOnly(left: 10, right: 10),
                   4.height,
                   Row(
                     children: [
@@ -93,7 +104,9 @@ class MLPharmacyProductComponentState extends State<MLPharmacyProductComponent> 
                       4.width,
                       Text(
                         ('\$95.00').validate(),
-                        style: boldTextStyle(color: Colors.grey.shade500, decoration: TextDecoration.lineThrough),
+                        style: boldTextStyle(
+                            color: Colors.grey.shade500,
+                            decoration: TextDecoration.lineThrough),
                       ),
                     ],
                   ).paddingOnly(left: 10, right: 10),
@@ -106,9 +119,6 @@ class MLPharmacyProductComponentState extends State<MLPharmacyProductComponent> 
               },
             );
           },
-          staggeredTileBuilder: (index) => StaggeredTile.fit(1),
-          mainAxisSpacing: 16.0,
-          crossAxisSpacing: 16.0,
         ),
       ],
     ).paddingAll(16.0);

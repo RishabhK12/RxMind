@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  late Stream<ConnectivityResult> _connectivityStream;
+  late Stream<List<ConnectivityResult>> _connectivityStream;
   bool _isOffline = false;
   Future<void> _pickAndQueueDischargePaper() async {
     try {
@@ -121,7 +121,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
 
     _connectivityStream = Connectivity().onConnectivityChanged;
-    _connectivityStream.listen((result) {
+    _connectivityStream.listen((results) {
+      final result =
+          results.isNotEmpty ? results.first : ConnectivityResult.none;
       final offline = result == ConnectivityResult.none;
       if (offline != _isOffline && mounted) {
         setState(() => _isOffline = offline);

@@ -10,10 +10,12 @@ class MLSpecialistVListComponent extends StatefulWidget {
   static String tag = '/MLSpecialistVListComponent';
 
   @override
-  MLSpecialistVListComponentState createState() => MLSpecialistVListComponentState();
+  MLSpecialistVListComponentState createState() =>
+      MLSpecialistVListComponentState();
 }
 
-class MLSpecialistVListComponentState extends State<MLSpecialistVListComponent> {
+class MLSpecialistVListComponentState
+    extends State<MLSpecialistVListComponent> {
   List<MLSpecialistData> data = mlSpecialistDataDataList();
 
   @override
@@ -33,11 +35,12 @@ class MLSpecialistVListComponentState extends State<MLSpecialistVListComponent> 
 
   @override
   Widget build(BuildContext context) {
-    return StaggeredGridView.countBuilder(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
+    return MasonryGridView.count(
       crossAxisCount: 2,
+      mainAxisSpacing: 16.0,
+      crossAxisSpacing: 16.0,
       itemCount: data.length,
+      shrinkWrap: true,
       itemBuilder: (context, index) {
         return Container(
           padding: EdgeInsets.all(16),
@@ -53,22 +56,22 @@ class MLSpecialistVListComponentState extends State<MLSpecialistVListComponent> 
               Container(
                 padding: EdgeInsets.all(16.0),
                 decoration: boxDecorationWithRoundedCorners(
-                  backgroundColor: appStore.isDarkModeOn ? cardDarkColor : mlColorGreyShade,
+                  backgroundColor:
+                      appStore.isDarkModeOn ? cardDarkColor : mlColorGreyShade,
                   borderRadius: radius(12.0),
                 ),
-                child: Image.asset(data[index].image.validate(), fit: BoxFit.fill, width: 48, height: 48),
+                child: Image.asset(data[index].image.validate(),
+                    fit: BoxFit.fill, width: 48, height: 48),
               ),
               8.height,
               Text(data[index].title.validate(), style: boldTextStyle()),
               4.height,
-              Text(data[index].subtitle.validate(), style: secondaryTextStyle(size: 16)),
+              Text(data[index].subtitle.validate(),
+                  style: secondaryTextStyle(size: 16)),
             ],
           ),
         );
       },
-      staggeredTileBuilder: (index) => StaggeredTile.fit(1),
-      mainAxisSpacing: 16.0,
-      crossAxisSpacing: 16.0,
     );
   }
 }

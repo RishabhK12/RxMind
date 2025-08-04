@@ -18,7 +18,7 @@ class MedicationsScreen extends StatefulWidget {
 class _MedicationsScreenState extends State<MedicationsScreen>
     with TickerProviderStateMixin {
   bool _showConfetti = false;
-  late Stream<ConnectivityResult> _connectivityStream;
+  late Stream<List<ConnectivityResult>> _connectivityStream;
   bool _isOffline = false;
   late AnimationController _listController;
   late AnimationController _fabController;
@@ -46,7 +46,9 @@ class _MedicationsScreenState extends State<MedicationsScreen>
     _fabController.repeat(reverse: true, period: const Duration(seconds: 2));
 
     _connectivityStream = Connectivity().onConnectivityChanged;
-    _connectivityStream.listen((result) {
+    _connectivityStream.listen((results) {
+      final result =
+          results.isNotEmpty ? results.first : ConnectivityResult.none;
       final offline = result == ConnectivityResult.none;
       if (offline != _isOffline && mounted) {
         setState(() => _isOffline = offline);

@@ -10,13 +10,29 @@ class MLProfileBottomComponent extends StatefulWidget {
   static String tag = '/MLProfileBottomComponent';
 
   @override
-  MLProfileBottomComponentState createState() => MLProfileBottomComponentState();
+  MLProfileBottomComponentState createState() =>
+      MLProfileBottomComponentState();
 }
 
 class MLProfileBottomComponentState extends State<MLProfileBottomComponent> {
-  List<String> data = <String>['Membership card', 'Dependents', 'Health care', 'Refer friends and family'];
-  List<String> categoriesData = <String>['Prescription', 'Medical Record', 'Medical Test', 'Health Tracking'];
-  List<Color> customColor = <Color>[Colors.blueAccent, Colors.orangeAccent, Colors.pinkAccent, Colors.cyan];
+  List<String> data = <String>[
+    'Membership card',
+    'Dependents',
+    'Health care',
+    'Refer friends and family'
+  ];
+  List<String> categoriesData = <String>[
+    'Prescription',
+    'Medical Record',
+    'Medical Test',
+    'Health Tracking'
+  ];
+  List<Color> customColor = <Color>[
+    Colors.blueAccent,
+    Colors.orangeAccent,
+    Colors.pinkAccent,
+    Colors.cyan
+  ];
   List<MLProfileCardData> mlProfileData = mlProfileDataList();
 
   @override
@@ -52,11 +68,13 @@ class MLProfileBottomComponentState extends State<MLProfileBottomComponent> {
             ],
           ),
           16.height,
-          StaggeredGridView.countBuilder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
+          MasonryGridView.count(
             crossAxisCount: 2,
+            mainAxisSpacing: 16.0,
+            crossAxisSpacing: 16.0,
             itemCount: mlProfileData.length,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return Container(
                 padding: EdgeInsets.all(16),
@@ -91,21 +109,21 @@ class MLProfileBottomComponentState extends State<MLProfileBottomComponent> {
                 },
               );
             },
-            staggeredTileBuilder: (index) => StaggeredTile.fit(1),
-            mainAxisSpacing: 16.0,
-            crossAxisSpacing: 16.0,
           ),
           16.height,
           Container(
             // margin: EdgeInsets.only(bottom: 16.0),
             padding: EdgeInsets.all(8.0),
-            decoration: boxDecorationRoundedWithShadow(8, backgroundColor: context.cardColor),
+            decoration: boxDecorationRoundedWithShadow(8,
+                backgroundColor: context.cardColor),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Image.asset('images/ic_theme.png', height: 24, width: 24, color: Colors.blue).paddingOnly(left: 4),
+                    Image.asset('images/ic_theme.png',
+                            height: 24, width: 24, color: Colors.blue)
+                        .paddingOnly(left: 4),
                     8.width,
                     Text('DarkMode', style: primaryTextStyle()),
                   ],
@@ -131,13 +149,15 @@ class MLProfileBottomComponentState extends State<MLProfileBottomComponent> {
                 return Container(
                   margin: EdgeInsets.only(bottom: 16.0),
                   padding: EdgeInsets.all(12.0),
-                  decoration: boxDecorationRoundedWithShadow(8, backgroundColor: context.cardColor),
+                  decoration: boxDecorationRoundedWithShadow(8,
+                      backgroundColor: context.cardColor),
                   child: Row(
                     children: [
                       Icon(Icons.tab, size: 24, color: Colors.blue),
                       8.width,
                       Text(e.validate(), style: primaryTextStyle()).expand(),
-                      Icon(Icons.arrow_forward_ios, color: Colors.grey[300], size: 16),
+                      Icon(Icons.arrow_forward_ios,
+                          color: Colors.grey[300], size: 16),
                     ],
                   ),
                 ).onTap(

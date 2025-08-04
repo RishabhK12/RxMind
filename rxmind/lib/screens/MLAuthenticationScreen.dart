@@ -7,7 +7,6 @@ import 'package:medilab_prokit/utils/MLCommon.dart';
 import 'package:medilab_prokit/utils/MLString.dart';
 import 'package:medilab_prokit/main.dart';
 import 'package:otp_text_field/otp_text_field.dart';
-import 'package:otp_text_field/otp_field_style.dart';
 
 import 'MLLoginScreen.dart';
 

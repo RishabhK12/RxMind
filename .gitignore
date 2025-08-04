@@ -2,6 +2,8 @@ __pycache__/
 node_modules/
 instructions.txt
 problems.txt
+filter_analysis.py
+analysis.txt
 # Flutter/Dart
 .dart_tool/
 .packages

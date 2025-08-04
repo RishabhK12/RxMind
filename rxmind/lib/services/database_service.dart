@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 class DatabaseService {
   /// Clears all app data from all tables.
@@ -58,8 +59,48 @@ class DatabaseService {
 
   Database? _db;
 
+  Future<void> init() async {
+    if (_db != null) return;
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'rxmind.db');
+    _db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute('''CREATE TABLE IF NOT EXISTS medications (
+          id TEXT PRIMARY KEY,
+          name TEXT,
+          dosage TEXT,
+          created_at TEXT
+        )''');
+        await db.execute('''CREATE TABLE IF NOT EXISTS tasks (
+          id TEXT PRIMARY KEY,
+          title TEXT,
+          description TEXT,
+          created_at TEXT
+        )''');
+        await db.execute('''CREATE TABLE IF NOT EXISTS compliance (
+          id TEXT PRIMARY KEY,
+          status TEXT,
+          created_at TEXT
+        )''');
+        await db.execute('''CREATE TABLE IF NOT EXISTS upload_queue (
+          id TEXT PRIMARY KEY,
+          data TEXT,
+          status TEXT,
+          created_at TEXT
+        )''');
+        await db.execute('''CREATE TABLE IF NOT EXISTS settings (
+          key TEXT PRIMARY KEY,
+          value TEXT
+        )''');
+      },
+    );
+  }
+
   Future<Database> get database async {
     if (_db != null) return _db!;
+    await init();
     if (_db != null) return _db!;
     throw Exception('Database initialization failed');
   }

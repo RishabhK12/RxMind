@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../constants/animations.dart';
 import '../../components/parallax_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,8 +71,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       const SizedBox(height: 24),
                       Text(
                         'Your health, organized simply.',
-                        style: theme.textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w600),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -104,7 +109,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   onPressed: () async {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.setBool('onboarding_complete', false);
-                    Navigator.of(context).pushReplacementNamed('/info');
+                    context.go('/info');
                   },
                   child: const Text(
                     'Get Started',

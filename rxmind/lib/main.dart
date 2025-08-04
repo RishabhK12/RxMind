@@ -5,11 +5,13 @@ import 'utils/app_theme.dart';
 import 'routes.dart';
 import 'services/upload_queue_processor.dart';
 import 'services/notification_service.dart';
+import 'services/database_service.dart';
 
 final AppStore appStore = AppStore();
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseService().init();
   NotificationService().init().then((_) {
     NotificationService().rescheduleAllNotifications();
   });

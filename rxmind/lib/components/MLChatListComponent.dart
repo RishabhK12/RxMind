@@ -4,9 +4,9 @@ import 'package:medilab_prokit/utils/MLColors.dart';
 import 'package:medilab_prokit/utils/MLImage.dart';
 
 class MLChatListComponent extends StatefulWidget {
-  List<String> data;
-  Color color;
-  Widget screen;
+  final List<String> data;
+  final Color color;
+  final Widget screen;
 
   MLChatListComponent(this.data, this.color, this.screen);
 
@@ -83,8 +83,11 @@ class MLChatListComponentState extends State<MLChatListComponent> {
                           overflow: TextOverflow.ellipsis,
                           text: TextSpan(
                             children: <TextSpan>[
-                              TextSpan(text: e.validate(), style: boldTextStyle()),
-                              TextSpan(text: '(Clinic Visit)', style: secondaryTextStyle(size: 16)),
+                              TextSpan(
+                                  text: e.validate(), style: boldTextStyle()),
+                              TextSpan(
+                                  text: '(Clinic Visit)',
+                                  style: secondaryTextStyle(size: 16)),
                             ],
                           ),
                         ),
@@ -94,7 +97,8 @@ class MLChatListComponentState extends State<MLChatListComponent> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("What are you doing?", style: secondaryTextStyle()),
+                        Text("What are you doing?",
+                            style: secondaryTextStyle()),
                         Container(
                           padding: EdgeInsets.all(6),
                           alignment: Alignment.center,
@@ -102,7 +106,8 @@ class MLChatListComponentState extends State<MLChatListComponent> {
                             backgroundColor: mlColorBlue,
                             boxShape: BoxShape.circle,
                           ),
-                          child: Text(notificationCounter.toString(), style: secondaryTextStyle(color: whiteColor)),
+                          child: Text(notificationCounter.toString(),
+                              style: secondaryTextStyle(color: whiteColor)),
                         ),
                       ],
                     )

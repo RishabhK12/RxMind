@@ -11,10 +11,12 @@ class MLCommonDiseaseListComponent extends StatefulWidget {
   static String tag = '/MLCommonDiseaseListComponent';
 
   @override
-  MLCommonDiseaseListComponentState createState() => MLCommonDiseaseListComponentState();
+  MLCommonDiseaseListComponentState createState() =>
+      MLCommonDiseaseListComponentState();
 }
 
-class MLCommonDiseaseListComponentState extends State<MLCommonDiseaseListComponent> {
+class MLCommonDiseaseListComponentState
+    extends State<MLCommonDiseaseListComponent> {
   List<MLDiseaseData> data = mlDiseaseDataList();
 
   @override
@@ -34,11 +36,10 @@ class MLCommonDiseaseListComponentState extends State<MLCommonDiseaseListCompone
 
   @override
   Widget build(BuildContext context) {
-    return StaggeredGridView.countBuilder(
-      scrollDirection: Axis.vertical,
-      physics: ScrollPhysics(),
-      shrinkWrap: true,
+    return MasonryGridView.count(
       crossAxisCount: 2,
+      mainAxisSpacing: 16.0,
+      crossAxisSpacing: 16.0,
       itemCount: data.length,
       itemBuilder: (context, index) {
         return Container(
@@ -52,11 +53,14 @@ class MLCommonDiseaseListComponentState extends State<MLCommonDiseaseListCompone
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              commonCachedNetworkImage(data[index].image.validate(), fit: BoxFit.cover, height: 100).cornerRadiusWithClipRRect(12.0),
+              commonCachedNetworkImage(data[index].image.validate(),
+                      fit: BoxFit.cover, height: 100)
+                  .cornerRadiusWithClipRRect(12.0),
               8.height,
               Text(data[index].title.validate(), style: boldTextStyle()),
               4.height,
-              Text(data[index].subtitle.validate(), style: secondaryTextStyle(size: 16)),
+              Text(data[index].subtitle.validate(),
+                  style: secondaryTextStyle(size: 16)),
             ],
           ),
         ).onTap(
@@ -65,9 +69,6 @@ class MLCommonDiseaseListComponentState extends State<MLCommonDiseaseListCompone
           },
         );
       },
-      staggeredTileBuilder: (index) => StaggeredTile.fit(1),
-      mainAxisSpacing: 16.0,
-      crossAxisSpacing: 16.0,
     );
   }
 }

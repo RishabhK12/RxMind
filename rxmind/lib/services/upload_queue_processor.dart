@@ -35,13 +35,17 @@ class UploadQueueProcessor {
     }
   }
 
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<dynamic>? _connectivitySubscription;
   bool _isProcessing = false;
 
   void start() {
     // Listen for connectivity changes
     _connectivitySubscription ??=
-        Connectivity().onConnectivityChanged.listen((result) {
+        Connectivity().onConnectivityChanged.listen((event) {
+      ConnectivityResult result = ConnectivityResult.none;
+      if (event.isNotEmpty) {
+        result = event[0];
+      }
       if (result != ConnectivityResult.none) {
         processQueue();
       }

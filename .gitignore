@@ -4,6 +4,7 @@ instructions.txt
 problems.txt
 filter_analysis.py
 analysis.txt
+rxmind/
 # Flutter/Dart
 .dart_tool/
 .packages

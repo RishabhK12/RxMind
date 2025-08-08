@@ -1,0 +1,47 @@
+name: rxmind_app
+description: RxMind - Your On-Device Guide to Safe Hospital Discharge
+publish_to: "none"
+version: 1.0.0+1
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_svg:
+  smooth_page_indicator:
+  provider:
+  font_awesome_flutter:
+  flutter_secure_storage:
+  sqflite:
+  archive:
+  file_picker:
+  google_ml_kit:
+  google_mlkit_smart_reply:
+  syncfusion_flutter_charts:
+  flutter_local_notifications:
+  flutter_slidable:
+  tesseract_ocr:
+  google_gemini:
+  # Add other dependencies as needed
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints:
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/illus/logo.svg
+    - assets/illus/onboard1.svg
+    - assets/illus/onboard2.svg
+    - assets/illus/onboard3.svg
+    # Add other assets as needed
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf

@@ -19,37 +19,5 @@ final GoRouter appRouter = GoRouter(
       path: '/main',
       builder: (context, state) => const MainNav(),
     ),
-    GoRoute(
-      path: '/measurement/weight',
-      builder: (context, state) => const WeightScreen(),
-    ),
-    GoRoute(
-      path: '/measurement/height',
-      builder: (context, state) => const HeightScreen(),
-    ),
-    GoRoute(
-      path: '/measurement/blood_pressure',
-      builder: (context, state) => const BloodPressureScreen(),
-    ),
-    GoRoute(
-      path: '/measurement/heart_rate',
-      builder: (context, state) => const HeartRateScreen(),
-    ),
-    GoRoute(
-      path: '/measurement/temperature',
-      builder: (context, state) => const TemperatureScreen(),
-    ),
-    GoRoute(
-      path: '/measurement/spo2',
-      builder: (context, state) => const SpO2Screen(),
-    ),
-    GoRoute(
-      path: '/measurement/glucose',
-      builder: (context, state) => const GlucoseScreen(),
-    ),
-    GoRoute(
-      path: '/measurement/optional',
-      builder: (context, state) => const OptionalScreen(),
-    ),
   ],
 );

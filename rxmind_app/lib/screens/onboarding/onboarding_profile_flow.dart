@@ -1,16 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:rxmind_app/theme/app_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingProfileFlow extends StatefulWidget {
   final VoidCallback onComplete;
-  const OnboardingProfileFlow({Key? key, required this.onComplete})
-      : super(key: key);
+  const OnboardingProfileFlow({super.key, required this.onComplete});
 
   @override
   State<OnboardingProfileFlow> createState() => _OnboardingProfileFlowState();
 }
 
 class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
+  bool _loading = true;
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboardingStatus();
+  }
+
+  Future<void> _checkOnboardingStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final complete = prefs.getBool('onboardingComplete') ?? false;
+    if (complete && mounted) {
+      // If onboarding is already complete, skip this screen
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/mainNav');
+      });
+    } else {
+      setState(() => _loading = false);
+    }
+  }
+
   // Profile data
   int? heightCm;
   int? weightKg;
@@ -50,10 +70,12 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
     }
   }
 
-  void next() {
+  Future<void> next() async {
     if (currentStep < totalSteps - 1) {
       setState(() => currentStep++);
     } else {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboardingComplete', true);
       widget.onComplete();
     }
   }
@@ -76,7 +98,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
           child: LinearProgressIndicator(
             value: (currentStep + 1) / totalSteps,
             minHeight: 8,
-            backgroundColor: theme.colorScheme.surfaceVariant,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             valueColor:
                 AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
           ),
@@ -288,6 +310,11 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFB),
       resizeToAvoidBottomInset: true,
@@ -323,7 +350,8 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 24),
                         child: Row(
                           children: [
                             if (currentStep > 0)
@@ -349,7 +377,9 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                                 elevation: 0,
                               ),
                               child: Semantics(
-                                label: canContinue ? 'Continue' : 'Continue (disabled)',
+                                label: canContinue
+                                    ? 'Continue'
+                                    : 'Continue (disabled)',
                                 button: true,
                                 enabled: canContinue,
                                 child: const Text('Continue'),

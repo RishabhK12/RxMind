@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
-  const ProfileSetupScreen({Key? key}) : super(key: key);
+  const ProfileSetupScreen({super.key});
 
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -41,7 +41,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
         elevation: 1,
@@ -101,8 +101,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     style: theme.textTheme.bodyLarge,
                     validator: (v) {
                       final age = int.tryParse(v ?? '');
-                      if (age == null || age < 0 || age > 120)
+                      if (age == null || age < 0 || age > 120) {
                         return 'Enter valid age';
+                      }
                       return null;
                     },
                   ),

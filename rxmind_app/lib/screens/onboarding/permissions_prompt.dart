@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PermissionsPromptScreen extends StatefulWidget {
-  const PermissionsPromptScreen({Key? key}) : super(key: key);
+  const PermissionsPromptScreen({super.key});
 
   @override
   State<PermissionsPromptScreen> createState() =>
@@ -51,7 +51,7 @@ class _PermissionsPromptScreenState extends State<PermissionsPromptScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: Center(
         child: Stack(
           children: [

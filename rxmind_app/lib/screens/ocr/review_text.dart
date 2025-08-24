@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ReviewTextScreen extends StatefulWidget {
-  const ReviewTextScreen({Key? key}) : super(key: key);
+  const ReviewTextScreen({super.key});
 
   @override
   State<ReviewTextScreen> createState() => _ReviewTextScreenState();
@@ -37,7 +37,7 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
         elevation: 1,

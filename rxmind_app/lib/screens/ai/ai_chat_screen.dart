@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'gemini_api_service.dart';
+import '../../gemini_api_key.dart';
 
 class AiChatScreen extends StatefulWidget {
-  const AiChatScreen({Key? key}) : super(key: key);
+  const AiChatScreen({super.key});
 
   @override
   State<AiChatScreen> createState() => _AiChatScreenState();
 }
 
 class _AiChatScreenState extends State<AiChatScreen> {
-  // TODO: Replace with secure storage or env config in production
-  static const String _apiKey = 'YOUR_GEMINI_API_KEY_HERE';
-  late final GeminiApiService _geminiApi = GeminiApiService(apiKey: _apiKey);
+  // Use a single source of truth for the Gemini API key
+  late final GeminiApiService _geminiApi =
+      GeminiApiService(apiKey: geminiApiKey);
   final List<_ChatMessage> _messages = [
     _ChatMessage(
         isUser: false,
@@ -20,7 +21,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   ];
   final TextEditingController _controller = TextEditingController();
   bool _isTyping = false;
-  bool _contextLoaded = true;
+  final bool _contextLoaded = true;
 
   void _sendMessage() async {
     final text = _controller.text.trim();
@@ -65,7 +66,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
         elevation: 1,
@@ -111,7 +112,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       decoration: BoxDecoration(
                         color: msg.isUser
                             ? theme.colorScheme.primary.withOpacity(0.15)
-                            : theme.colorScheme.surfaceVariant,
+                            : theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(msg.text),

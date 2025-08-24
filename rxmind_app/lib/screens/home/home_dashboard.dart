@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:archive/archive_io.dart';
+
+typedef DashboardTabCallback = void Function(int tabIndex);
 
 class HomeDashboardScreen extends StatefulWidget {
-  const HomeDashboardScreen({Key? key}) : super(key: key);
+  final DashboardTabCallback? onNavigateToTab;
+  const HomeDashboardScreen({super.key, this.onNavigateToTab});
 
   @override
   State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
@@ -21,7 +33,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
         elevation: 1,
@@ -29,15 +41,20 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           children: [
             Semantics(
               label: 'User profile avatar',
-              child: CircleAvatar(
-                radius: 22,
-                backgroundColor: theme.colorScheme.secondary,
-                child: Text(
-                  userName[0],
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.onSecondary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
+              button: true,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(22),
+                onTap: () => Navigator.pushNamed(context, '/settings'),
+                child: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: theme.colorScheme.secondary,
+                  child: Text(
+                    userName[0],
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: theme.colorScheme.onSecondary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
                   ),
                 ),
               ),
@@ -83,9 +100,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     return Semantics(
                       label:
                           'Task: ${task['title']}, progress ${(task['progress'] * 100).round()} percent',
-                      child: _TaskCard(
-                        title: task['title'],
-                        progress: task['progress'],
+                      child: GestureDetector(
+                        onTap: () =>
+                            widget.onNavigateToTab?.call(2), // 2 = Tasks tab
+                        child: _TaskCard(
+                          title: task['title'],
+                          progress: task['progress'],
+                        ),
                       ),
                     );
                   },
@@ -114,7 +135,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       icon: FontAwesomeIcons.pills,
                       label: 'Medications',
                       color: theme.colorScheme.secondary,
-                      onTap: () => Navigator.pushNamed(context, '/medications'),
+                      onTap: () => widget.onNavigateToTab
+                          ?.call(3), // 3 = Medications tab
                     ),
                   ),
                   Semantics(
@@ -124,7 +146,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       icon: Icons.checklist_rtl,
                       label: 'Tasks & Reminders',
                       color: theme.colorScheme.primary,
-                      onTap: () => Navigator.pushNamed(context, '/tasks'),
+                      onTap: () =>
+                          widget.onNavigateToTab?.call(2), // 2 = Tasks tab
                     ),
                   ),
                   Semantics(
@@ -134,7 +157,54 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       icon: Icons.bar_chart,
                       label: 'Stats',
                       color: theme.colorScheme.secondary,
-                      onTap: () => Navigator.pushNamed(context, '/stats'),
+                      onTap: () =>
+                          widget.onNavigateToTab?.call(1), // 1 = Charts tab
+                    ),
+                  ),
+                  Semantics(
+                    label: 'Export Data',
+                    button: true,
+                    child: _ActionTile(
+                      icon: Icons.download,
+                      label: 'Export Data',
+                      color: theme.colorScheme.primary,
+                      onTap: () async {
+                        final storage = FlutterSecureStorage();
+                        final allData = await storage.readAll();
+                        final pdf = pw.Document();
+                        pdf.addPage(
+                          pw.Page(
+                            build: (pw.Context context) => pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text('RxMind Export',
+                                    style: pw.TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: pw.FontWeight.bold)),
+                                pw.SizedBox(height: 16),
+                                pw.Text('Profile & App Data:',
+                                    style: pw.TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: pw.FontWeight.bold)),
+                                pw.SizedBox(height: 8),
+                                ...allData.entries.map((e) => pw.Text(
+                                    '${e.key}: ${e.value}',
+                                    style: pw.TextStyle(fontSize: 12))),
+                              ],
+                            ),
+                          ),
+                        );
+                        final outputDir =
+                            await getApplicationDocumentsDirectory();
+                        final filePath = '${outputDir.path}/rxmind_export.pdf';
+                        final file = File(filePath);
+                        await file.writeAsBytes(await pdf.save());
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text('File downloaded: rxmind_export.pdf')),
+                        );
+                      },
                     ),
                   ),
                 ]),
@@ -155,7 +225,146 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         child: FloatingActionButton(
           backgroundColor: theme.colorScheme.secondary,
           child: const Icon(Icons.add, size: 28, color: Colors.white),
-          onPressed: () => Navigator.pushNamed(context, '/newTask'),
+          onPressed: () async {
+            final result = await showDialog<Map<String, dynamic>>(
+              context: context,
+              builder: (context) {
+                final _titleController = TextEditingController();
+                DateTime? _selectedDate;
+                TimeOfDay? _selectedTime;
+                bool _repeat = false;
+                int _repeatEvery = 1;
+                String _repeatPeriod = 'day';
+                return StatefulBuilder(
+                  builder: (context, setState) => AlertDialog(
+                    title: const Text('Create New Task'),
+                    content: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: _titleController,
+                            decoration: const InputDecoration(
+                              labelText: 'Task Title',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () async {
+                                    final picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2020),
+                                      lastDate: DateTime(2100),
+                                    );
+                                    if (picked != null) {
+                                      setState(() => _selectedDate = picked);
+                                    }
+                                  },
+                                  child: Text(_selectedDate == null
+                                      ? 'Pick Date'
+                                      : '${_selectedDate!.month}/${_selectedDate!.day}/${_selectedDate!.year}'),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () async {
+                                    final picked = await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.now(),
+                                    );
+                                    if (picked != null) {
+                                      setState(() => _selectedTime = picked);
+                                    }
+                                  },
+                                  child: Text(_selectedTime == null
+                                      ? 'Pick Time'
+                                      : _selectedTime!.format(context)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _repeat,
+                                onChanged: (v) =>
+                                    setState(() => _repeat = v ?? false),
+                              ),
+                              const Text('Repeat'),
+                              if (_repeat) ...[
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 48,
+                                  child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      hintText: '1',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    onChanged: (v) => setState(() =>
+                                        _repeatEvery = int.tryParse(v) ?? 1),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                DropdownButton<String>(
+                                  value: _repeatPeriod,
+                                  items: const [
+                                    DropdownMenuItem(
+                                        value: 'day', child: Text('day')),
+                                    DropdownMenuItem(
+                                        value: 'week', child: Text('week')),
+                                    DropdownMenuItem(
+                                        value: 'month', child: Text('month')),
+                                  ],
+                                  onChanged: (v) => setState(
+                                      () => _repeatPeriod = v ?? 'day'),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_titleController.text.trim().isEmpty ||
+                              _selectedDate == null ||
+                              _selectedTime == null) return;
+                          Navigator.pop(context, {
+                            'title': _titleController.text.trim(),
+                            'date': _selectedDate,
+                            'time': _selectedTime,
+                            'repeat': _repeat,
+                            'repeatEvery': _repeatEvery,
+                            'repeatPeriod': _repeatPeriod,
+                          });
+                        },
+                        child: const Text('Create'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+            if (result != null) {
+              // TODO: Save the new task to persistent storage or state
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Task "${result['title']}" created!')),
+              );
+            }
+          },
         ),
       ),
     );
@@ -197,7 +406,7 @@ class _TaskCard extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: progress,
                   strokeWidth: 5,
-                  backgroundColor: theme.colorScheme.surfaceVariant,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   valueColor:
                       AlwaysStoppedAnimation(theme.colorScheme.secondary),
                 ),

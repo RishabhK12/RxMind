@@ -7,10 +7,11 @@ class GeminiApiService {
 
   Future<String> sendMessage(String message) async {
     final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey');
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey');
     final body = jsonEncode({
       "contents": [
         {
+          "role": "user",
           "parts": [
             {"text": message}
           ]
@@ -26,7 +27,14 @@ class GeminiApiService {
       final data = jsonDecode(response.body);
       return data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '';
     } else {
-      throw Exception('Gemini API error: ${response.statusCode}');
+      String errorMsg = 'Gemini API error: ${response.statusCode}';
+      try {
+        final err = jsonDecode(response.body);
+        if (err['error'] != null && err['error']['message'] != null) {
+          errorMsg += '\n${err['error']['message']}';
+        }
+      } catch (_) {}
+      throw Exception(errorMsg);
     }
   }
 }

@@ -59,8 +59,8 @@ class _RxMindAppState extends State<RxMindApp> {
           themeMode: _themeMode,
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaleFactor: _textScale,
               disableAnimations: _reducedMotion,
+              textScaler: TextScaler.linear(_textScale),
             ),
             child: child!,
           ),
@@ -82,7 +82,7 @@ class _RxMindAppState extends State<RxMindApp> {
             '/parsedSummary': (context) => const ParsedSummaryScreen(),
             '/tasks': (context) => const TasksScreen(),
             '/medications': (context) => const MedicationsScreen(),
-            '/stats': (context) => const ComplianceStatsScreen(),
+            '/stats': (context) => ComplianceStatsScreen(),
             '/settings': (context) => const SettingsScreen(),
           },
         ),
@@ -102,6 +102,7 @@ class RxMindSettings extends InheritedWidget {
   final void Function(bool) updateReducedMotion;
 
   const RxMindSettings({
+    super.key,
     required this.themeMode,
     required this.highContrast,
     required this.textScale,
@@ -110,8 +111,8 @@ class RxMindSettings extends InheritedWidget {
     required this.updateHighContrast,
     required this.updateTextScale,
     required this.updateReducedMotion,
-    required Widget child,
-  }) : super(child: child);
+    required super.child,
+  });
 
   static RxMindSettings of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<RxMindSettings>()!;

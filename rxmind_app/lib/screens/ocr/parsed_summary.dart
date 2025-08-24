@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ParsedSummaryScreen extends StatefulWidget {
   final Map<String, dynamic>? parsedJson;
-  const ParsedSummaryScreen({Key? key, this.parsedJson}) : super(key: key);
+  const ParsedSummaryScreen({super.key, this.parsedJson});
 
   @override
   State<ParsedSummaryScreen> createState() => _ParsedSummaryScreenState();
@@ -31,7 +31,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
         elevation: 1,
@@ -97,7 +97,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
                 context,
                 item,
                 subtitle: item['name'].toString().length > 40
-                    ? item['name'].toString().substring(0, 40) + '...'
+                    ? '${item['name'].toString().substring(0, 40)}...'
                     : item['name'],
               ),
             ),

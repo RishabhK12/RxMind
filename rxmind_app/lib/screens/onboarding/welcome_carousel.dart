@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class WelcomeCarousel extends StatefulWidget {
-  const WelcomeCarousel({Key? key}) : super(key: key);
+  const WelcomeCarousel({super.key});
 
   @override
   State<WelcomeCarousel> createState() => _WelcomeCarouselState();
@@ -53,7 +53,7 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -70,10 +70,7 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                       double value = 1.0;
                       if (_pageController.position.haveDimensions) {
                         final pageValue = _pageController.page;
-                        value = ((pageValue != null
-                                    ? pageValue
-                                    : _pageIndex.toDouble()) -
-                                i)
+                        value = ((pageValue ?? _pageIndex.toDouble()) - i)
                             .toDouble();
                         value = (1 - (value.abs() * 0.2)).clamp(0.8, 1.0);
                       }
@@ -119,15 +116,29 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
-              child: SmoothPageIndicator(
-                controller: _pageController,
-                count: _pages.length,
-                effect: WormEffect(
-                  dotHeight: 10,
-                  dotWidth: 10,
-                  spacing: 8,
-                  dotColor: Theme.of(context).colorScheme.surfaceVariant,
-                  activeDotColor: Theme.of(context).colorScheme.secondary,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                    width: 1.5,
+                  ),
+                ),
+                child: SmoothPageIndicator(
+                  controller: _pageController,
+                  count: _pages.length,
+                  effect: WormEffect(
+                    dotHeight: 10,
+                    dotWidth: 10,
+                    spacing: 8,
+                    dotColor:
+                        Theme.of(context).colorScheme.outline.withOpacity(0.4),
+                    activeDotColor: Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
               ),
             ),

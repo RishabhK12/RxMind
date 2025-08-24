@@ -8,6 +8,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  pdf: ^3.10.7
+  path_provider: ^2.1.2
+  shared_preferences: ^2.2.2
   flutter_svg:
   smooth_page_indicator:
   provider:
@@ -23,6 +26,7 @@ dependencies:
   flutter_slidable:
   tesseract_ocr:
   google_gemini:
+  image_picker: ^1.2.0
   # Add other dependencies as needed
 
 dev_dependencies:

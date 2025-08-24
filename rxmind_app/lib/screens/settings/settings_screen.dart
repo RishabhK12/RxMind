@@ -8,7 +8,7 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -29,7 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final settings = RxMindSettings.of(context);
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
         elevation: 1,
@@ -151,7 +151,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const SizedBox.shrink(),
             ),
           ),
-          Divider(height: 32, color: theme.colorScheme.surfaceVariant),
+          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Text('Data',
@@ -294,7 +294,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Icon(Icons.motion_photos_off),
             ),
           ),
-          Divider(height: 32, color: theme.colorScheme.surfaceVariant),
+          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Text('About',

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ParsingProgressScreen extends StatefulWidget {
-  const ParsingProgressScreen({Key? key}) : super(key: key);
+  const ParsingProgressScreen({super.key});
 
   @override
   State<ParsingProgressScreen> createState() => _ParsingProgressScreenState();

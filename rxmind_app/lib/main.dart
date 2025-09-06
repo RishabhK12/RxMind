@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'screens/onboarding/welcome_carousel.dart';
@@ -16,8 +18,14 @@ import 'screens/tracker/medications_screen.dart';
 import 'screens/stats/compliance_stats.dart';
 import 'screens/settings/settings_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   runApp(const RxMindApp());
+  // Initialize DB after first frame
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await LocalStorage.initDb();
+  });
 }
 
 class RxMindApp extends StatefulWidget {

@@ -27,6 +27,7 @@ dependencies:
   tesseract_ocr:
   google_gemini:
   image_picker: ^1.2.0
+  flutter_dotenv: ^5.0.2
   # Add other dependencies as needed
 
 dev_dependencies:

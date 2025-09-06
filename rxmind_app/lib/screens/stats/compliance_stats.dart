@@ -41,60 +41,22 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
   List<PieData> pieData = [];
   double piePercent = 0;
 
-  late AnimationController _chartController;
-  late Animation<double> _chartAnimation;
+  // Animation removed
 
   @override
   void initState() {
     super.initState();
-    _chartController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 650),
-    );
-    _chartAnimation =
-        CurvedAnimation(parent: _chartController, curve: Curves.easeOutCubic);
-    _resetAndAnimateCharts();
-  }
-
-  @override
-  void dispose() {
-    _chartController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Do not call _resetAndAnimateCharts here to avoid using _chartController before initState
-  }
-
-  void _resetAndAnimateCharts() {
-    weekData = _targetWeekData.map((d) => DayCount(d.day, 0)).toList();
-    pieData = [
-      PieData('On-Time', 0, Colors.teal),
-      PieData('Missed', 0, Colors.red)
-    ];
-    piePercent = 0;
-    _chartController.reset();
-    _chartController.forward();
-    _chartController.addListener(_updateChartAnimation);
-  }
-
-  void _updateChartAnimation() {
-    final t = _chartAnimation.value;
-    setState(() {
-      weekData = List.generate(_targetWeekData.length, (i) {
-        final target = _targetWeekData[i].count;
-        return DayCount(_targetWeekData[i].day, (target * t).round());
-      });
-      pieData = [
-        PieData('On-Time', (_targetPieData[0].value * t).round(), Colors.teal),
-        PieData('Missed', (_targetPieData[1].value * t).round(), Colors.red),
-      ];
-      piePercent = t;
+    weekData = List.generate(_targetWeekData.length, (i) {
+      final target = _targetWeekData[i].count;
+      return DayCount(_targetWeekData[i].day, target);
     });
-    if (t >= 1.0) {
-      // Ensure final state is fully populated and charts are rebuilt
+    pieData = [
+      PieData('On-Time', _targetPieData[0].value, Colors.teal),
+      PieData('Missed', _targetPieData[1].value, Colors.red)
+    ];
+    piePercent = 1.0;
+    // Instantly reset chart data
+    void resetCharts() {
       setState(() {
         weekData = List.generate(_targetWeekData.length, (i) {
           final target = _targetWeekData[i].count;
@@ -102,13 +64,28 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
         });
         pieData = [
           PieData('On-Time', _targetPieData[0].value, Colors.teal),
-          PieData('Missed', _targetPieData[1].value, Colors.red),
+          PieData('Missed', _targetPieData[1].value, Colors.red)
         ];
         piePercent = 1.0;
       });
-      _chartController.removeListener(_updateChartAnimation);
     }
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  void _resetAndAnimateCharts() {
+    // Method no longer used; animation removed
+  }
+
+  // Animation logic removed
 
   final List<String> glossaryTerms = [
     'Hypertension',

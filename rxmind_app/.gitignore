@@ -15,6 +15,9 @@ lib/gemini_api_key.dart
 .svn/
 .swiftpm/
 migrate_working_dir/
+instructions.txt
+problems.txt
+context.txt
 
 # IntelliJ related
 *.iml
@@ -47,3 +50,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment variables
+.env

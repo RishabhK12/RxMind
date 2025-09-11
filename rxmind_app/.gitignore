@@ -1,7 +1,6 @@
 # Gemini API key and environment
 .env
 .env.*
-lib/gemini_api_key.dart
 # Miscellaneous
 *.class
 *.log

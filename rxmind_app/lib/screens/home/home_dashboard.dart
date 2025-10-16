@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart';
+// ...existing code...
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:archive/archive_io.dart';
 
 typedef DashboardTabCallback = void Function(int tabIndex);
 

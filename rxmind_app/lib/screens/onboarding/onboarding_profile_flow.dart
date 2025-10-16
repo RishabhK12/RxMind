@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rxmind_app/theme/app_theme.dart';
+// ...existing code...
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingProfileFlow extends StatefulWidget {
@@ -87,6 +87,8 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   }
 
   Widget buildProgressBar() {
+    // ...existing code...
+    // ...existing code...
     final theme = Theme.of(context);
     return Semantics(
       label: 'Progress: Step ${currentStep + 1} of $totalSteps',

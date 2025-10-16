@@ -42,6 +42,7 @@ flutter:
     - assets/illus/onboard1.svg
     - assets/illus/onboard2.svg
     - assets/illus/onboard3.svg
+    - .env
     # Add other assets as needed
   fonts:
     - family: Poppins

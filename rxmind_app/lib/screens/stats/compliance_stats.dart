@@ -55,20 +55,7 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
       PieData('Missed', _targetPieData[1].value, Colors.red)
     ];
     piePercent = 1.0;
-    // Instantly reset chart data
-    void resetCharts() {
-      setState(() {
-        weekData = List.generate(_targetWeekData.length, (i) {
-          final target = _targetWeekData[i].count;
-          return DayCount(_targetWeekData[i].day, target);
-        });
-        pieData = [
-          PieData('On-Time', _targetPieData[0].value, Colors.teal),
-          PieData('Missed', _targetPieData[1].value, Colors.red)
-        ];
-        piePercent = 1.0;
-      });
-    }
+    // Removed unused resetCharts method
   }
 
   @override

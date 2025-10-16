@@ -1,6 +1,7 @@
 # Gemini API key and environment
 .env
 .env.*
+!sample.env
 # Miscellaneous
 *.class
 *.log
@@ -49,6 +50,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# Environment variables
-.env

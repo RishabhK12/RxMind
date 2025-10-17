@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -10,24 +8,24 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  final FlutterLocalNotificationsPlugin _notifications =
-      FlutterLocalNotificationsPlugin();
-  List<Map<String, dynamic>> tasksList = [
-    {
-      'id': UniqueKey().toString(),
-      'title': 'Take Morning Meds',
-      'isOverdue': false,
-      'snoozeCount': 0,
-      'dueTime': DateTime.now().add(const Duration(hours: 1)),
-    },
-    {
-      'id': UniqueKey().toString(),
-      'title': 'Check Vitals',
-      'isOverdue': true,
-      'snoozeCount': 2,
-      'dueTime': DateTime.now().add(const Duration(hours: 2)),
-    },
-  ];
+  List<Map<String, dynamic>> tasksList = [];
+  bool dischargeUploaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDischargeStatus();
+  }
+
+  Future<void> _loadDischargeStatus() async {
+    // TODO: Implement real discharge upload status and tasks list loading from persistent storage
+    // Example:
+    // final prefs = await SharedPreferences.getInstance();
+    // dischargeUploaded = prefs.getBool('dischargeUploaded') ?? false;
+    // tasksList = await loadTasksFromStorage();
+    // setState(() {});
+  }
+
   List<Map<String, dynamic>> completedTasks = [];
   bool showCompletedDropdown = false;
 
@@ -50,64 +48,12 @@ class _TasksScreenState extends State<TasksScreen> {
     return list;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _initNotifications();
-  }
-
-  Future<void> _initNotifications() async {
-    const AndroidInitializationSettings androidInit =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidInit);
-    await _notifications.initialize(initSettings);
-  }
-
-  Future<void> _showEscalationNotification(String title) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-      'escalation_channel',
-      'Escalation Notifications',
-      channelDescription: 'High-priority reminders for overdue tasks',
-      importance: Importance.max,
-      priority: Priority.high,
-      color: Color(0xFFD32F2F),
-    );
-    const NotificationDetails details =
-        NotificationDetails(android: androidDetails);
-    await _notifications.show(0, 'High-Priority Reminder', title, details);
-  }
-
-  void _reorderTasks(int oldIndex, int newIndex) {
-    setState(() {
-      if (newIndex > oldIndex) newIndex--;
-      final item = tasksList.removeAt(oldIndex);
-      tasksList.insert(newIndex, item);
-    });
-  }
-
-  void _snoozeTask(Map<String, dynamic> task) {
-    setState(() {
-      task['snoozeCount'] = (task['snoozeCount'] ?? 0) + 1;
-      // Here you would update the due time, e.g., by 1 hour
-      if (task['snoozeCount'] >= 3) {
-        _escalateReminder(task);
-      }
-    });
-  }
+  // Removed unused _snoozeTask function
 
   void _escalateReminder(Map<String, dynamic> task) {
-    _showEscalationNotification('High-priority reminder for ${task['title']}!');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('High-priority reminder for ${task['title']}!')),
     );
-  }
-
-  void _deleteTask(String id) {
-    setState(() {
-      tasksList.removeWhere((t) => t['id'] == id);
-    });
   }
 
   void _toggleCompleteTask(Map<String, dynamic> task) async {
@@ -175,123 +121,26 @@ class _TasksScreenState extends State<TasksScreen> {
           builder: (context, constraints) {
             return Column(
               children: [
-                // Main task list
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                     children: [
-                      ReorderableListView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        onReorder: _reorderTasks,
-                        children: [
-                          for (final task in _safeTasksList)
-                            Semantics(
-                              key: ValueKey(task['id']),
-                              label:
-                                  'Task: ${task['title']}${task['isOverdue'] ? ', overdue' : ''}',
-                              child: Slidable(
-                                key: ValueKey(task['id']),
-                                endActionPane: ActionPane(
-                                  motion: const DrawerMotion(),
-                                  children: [
-                                    Semantics(
-                                      label: 'Delete task',
-                                      button: true,
-                                      child: SlidableAction(
-                                        onPressed: (_) =>
-                                            _deleteTask(task['id']),
-                                        backgroundColor:
-                                            theme.colorScheme.error,
-                                        foregroundColor:
-                                            theme.colorScheme.onError,
-                                        icon: Icons.delete,
-                                        label: 'Delete',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                child: _buildTaskCard(context, task),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // Completed tasks dropdown, now just below the main list
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            GestureDetector(
-                              onTap: () => setState(() =>
-                                  showCompletedDropdown =
-                                      !showCompletedDropdown),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary
-                                      .withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 12),
-                                child: Row(
-                                  children: [
-                                    Text('Completed Tasks',
-                                        style: theme.textTheme.titleMedium),
-                                    const Spacer(),
-                                    AnimatedRotation(
-                                      turns: showCompletedDropdown ? 0.5 : 0.0,
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      child: const Icon(Icons.expand_more),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            AnimatedCrossFade(
-                              crossFadeState: showCompletedDropdown
-                                  ? CrossFadeState.showSecond
-                                  : CrossFadeState.showFirst,
-                              duration: const Duration(milliseconds: 200),
-                              firstChild: const SizedBox.shrink(),
-                              secondChild: completedTasks.isEmpty
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Text('No completed tasks yet.',
-                                          style: theme.textTheme.bodyMedium),
-                                    )
-                                  : SizedBox(
-                                      height: 160,
-                                      child: ListView.separated(
-                                        itemCount: completedTasks.length,
-                                        separatorBuilder: (context, i) =>
-                                            const SizedBox(height: 10),
-                                        itemBuilder: (context, i) {
-                                          final t = completedTasks[i];
-                                          return ListTile(
-                                            leading: Icon(Icons.check_circle,
-                                                color:
-                                                    theme.colorScheme.primary),
-                                            title: Text(t['title'] ?? '',
-                                                style:
-                                                    theme.textTheme.bodyLarge),
-                                            subtitle: t['isOverdue'] == true
-                                                ? Text('Was overdue',
-                                                    style: TextStyle(
-                                                        color: theme
-                                                            .colorScheme.error))
-                                                : null,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                            ),
-                          ],
+                      for (final task in _safeTasksList)
+                        Semantics(
+                          key: ValueKey(task['id']),
+                          label:
+                              'Task: ${task['title']}${task['isOverdue'] ? ', overdue' : ''}',
+                          child: _buildTaskCard(context, task),
                         ),
-                      ),
-                      const SizedBox(height: 16), // Small gap before legend
+                      if (_safeTasksList.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                            'No tasks yet. Tap + to add a new task.',
+                            style: theme.textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -300,28 +149,23 @@ class _TasksScreenState extends State<TasksScreen> {
           },
         ),
       ),
-      bottomSheet: Semantics(
-        label:
-            'Legend: Snooze reschedules by 1 hour. Overdue tasks are marked in red.',
-        child: Container(
-          color: theme.colorScheme.surface,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              Icon(Icons.snooze, size: 20, color: Colors.orange.shade700),
-              const SizedBox(width: 4),
-              Text('Snooze reschedules by 1 hr',
-                  style: theme.textTheme.bodyMedium),
-              const Spacer(),
-              Icon(Icons.warning, size: 20, color: theme.colorScheme.error),
-              const SizedBox(width: 4),
-              Text('Overdue',
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(color: theme.colorScheme.error)),
-            ],
-          ),
-        ),
-      ),
+      floatingActionButton: dischargeUploaded
+          ? Semantics(
+              label: 'Add new task',
+              button: true,
+              child: FloatingActionButton(
+                backgroundColor: theme.colorScheme.secondary,
+                child: const Icon(Icons.add, size: 28, color: Colors.white),
+                onPressed: () async {
+                  // TODO: Implement manual task creation
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('Manual task creation coming soon!')),
+                  );
+                },
+              ),
+            )
+          : null,
     );
   }
 

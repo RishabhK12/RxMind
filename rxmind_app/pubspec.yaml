@@ -28,6 +28,7 @@ dependencies:
   google_gemini:
   image_picker: ^1.2.0
   flutter_dotenv: ^5.0.2
+  permission_handler: ^11.3.0
   # Add other dependencies as needed
 
 dev_dependencies:

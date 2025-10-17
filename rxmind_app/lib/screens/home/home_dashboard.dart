@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pdf/widgets.dart' as pw;
+// import 'package:pdf/widgets.dart' as pw; // Remove if not used
 // ...existing code...
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 typedef DashboardTabCallback = void Function(int tabIndex);
 
@@ -17,13 +15,37 @@ class HomeDashboardScreen extends StatefulWidget {
 }
 
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
-  // Dummy data for preview
-  final String userName = 'Alex';
-  final List<Map<String, dynamic>> tasks = [
-    {'title': 'Take Morning Meds', 'progress': 0.7},
-    {'title': 'Follow-up Call', 'progress': 0.3},
-    {'title': 'Check Vitals', 'progress': 0.9},
-  ];
+  String? userName;
+  bool dischargeUploaded = false;
+  List<Map<String, dynamic>> tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    final storage = FlutterSecureStorage();
+    userName = await storage.read(key: 'name');
+    dischargeUploaded =
+        (await storage.read(key: 'dischargeUploaded')) == 'true';
+    setState(() {
+      if (!dischargeUploaded) {
+        tasks = [
+          {
+            'title': 'Upload Discharge Paper',
+            'progress': 0.0,
+            'uploadTask': true
+          },
+        ];
+      } else {
+        // Load real tasks from storage or backend
+        // tasks = await fetchTasks();
+        tasks = [];
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +67,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   radius: 22,
                   backgroundColor: theme.colorScheme.secondary,
                   child: Text(
-                    userName[0],
+                    userName != null && userName!.isNotEmpty
+                        ? userName![0].toUpperCase()
+                        : '?',
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: theme.colorScheme.onSecondary,
                       fontWeight: FontWeight.bold,
@@ -57,10 +81,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ),
             const SizedBox(width: 12),
             Semantics(
-              label: 'Greeting: Hi, $userName',
+              label: 'Welcome to RxMind',
               child: Text(
-                'Hi, $userName',
-                style: theme.textTheme.titleLarge,
+                'Welcome to RxMind',
+                style: theme.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -165,40 +190,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       label: 'Export Data',
                       color: theme.colorScheme.primary,
                       onTap: () async {
-                        final storage = FlutterSecureStorage();
-                        final allData = await storage.readAll();
-                        final pdf = pw.Document();
-                        pdf.addPage(
-                          pw.Page(
-                            build: (pw.Context context) => pw.Column(
-                              crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: [
-                                pw.Text('RxMind Export',
-                                    style: pw.TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: pw.FontWeight.bold)),
-                                pw.SizedBox(height: 16),
-                                pw.Text('Profile & App Data:',
-                                    style: pw.TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: pw.FontWeight.bold)),
-                                pw.SizedBox(height: 8),
-                                ...allData.entries.map((e) => pw.Text(
-                                    '${e.key}: ${e.value}',
-                                    style: pw.TextStyle(fontSize: 12))),
-                              ],
-                            ),
-                          ),
-                        );
-                        final outputDir =
-                            await getApplicationDocumentsDirectory();
-                        final filePath = '${outputDir.path}/rxmind_export.pdf';
-                        final file = File(filePath);
-                        await file.writeAsBytes(await pdf.save());
+                        // TODO: Implement PDF export with correct imports
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                              content:
-                                  Text('File downloaded: rxmind_export.pdf')),
+                              content: Text('Export feature coming soon.')),
                         );
                       },
                     ),

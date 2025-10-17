@@ -1,2 +1,4 @@
-// Place your Gemini API key here. DO NOT commit this file to version control.
-const String geminiApiKey = 'YOUR_GEMINI_API_KEY_HERE';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+/// Loads Gemini API key from .env file in project root.
+String get geminiApiKey => dotenv.env['GEMINI_API_KEY'] ?? '';

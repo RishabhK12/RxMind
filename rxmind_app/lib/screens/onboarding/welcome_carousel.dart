@@ -15,7 +15,7 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
   final List<_CarouselPage> _pages = [
     _CarouselPage(
       illustration: 'assets/illus/onboard1.svg',
-      title: 'Welcome to Discharge Assistant',
+      title: 'Welcome to RxMind',
       description:
           'Your on-device guide to safe hospital discharge. All your instructions, meds, and reminders in one secure place.',
     ),

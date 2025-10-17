@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:rxmind_app/screens/tracker/glossary_detail_screen.dart';
+import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
+import 'package:rxmind_app/gemini_api_key.dart';
+import 'dart:convert';
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
@@ -26,46 +27,88 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
   Future<void> _fetchMedInfo(String name, int index) async {
     if (medGlossary.containsKey(name)) return;
-    // Example: MedlinePlus Connect API (or similar public API)
-    final url = Uri.parse(
-        'https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search?terms=$name');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        String info = '';
-        if (data is List &&
-            data.length > 2 &&
-            data[2] is List &&
-            data[2].isNotEmpty) {
-          info = data[2][0].toString();
+    final GeminiApiService geminiService =
+        GeminiApiService(apiKey: geminiApiKey);
+    String prompt = '''
+You are a medical assistant. Please provide ONLY the following JSON object for the medication "$name":
+{
+  "name": "<medication name>",
+  "description": "<one-sentence plain-language summary>",
+  "instructions": "<concise instructions for use>",
+  "side_effects": "<common side effects, comma separated>"
+}
+Do NOT include any extra text, preamble, or confirmation. Only output the JSON object. If you cannot find information, return:
+{
+  "name": "$name",
+  "description": "No information found.",
+  "instructions": "",
+  "side_effects": ""
+}
+''';
+    int attempts = 0;
+    String info = '';
+    String errorMsg = '';
+    while (attempts < 2) {
+      try {
+        final response = await geminiService.sendMessage(prompt);
+        final jsonStart = response.indexOf('{');
+        final jsonEnd = response.lastIndexOf('}');
+        if (jsonStart != -1 && jsonEnd != -1) {
+          final jsonStr = response.substring(jsonStart, jsonEnd + 1);
+          final data = json.decode(jsonStr);
+          info = 'Name: ' +
+              data['name'].toString() +
+              '\n' +
+              'Description: ' +
+              data['description'].toString() +
+              '\n' +
+              'Instructions: ' +
+              data['instructions'].toString() +
+              '\n' +
+              'Side Effects: ' +
+              data['side_effects'].toString();
+          break;
         } else {
-          info = 'No additional information found.';
+          errorMsg = 'Malformed response from Gemini API.';
+          attempts++;
         }
-        setState(() {
-          medGlossary[name] = info;
-        });
+      } catch (e) {
+        errorMsg = 'Error: ${e.toString()}';
+        break;
       }
-    } catch (e) {
-      setState(() {
-        medGlossary[name] = 'Unable to fetch information.';
-      });
+    }
+    if (info.isEmpty)
+      info = errorMsg.isNotEmpty ? errorMsg : 'Unable to fetch information.';
+    setState(() {
+      medGlossary[name] = info;
+    });
+    if (errorMsg.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMsg, style: const TextStyle(color: Colors.red)),
+          backgroundColor: Colors.white,
+        ),
+      );
     }
   }
 
-  // Dummy data for preview
-  List<Map<String, dynamic>> medicationsList = [
-    {
-      'name': 'Aspirin',
-      'nextDoseTime': DateTime.now().add(const Duration(hours: 2)),
-      'isOverdue': false,
-    },
-    {
-      'name': 'Lisinopril',
-      'nextDoseTime': DateTime.now().subtract(const Duration(hours: 1)),
-      'isOverdue': true,
-    },
-  ];
+  List<Map<String, dynamic>> medicationsList = [];
+  bool dischargeUploaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDischargeStatus();
+  }
+
+  Future<void> _loadDischargeStatus() async {
+    // TODO: Implement real discharge upload status and medication list loading from persistent storage
+    // Example:
+    // final prefs = await SharedPreferences.getInstance();
+    // dischargeUploaded = prefs.getBool('dischargeUploaded') ?? false;
+    // medicationsList = await loadMedicationsFromStorage();
+    // setState(() {});
+  }
 
   void _markTaken(int index) {
     final oldNextDose = medicationsList[index]['nextDoseTime'];
@@ -166,6 +209,15 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
               ),
             ),
           ),
+          if (medicationsList.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'No medications yet. Tap + to add a new medication.',
+                style: theme.textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+            ),
           ...List.generate(medicationsList.length, (i) {
             final med = medicationsList[i];
             final isExpanded = expandedIndex == i;
@@ -222,6 +274,71 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
           }),
         ],
       ),
+      floatingActionButton: dischargeUploaded
+          ? Semantics(
+              label: 'Add new medication',
+              button: true,
+              child: FloatingActionButton(
+                backgroundColor: theme.colorScheme.secondary,
+                child: const Icon(Icons.add, size: 28, color: Colors.white),
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) {
+                      final TextEditingController nameController =
+                          TextEditingController();
+                      final TextEditingController instructionsController =
+                          TextEditingController();
+                      return AlertDialog(
+                        title: const Text('Add Medication'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: nameController,
+                              decoration: const InputDecoration(
+                                  labelText: 'Medication Name'),
+                            ),
+                            TextField(
+                              controller: instructionsController,
+                              decoration: const InputDecoration(
+                                  labelText: 'Instructions'),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              final name = nameController.text.trim();
+                              final instructions =
+                                  instructionsController.text.trim();
+                              if (name.isNotEmpty) {
+                                setState(() {
+                                  medicationsList.add({
+                                    'name': name,
+                                    'instructions': instructions,
+                                    'nextDoseTime': DateTime.now()
+                                        .add(const Duration(hours: 24)),
+                                    'isOverdue': false,
+                                  });
+                                });
+                                Navigator.pop(ctx);
+                              }
+                            },
+                            child: const Text('Add'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            )
+          : null,
     );
   }
 }

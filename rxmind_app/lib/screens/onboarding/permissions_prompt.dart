@@ -1,3 +1,4 @@
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
 class PermissionsPromptScreen extends StatefulWidget {
@@ -16,11 +17,20 @@ class _PermissionsPromptScreenState extends State<PermissionsPromptScreen>
 
   Future<void> _requestPermissions() async {
     setState(() => _requesting = true);
-    // TODO: Implement permission request logic using permission_handler or similar
-    await Future.delayed(const Duration(milliseconds: 1200));
+    // Request camera and storage permissions
+    final cameraStatus = await Permission.camera.request();
+    final storageStatus = await Permission.storage.request();
     if (!mounted) return;
     setState(() => _requesting = false);
-    Navigator.pushReplacementNamed(context, '/onboardingProfile');
+    if (cameraStatus.isGranted && storageStatus.isGranted) {
+      Navigator.pushReplacementNamed(context, '/onboardingProfile');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Permissions denied. Please enable camera and storage permissions to continue.')),
+      );
+    }
   }
 
   void _skip() {

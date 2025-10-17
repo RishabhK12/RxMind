@@ -335,8 +335,15 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                   child: Column(
                     children: [
                       const SizedBox(height: 16),
-                      // App logo
-                      Image.asset('assets/illus/logo.svg', height: 36),
+                      // RxMind logo (SVG)
+                      SizedBox(
+                        height: 48,
+                        child: Image.asset(
+                          'assets/illus/logo.svg',
+                          errorBuilder: (context, error, stackTrace) =>
+                              Icon(Icons.error, size: 48, color: Colors.red),
+                        ),
+                      ),
                       buildProgressBar(),
                       Expanded(
                         child: AnimatedSwitcher(

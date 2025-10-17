@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'gemini_api_service.dart';
 import '../../gemini_api_key.dart';
 import '../../core/ai/chat_manager.dart';
+import '../../core/widgets/markdown_text.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -195,7 +196,12 @@ class _AiChatScreenState extends State<AiChatScreen> {
                                   : theme.colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Text(msg['content'] ?? ''),
+                            child: isUser
+                                ? Text(msg['content'] ?? '')
+                                : MarkdownText(
+                                    data: msg['content'] ?? '',
+                                    selectable: true,
+                                  ),
                           ),
                         ),
                       );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'dart:convert';
 
 class ParsedSummaryScreen extends StatefulWidget {
   final Map<String, dynamic>? parsedJson;
@@ -10,26 +12,191 @@ class ParsedSummaryScreen extends StatefulWidget {
 }
 
 class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
-  // Dummy data for preview
-  final List<Map<String, dynamic>> medications = [
-    {'name': 'Aspirin', 'dose': '81mg', 'frequency': 'Daily'},
-    {'name': 'Lisinopril', 'dose': '10mg', 'frequency': 'Morning'},
-  ];
-  final List<Map<String, dynamic>> followUps = [
-    {'name': 'Cardiology', 'date': '2025-08-10 10:00 AM'},
-  ];
-  final List<Map<String, dynamic>> instructions = [
-    {'name': 'No heavy lifting for 2 weeks.'},
-    {'name': 'Monitor blood pressure daily.'},
-  ];
+  List<Map<String, dynamic>> medications = [];
+  List<Map<String, dynamic>> followUps = [];
+  List<Map<String, dynamic>> instructions = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _parseDischargeData();
+  }
+
+  Future<void> _parseDischargeData() async {
+    // Get the parsed JSON from the route arguments
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final parsedJsonString = args?['parsedJson'] as String? ?? '';
+
+    if (parsedJsonString.isEmpty) {
+      // Use dummy data if no parsed data available
+      setState(() {
+        medications = [
+          {'name': 'Aspirin', 'dose': '81mg', 'frequency': 'Daily'},
+          {'name': 'Lisinopril', 'dose': '10mg', 'frequency': 'Morning'},
+        ];
+        followUps = [
+          {'name': 'Cardiology', 'date': '2025-08-10 10:00 AM'},
+        ];
+        instructions = [
+          {'name': 'No heavy lifting for 2 weeks.'},
+          {'name': 'Monitor blood pressure daily.'},
+        ];
+        _loading = false;
+      });
+      return;
+    }
+
+    try {
+      // Extract JSON from the response (handle markdown code blocks)
+      String jsonStr = parsedJsonString;
+      final jsonStart = parsedJsonString.indexOf('{');
+      final jsonEnd = parsedJsonString.lastIndexOf('}');
+      if (jsonStart != -1 && jsonEnd != -1) {
+        jsonStr = parsedJsonString.substring(jsonStart, jsonEnd + 1);
+      }
+
+      final Map<String, dynamic> parsed = jsonDecode(jsonStr);
+
+      // Extract medications
+      if (parsed.containsKey('medications') && parsed['medications'] is List) {
+        medications = (parsed['medications'] as List)
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+      }
+
+      // Extract follow-ups
+      if (parsed.containsKey('follow_ups') && parsed['follow_ups'] is List) {
+        followUps = (parsed['follow_ups'] as List)
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+      }
+
+      // Extract instructions
+      if (parsed.containsKey('instructions') &&
+          parsed['instructions'] is List) {
+        instructions = (parsed['instructions'] as List)
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+      }
+    } catch (e) {
+      // If parsing fails, use dummy data
+      medications = [
+        {'name': 'Aspirin', 'dose': '81mg', 'frequency': 'Daily'},
+        {'name': 'Lisinopril', 'dose': '10mg', 'frequency': 'Morning'},
+      ];
+      followUps = [
+        {'name': 'Cardiology', 'date': '2025-08-10 10:00 AM'},
+      ];
+      instructions = [
+        {'name': 'No heavy lifting for 2 weeks.'},
+        {'name': 'Monitor blood pressure daily.'},
+      ];
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error parsing data: $e')),
+      );
+    }
+
+    setState(() {
+      _loading = false;
+    });
+  }
 
   void _editItem(Map<String, dynamic> item) {
     // TODO: Implement edit modal or navigation
   }
 
+  Future<void> _confirmAndSave() async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Convert medications to the format expected by medications_screen
+      final medicationsForStorage = medications.map((med) {
+        return {
+          'name': med['name'] ?? 'Unknown Medication',
+          'dose': med['dose'] ?? '',
+          'frequency': med['frequency'] ?? 'As needed',
+          'nextDoseTime': DateTime.now().toIso8601String(),
+          'isOverdue': false,
+        };
+      }).toList();
+
+      // Convert follow-ups and instructions to tasks
+      final tasksForStorage = <Map<String, dynamic>>[];
+
+      // Add follow-up appointments as tasks
+      for (final followUp in followUps) {
+        tasksForStorage.add({
+          'id': UniqueKey().toString(),
+          'title': 'Follow-up: ${followUp['name'] ?? 'Appointment'}',
+          'dueTime': followUp['date'] ??
+              DateTime.now().add(const Duration(days: 7)).toIso8601String(),
+          'isOverdue': false,
+          'snoozeCount': 0,
+          'completed': false,
+        });
+      }
+
+      // Add instructions as tasks
+      for (final instruction in instructions) {
+        tasksForStorage.add({
+          'id': UniqueKey().toString(),
+          'title': instruction['name'] ?? instruction['instruction'] ?? 'Task',
+          'dueTime': DateTime.now().toIso8601String(),
+          'isOverdue': false,
+          'snoozeCount': 0,
+          'completed': false,
+        });
+      }
+
+      // Save to persistent storage
+      await DischargeDataManager.saveDischargeData(
+        medications: medicationsForStorage,
+        tasks: tasksForStorage,
+        followUps: followUps,
+        instructions: instructions,
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context); // Dismiss loading dialog
+
+      // Navigate to main app
+      Navigator.pushReplacementNamed(context, '/mainNav');
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Discharge data saved successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context); // Dismiss loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving data: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -111,10 +278,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           padding: const EdgeInsets.all(16),
           color: theme.colorScheme.surface,
           child: ElevatedButton(
-            onPressed: () {
-              // TODO: Save and generate tasks/meds, then navigate
-              Navigator.pushReplacementNamed(context, '/tasks');
-            },
+            onPressed: _confirmAndSave,
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.secondary,
               padding: const EdgeInsets.symmetric(vertical: 16),

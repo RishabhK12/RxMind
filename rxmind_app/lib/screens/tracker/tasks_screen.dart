@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -18,12 +19,40 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Future<void> _loadDischargeStatus() async {
-    // TODO: Implement real discharge upload status and tasks list loading from persistent storage
-    // Example:
-    // final prefs = await SharedPreferences.getInstance();
-    // dischargeUploaded = prefs.getBool('dischargeUploaded') ?? false;
-    // tasksList = await loadTasksFromStorage();
-    // setState(() {});
+    final uploaded = await DischargeDataManager.isDischargeUploaded();
+    final tasks = await DischargeDataManager.loadTasks();
+
+    setState(() {
+      dischargeUploaded = uploaded;
+      if (uploaded && tasks.isNotEmpty) {
+        tasksList = tasks.map((task) {
+          // Parse dueTime if it's a string
+          DateTime? dueTime;
+          if (task['dueTime'] is String) {
+            try {
+              dueTime = DateTime.parse(task['dueTime']);
+            } catch (e) {
+              dueTime = DateTime.now();
+            }
+          } else if (task['dueTime'] is DateTime) {
+            dueTime = task['dueTime'];
+          } else {
+            dueTime = DateTime.now();
+          }
+
+          return {
+            'id': task['id'] ?? UniqueKey().toString(),
+            'title': task['title'] ?? 'Task',
+            'dueTime': dueTime,
+            'isOverdue': task['isOverdue'] ?? false,
+            'snoozeCount': task['snoozeCount'] ?? 0,
+            'completed': task['completed'] ?? false,
+          };
+        }).toList();
+      } else {
+        tasksList = [];
+      }
+    });
   }
 
   List<Map<String, dynamic>> completedTasks = [];

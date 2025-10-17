@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-// import 'package:pdf/widgets.dart' as pw; // Remove if not used
-// ...existing code...
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 typedef DashboardTabCallback = void Function(int tabIndex);
 
@@ -26,10 +25,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Future<void> _loadUserProfile() async {
-    final storage = FlutterSecureStorage();
-    userName = await storage.read(key: 'name');
-    dischargeUploaded =
-        (await storage.read(key: 'dischargeUploaded')) == 'true';
+    final prefs = await SharedPreferences.getInstance();
+    userName = prefs.getString('userName');
+    dischargeUploaded = await DischargeDataManager.isDischargeUploaded();
     setState(() {
       if (!dischargeUploaded) {
         tasks = [
@@ -81,9 +79,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ),
             const SizedBox(width: 12),
             Semantics(
-              label: 'Welcome to RxMind',
+              label: userName != null && userName!.isNotEmpty
+                  ? 'Welcome $userName'
+                  : 'Welcome to RxMind',
               child: Text(
-                'Welcome to RxMind',
+                userName != null && userName!.isNotEmpty
+                    ? 'Welcome $userName'
+                    : 'Welcome to RxMind',
                 style: theme.textTheme.titleLarge
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),

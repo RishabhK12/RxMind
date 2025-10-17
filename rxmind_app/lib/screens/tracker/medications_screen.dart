@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/screens/tracker/glossary_detail_screen.dart';
 import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
 import 'package:rxmind_app/gemini_api_key.dart';
+import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'dart:convert';
 
 class MedicationsScreen extends StatefulWidget {
@@ -102,12 +103,39 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
   }
 
   Future<void> _loadDischargeStatus() async {
-    // TODO: Implement real discharge upload status and medication list loading from persistent storage
-    // Example:
-    // final prefs = await SharedPreferences.getInstance();
-    // dischargeUploaded = prefs.getBool('dischargeUploaded') ?? false;
-    // medicationsList = await loadMedicationsFromStorage();
-    // setState(() {});
+    final uploaded = await DischargeDataManager.isDischargeUploaded();
+    final meds = await DischargeDataManager.loadMedications();
+
+    setState(() {
+      dischargeUploaded = uploaded;
+      if (uploaded && meds.isNotEmpty) {
+        medicationsList = meds.map((med) {
+          // Parse nextDoseTime if it's a string
+          DateTime? nextDoseTime;
+          if (med['nextDoseTime'] is String) {
+            try {
+              nextDoseTime = DateTime.parse(med['nextDoseTime']);
+            } catch (e) {
+              nextDoseTime = DateTime.now();
+            }
+          } else if (med['nextDoseTime'] is DateTime) {
+            nextDoseTime = med['nextDoseTime'];
+          } else {
+            nextDoseTime = DateTime.now();
+          }
+
+          return {
+            'name': med['name'] ?? 'Unknown',
+            'dose': med['dose'] ?? '',
+            'frequency': med['frequency'] ?? 'As needed',
+            'nextDoseTime': nextDoseTime,
+            'isOverdue': med['isOverdue'] ?? false,
+          };
+        }).toList();
+      } else {
+        medicationsList = [];
+      }
+    });
   }
 
   void _markTaken(int index) {

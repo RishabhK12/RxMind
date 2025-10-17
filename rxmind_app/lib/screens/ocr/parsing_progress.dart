@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
+import 'package:rxmind_app/gemini_api_key.dart';
 
 class ParsingProgressScreen extends StatefulWidget {
   const ParsingProgressScreen({super.key});
@@ -25,42 +25,46 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
       return;
     }
     try {
-      const apiKey =
-          'YOUR_GEMINI_API_KEY_HERE'; // <-- Replace with your Gemini API key
-      final url = Uri.parse(
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey');
-      final body = jsonEncode({
-        "contents": [
-          {
-            "parts": [
-              {
-                "text":
-                    "Parse the following hospital discharge text into structured JSON with medications, follow-ups, and instructions: $reviewedText"
-              }
-            ]
-          }
-        ]
-      });
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: body,
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        // Gemini returns the result in data['candidates'][0]['content']['parts'][0]['text']
-        final parsedJson =
-            data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '';
-        if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/parsedSummary',
-            arguments: {'parsedJson': parsedJson});
-      } else {
-        setState(() => _error = 'Gemini API error: ${response.statusCode}');
-        await Future.delayed(const Duration(seconds: 2));
-        if (mounted) Navigator.pop(context);
-      }
+      final GeminiApiService geminiService =
+          GeminiApiService(apiKey: geminiApiKey);
+
+      final String prompt = '''
+You are a medical assistant. Parse the following hospital discharge text into structured JSON format.
+
+IMPORTANT: Respond ONLY with a valid JSON object. Do NOT include any explanation, preamble, or markdown formatting.
+
+Required JSON structure:
+{
+  "medications": [
+    {
+      "name": "medication name",
+      "dose": "dosage amount",
+      "frequency": "how often to take"
+    }
+  ],
+  "follow_ups": [
+    {
+      "name": "doctor/department name",
+      "date": "appointment date and time"
+    }
+  ],
+  "instructions": [
+    {
+      "name": "instruction text"
+    }
+  ]
+}
+
+Discharge Text:
+$reviewedText
+
+Response (JSON only):''';
+
+      final response = await geminiService.sendMessage(prompt);
+
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/parsedSummary',
+          arguments: {'parsedJson': response});
     } catch (e) {
       setState(() => _error = 'Parsing failed: $e');
       await Future.delayed(const Duration(seconds: 2));

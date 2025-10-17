@@ -32,6 +32,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   }
 
   // Profile data
+  String? userName;
   int? heightCm;
   int? weightKg;
   bool useMetric = true;
@@ -48,22 +49,24 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
 
   // Navigation
   int currentStep = 0;
-  final int totalSteps = 8;
+  final int totalSteps = 9; // Increased from 8 to include name step
 
   // Validation
   bool get canContinue {
     switch (currentStep) {
       case 0:
-        return heightCm != null;
+        return userName != null && userName!.isNotEmpty;
       case 1:
-        return weightKg != null;
+        return heightCm != null;
       case 2:
-        return age != null;
+        return weightKg != null;
       case 3:
-        return sex != null;
+        return age != null;
       case 4:
-        return bedtime != null && wakeTime != null;
+        return sex != null;
       case 5:
+        return bedtime != null && wakeTime != null;
+      case 6:
         return activityLevel != null;
       default:
         return true;
@@ -76,6 +79,10 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('onboardingComplete', true);
+      // Save user name to storage
+      if (userName != null && userName!.isNotEmpty) {
+        await prefs.setString('userName', userName!);
+      }
       widget.onComplete();
     }
   }
@@ -113,6 +120,36 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
     final theme = Theme.of(context);
     switch (currentStep) {
       case 0:
+        return Semantics(
+          label: 'Name input',
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('What\'s your name?',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF212121))),
+                const SizedBox(height: 32),
+                TextField(
+                  onChanged: (val) => setState(() => userName = val),
+                  decoration: InputDecoration(
+                    labelText: 'Your Name',
+                    hintText: 'Enter your first name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                  textCapitalization: TextCapitalization.words,
+                  autofocus: true,
+                ),
+              ],
+            ),
+          ),
+        );
+      case 1:
         return Semantics(
           label: 'Height input',
           child: Column(
@@ -152,7 +189,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
             ],
           ),
         );
-      case 1:
+      case 2:
         return Semantics(
           label: 'Weight input',
           child: Column(
@@ -192,7 +229,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
             ],
           ),
         );
-      case 2:
+      case 3:
         return Semantics(
           label: 'Age input',
           child: _NumberPickerCard(
@@ -204,7 +241,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
             onChanged: (v) => setState(() => age = v),
           ),
         );
-      case 3:
+      case 4:
         return Semantics(
           label: 'Sex selection',
           child: _SexPickerCard(
@@ -212,7 +249,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
             onChanged: (v) => setState(() => sex = v),
           ),
         );
-      case 4:
+      case 5:
         return Semantics(
           label: 'Sleep schedule input',
           child: _SleepScheduleCard(
@@ -224,7 +261,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
             }),
           ),
         );
-      case 5:
+      case 6:
         return Semantics(
           label: 'Activity level selection',
           child: _ActivityLevelCard(
@@ -232,7 +269,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
             onChanged: (v) => setState(() => activityLevel = v),
           ),
         );
-      case 6:
+      case 7:
         return Column(
           children: [
             _ChipSelectCard(
@@ -264,7 +301,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
               ),
           ],
         );
-      case 7:
+      case 8:
         return Column(
           children: [
             _ChipSelectCard(
@@ -296,7 +333,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
               ),
           ],
         );
-      case 8:
+      case 9:
         return _ChipSelectCard(
           title: 'Any allergies?',
           options: ['Penicillin', 'Peanuts', 'Latex', 'Shellfish', 'Other'],

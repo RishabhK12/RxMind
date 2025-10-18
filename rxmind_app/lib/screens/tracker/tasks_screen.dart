@@ -161,7 +161,50 @@ class _TasksScreenState extends State<TasksScreen> {
                               'Task: ${task['title']}${task['isOverdue'] ? ', overdue' : ''}',
                           child: _buildTaskCard(context, task),
                         ),
-                      if (_safeTasksList.isEmpty)
+                      if (_safeTasksList.isEmpty && !dischargeUploaded)
+                        Semantics(
+                          label: 'Upload Discharge Paper',
+                          button: true,
+                          child: GestureDetector(
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/uploadOptions'),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 6, horizontal: 8),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surface,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.10),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                                border: Border.all(
+                                    color: theme.colorScheme.primary, width: 2),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.upload_file,
+                                      color: theme.colorScheme.primary,
+                                      size: 28),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'Upload Discharge Paper',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (_safeTasksList.isEmpty && dischargeUploaded)
                         Padding(
                           padding: const EdgeInsets.all(24),
                           child: Text(

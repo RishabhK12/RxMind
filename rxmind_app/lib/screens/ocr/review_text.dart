@@ -11,11 +11,21 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
   bool _editMode = false;
   late TextEditingController _controller;
 
+  bool _loading = true;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final ocrText = ModalRoute.of(context)?.settings.arguments as String?;
     _controller = TextEditingController(text: ocrText ?? '');
+
+    // For large documents, there might be a delay in loading the text
+    // into the controller, so we show a loading indicator briefly
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    });
   }
 
   @override
@@ -74,40 +84,59 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 4,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: _editMode
-                ? Semantics(
-                    label: 'Edit text field',
-                    textField: true,
-                    child: TextField(
-                      key: const ValueKey('edit'),
-                      controller: _controller,
-                      maxLines: null,
-                      style: theme.textTheme.bodyLarge
-                          ?.copyWith(color: theme.colorScheme.onSurface),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(16),
-                      ),
-                      autofocus: true,
+        child: _loading
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Processing document text...',
+                      style: theme.textTheme.bodyLarge,
                     ),
-                  )
-                : Semantics(
-                    label: 'OCR result text',
-                    child: SelectableText(
-                      _controller.text,
-                      key: const ValueKey('readonly'),
-                      style: theme.textTheme.bodyLarge
-                          ?.copyWith(color: theme.colorScheme.onSurface),
-                    ),
-                  ),
-          ),
-        ),
+                  ],
+                ),
+              )
+            : Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: _editMode
+                      ? Semantics(
+                          label: 'Edit text field',
+                          textField: true,
+                          child: TextField(
+                            key: const ValueKey('edit'),
+                            controller: _controller,
+                            maxLines: null,
+                            style: theme.textTheme.bodyLarge
+                                ?.copyWith(color: theme.colorScheme.onSurface),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(16),
+                            ),
+                            autofocus: true,
+                          ),
+                        )
+                      : Semantics(
+                          label: 'OCR result text',
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: SelectableText(
+                              _controller.text.isEmpty
+                                  ? 'No text was found or extracted from your document. You can enter text manually by tapping the edit button above.'
+                                  : _controller.text,
+                              key: const ValueKey('readonly'),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.onSurface),
+                            ),
+                          ),
+                        ),
+                ),
+              ),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -127,10 +156,14 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
               label: 'Retake',
               button: true,
               child: TextButton(
-                onPressed: () =>
-                    Navigator.pushReplacementNamed(context, '/uploadOptions'),
+                onPressed: _loading
+                    ? null
+                    : () => Navigator.pushReplacementNamed(
+                        context, '/uploadOptions'),
                 style: TextButton.styleFrom(
                   foregroundColor: theme.colorScheme.primary,
+                  disabledForegroundColor:
+                      theme.colorScheme.primary.withOpacity(0.4),
                 ),
                 child: const Text('Retake'),
               ),
@@ -140,15 +173,17 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
               label: 'Continue',
               button: true,
               child: ElevatedButton(
-                onPressed: _continue,
+                onPressed: _loading ? null : _continue,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.secondary,
+                  disabledBackgroundColor:
+                      theme.colorScheme.secondary.withOpacity(0.4),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  elevation: 4,
+                  elevation: _loading ? 1 : 4,
                 ),
                 child: const Text('Continue'),
               ),

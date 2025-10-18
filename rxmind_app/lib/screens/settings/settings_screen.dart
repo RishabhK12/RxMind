@@ -6,6 +6,7 @@ import 'package:path/path.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:archive/archive_io.dart';
+import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,13 +17,54 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _screenReader = false; // Placeholder, not implemented
-  // Profile fields (dummy for now)
-  int? _height = 170;
-  int? _weight = 70;
-  int? _age = 30;
-  String? _sex = 'Male';
-  TimeOfDay? _bedtime = TimeOfDay(hour: 22, minute: 0);
-  TimeOfDay? _wakeTime = TimeOfDay(hour: 7, minute: 0);
+  String? _name;
+  int? _height;
+  int? _weight;
+  int? _age;
+  String? _sex;
+  TimeOfDay? _bedtime;
+  TimeOfDay? _wakeTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final data = await DischargeDataManager.loadProfileData();
+    setState(() {
+      _name = data['name'];
+      _height = data['height'];
+      _weight = data['weight'];
+      _age = data['age'];
+      _sex = data['sex'];
+      if (data['bedtime'] != null) {
+        final parts = (data['bedtime'] as String).split(':');
+        _bedtime =
+            TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+      }
+      if (data['wakeTime'] != null) {
+        final parts = (data['wakeTime'] as String).split(':');
+        _wakeTime =
+            TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+      }
+    });
+  }
+
+  Future<void> _saveProfileData() async {
+    await DischargeDataManager.saveProfileData(
+      name: _name,
+      height: _height,
+      weight: _weight,
+      age: _age,
+      sex: _sex,
+      bedtime:
+          _bedtime != null ? '${_bedtime!.hour}:${_bedtime!.minute}' : null,
+      wakeTime:
+          _wakeTime != null ? '${_wakeTime!.hour}:${_wakeTime!.minute}' : null,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +89,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Profile',
                   style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6))),
+                      color: theme.colorScheme.onSurface
+                          .withAlpha((0.6 * 255).toInt()))),
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Name'),
+            trailing: Text(_name ?? 'Not Set'),
+            onTap: () async {
+              final newName = await _showTextPicker(context, 'Name', _name);
+              if (newName != null) {
+                setState(() => _name = newName);
+                await _saveProfileData();
+              }
+            },
           ),
           ListTile(
             leading: const Icon(Icons.height),
@@ -57,7 +112,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () async {
               final val = await _showNumberPicker(
                   context, 'Height (cm)', _height ?? 170, 100, 220);
-              if (val != null) setState(() => _height = val);
+              if (val != null) {
+                setState(() => _height = val);
+                await _saveProfileData();
+              }
             },
             subtitle: Semantics(
               label: 'Tap to set height in centimeters',
@@ -71,7 +129,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () async {
               final val = await _showNumberPicker(
                   context, 'Weight (kg)', _weight ?? 70, 30, 200);
-              if (val != null) setState(() => _weight = val);
+              if (val != null) {
+                setState(() => _weight = val);
+                await _saveProfileData();
+              }
             },
             subtitle: Semantics(
               label: 'Tap to set weight in kilograms',
@@ -85,7 +146,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () async {
               final val =
                   await _showNumberPicker(context, 'Age', _age ?? 30, 10, 120);
-              if (val != null) setState(() => _age = val);
+              if (val != null) {
+                setState(() => _age = val);
+                await _saveProfileData();
+              }
             },
             subtitle: Semantics(
               label: 'Tap to set age in years',
@@ -114,7 +178,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               );
-              if (val != null) setState(() => _sex = val);
+              if (val != null) {
+                setState(() => _sex = val);
+                await _saveProfileData();
+              }
             },
             subtitle: Semantics(
               label: 'Tap to set biological sex',
@@ -129,7 +196,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               final picked = await showTimePicker(
                   context: context,
                   initialTime: _bedtime ?? TimeOfDay(hour: 22, minute: 0));
-              if (picked != null) setState(() => _bedtime = picked);
+              if (picked != null) {
+                setState(() => _bedtime = picked);
+                await _saveProfileData();
+              }
             },
             subtitle: Semantics(
               label: 'Tap to set bedtime',
@@ -144,7 +214,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               final picked = await showTimePicker(
                   context: context,
                   initialTime: _wakeTime ?? TimeOfDay(hour: 7, minute: 0));
-              if (picked != null) setState(() => _wakeTime = picked);
+              if (picked != null) {
+                setState(() => _wakeTime = picked);
+                await _saveProfileData();
+              }
             },
             subtitle: Semantics(
               label: 'Tap to set wake time',
@@ -180,10 +253,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 archive
                     .addFile(ArchiveFile('rxmind.db', dbBytes.length, dbBytes));
               }
-              final zipData = ZipEncoder().encode(archive);
+              final zipData = ZipEncoder().encode(archive) ?? [];
               final output = await FilePicker.platform.saveFile(
                   dialogTitle: 'Export RxMind Data',
                   fileName: 'rxmind_export.zip');
+              if (!mounted) return;
               if (output != null) {
                 await File(output).writeAsBytes(zipData);
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -216,29 +290,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface.withOpacity(0.6))),
           ),
-          RadioListTile<ThemeMode>(
-            value: ThemeMode.light,
-            groupValue: settings.themeMode,
-            onChanged: (v) {
-              settings.updateTheme(v!);
-            },
+          ListTile(
             title: Text('Light Mode', style: theme.textTheme.bodyMedium),
+            leading: Radio<ThemeMode>(
+              value: ThemeMode.light,
+              groupValue: settings.themeMode,
+              onChanged: (v) => settings.updateTheme(v!),
+            ),
+            onTap: () => settings.updateTheme(ThemeMode.light),
           ),
-          RadioListTile<ThemeMode>(
-            value: ThemeMode.dark,
-            groupValue: settings.themeMode,
-            onChanged: (v) {
-              settings.updateTheme(v!);
-            },
+          ListTile(
             title: Text('Dark Mode', style: theme.textTheme.bodyMedium),
+            leading: Radio<ThemeMode>(
+              value: ThemeMode.dark,
+              groupValue: settings.themeMode,
+              onChanged: (v) => settings.updateTheme(v!),
+            ),
+            onTap: () => settings.updateTheme(ThemeMode.dark),
           ),
-          RadioListTile<ThemeMode>(
-            value: ThemeMode.system,
-            groupValue: settings.themeMode,
-            onChanged: (v) {
-              settings.updateTheme(v!);
-            },
+          ListTile(
             title: Text('System Default', style: theme.textTheme.bodyMedium),
+            leading: Radio<ThemeMode>(
+              value: ThemeMode.system,
+              groupValue: settings.themeMode,
+              onChanged: (v) => settings.updateTheme(v!),
+            ),
+            onTap: () => settings.updateTheme(ThemeMode.system),
           ),
           SwitchListTile(
             value: settings.highContrast,
@@ -257,7 +334,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Accessibility',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color:
+                    theme.colorScheme.onSurface.withAlpha((0.6 * 255).toInt()),
               ),
             ),
           ),
@@ -304,7 +382,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: Icon(Icons.info_outline,
-                color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                color:
+                    theme.colorScheme.onSurface.withAlpha((0.6 * 255).toInt())),
             title: const Text('Version'),
             subtitle: const Text('RxMind v1.0.0'),
           ),
@@ -324,10 +403,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Helper methods moved outside build
-  Future<int?> _showNumberPicker(
-      BuildContext context, String title, int initial, int min, int max) async {
-    int temp = initial;
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text(
+              'Are you sure you want to delete all your data? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              onPressed: () async {
+                await DischargeDataManager.clearDischargeData();
+                Navigator.of(ctx).pop(); // Close the dialog
+                // Check if widget is still mounted before using BuildContext
+                if (!mounted) return;
+                // Navigate to a fresh start, e.g., the splash screen
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/splash', (Route<dynamic> route) => false);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<int?> _showNumberPicker(BuildContext context, String title,
+      int initialValue, int min, int max) async {
+    int temp = initialValue;
     return showDialog<int>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -359,57 +471,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context) {
-    final controller = TextEditingController();
-    showDialog(
+  Future<String?> _showTextPicker(
+      BuildContext context, String title, String? initialValue) {
+    final controller = TextEditingController(text: initialValue);
+    return showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Delete All Data',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(color: Theme.of(context).colorScheme.error)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-                'This action is irreversible. To confirm, type "DELETE" below.'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(hintText: 'Type DELETE'),
-            ),
-          ],
+        title: Text(title),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           TextButton(
-            onPressed: () async {
-              if (controller.text == 'DELETE') {
-                // Delete secure storage
-                final storage = FlutterSecureStorage();
-                await storage.deleteAll();
-                // Delete database
-                try {
-                  final dbPath = await getDatabasesPath();
-                  final dbFile = File(join(dbPath, 'rxmind.db'));
-                  if (await dbFile.exists()) {
-                    await dbFile.delete();
-                  }
-                } catch (_) {}
-                // Navigate to splash
-                if (context.mounted) {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/splash', (route) => false);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('All data deleted.')));
-                }
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                Navigator.pop(ctx, controller.text);
               }
             },
-            style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error),
-            child: const Text('Delete'),
+            child: const Text('OK'),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'gemini_api_service.dart';
 import '../../gemini_api_key.dart';
 import '../../core/ai/chat_manager.dart';
 import '../../core/widgets/markdown_text.dart';
+import '../../services/discharge_data_manager.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -19,11 +20,22 @@ class _AiChatScreenState extends State<AiChatScreen> {
   bool _isTyping = false;
   final bool _contextLoaded = true;
   bool _initialized = false;
+  bool _dischargeUploaded = false;
 
   @override
   void initState() {
     super.initState();
     _initChats();
+    _checkDischargeStatus();
+  }
+
+  Future<void> _checkDischargeStatus() async {
+    final uploaded = await DischargeDataManager.isDischargeUploaded();
+    if (mounted) {
+      setState(() {
+        _dischargeUploaded = uploaded;
+      });
+    }
   }
 
   Future<void> _initChats() async {
@@ -113,148 +125,179 @@ class _AiChatScreenState extends State<AiChatScreen> {
       ),
       body: !_initialized
           ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                // Chat session menu
-                Container(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children:
-                                List.generate(_chatManager.chatCount, (i) {
-                              final isActive =
-                                  i == _chatManager.activeChatIndex;
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                child: ChoiceChip(
-                                  label: Text('Chat ${i + 1}'),
-                                  selected: isActive,
-                                  onSelected: (_) {
-                                    setState(() {
-                                      _chatManager.switchChat(i);
-                                    });
-                                  },
-                                ),
-                              );
-                            }),
-                          ),
+          : !_dischargeUploaded
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.upload_file,
+                          size: 80,
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.5),
                         ),
-                      ),
-                      Semantics(
-                        label: 'New chat',
-                        button: true,
-                        child: IconButton(
-                          icon: const Icon(Icons.add),
-                          tooltip: 'New chat',
-                          onPressed: () {
-                            setState(() {
-                              _chatManager.newChat();
-                            });
-                          },
+                        const SizedBox(height: 24),
+                        Text(
+                          'Upload a Discharge Paper First',
+                          style: theme.textTheme.titleLarge,
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_contextLoaded)
-                  Semantics(
-                    label: 'Context loaded',
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Context loaded',
-                          style: theme.textTheme.bodySmall),
+                        const SizedBox(height: 12),
+                        Text(
+                          'The AI chat needs your discharge information to provide personalized assistance. Please scan or upload your discharge paper first.',
+                          style: theme.textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
-                Expanded(
-                  child: ListView.builder(
-                    reverse: false,
-                    itemCount: _chatManager.activeChat.length,
-                    itemBuilder: (context, i) {
-                      final msg = _chatManager.activeChat[i];
-                      final isUser = msg['role'] == 'user';
-                      return Semantics(
-                        label: isUser ? 'User message' : 'Assistant message',
-                        child: Align(
-                          alignment: isUser
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 12),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isUser
-                                  ? theme.colorScheme.primary
-                                      .withValues(alpha: 0.15)
-                                  : theme.colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: isUser
-                                ? Text(msg['content'] ?? '')
-                                : MarkdownText(
-                                    data: msg['content'] ?? '',
-                                    selectable: true,
-                                  ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                if (_isTyping)
-                  Semantics(
-                    label: 'Assistant is typing',
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                )
+              : Column(
+                  children: [
+                    // Chat session menu
+                    Container(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 12),
                       child: Row(
                         children: [
-                          const SizedBox(width: 8),
-                          const CircularProgressIndicator(strokeWidth: 2),
-                          const SizedBox(width: 12),
-                          Text('Assistant is typing...',
-                              style: theme.textTheme.bodySmall),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children:
+                                    List.generate(_chatManager.chatCount, (i) {
+                                  final isActive =
+                                      i == _chatManager.activeChatIndex;
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4),
+                                    child: ChoiceChip(
+                                      label: Text('Chat ${i + 1}'),
+                                      selected: isActive,
+                                      onSelected: (_) {
+                                        setState(() {
+                                          _chatManager.switchChat(i);
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ),
+                          ),
+                          Semantics(
+                            label: 'New chat',
+                            button: true,
+                            child: IconButton(
+                              icon: const Icon(Icons.add),
+                              tooltip: 'New chat',
+                              onPressed: () {
+                                setState(() {
+                                  _chatManager.newChat();
+                                });
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Semantics(
-                          label: 'Type your message',
-                          textField: true,
-                          child: TextField(
-                            controller: _controller,
-                            decoration: const InputDecoration(
-                              hintText: 'Type your message...',
-                              border: OutlineInputBorder(),
+                    if (_contextLoaded)
+                      Semantics(
+                        label: 'Context loaded',
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Context loaded',
+                              style: theme.textTheme.bodySmall),
+                        ),
+                      ),
+                    Expanded(
+                      child: ListView.builder(
+                        reverse: false,
+                        itemCount: _chatManager.activeChat.length,
+                        itemBuilder: (context, i) {
+                          final msg = _chatManager.activeChat[i];
+                          final isUser = msg['role'] == 'user';
+                          return Semantics(
+                            label:
+                                isUser ? 'User message' : 'Assistant message',
+                            child: Align(
+                              alignment: isUser
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 12),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: isUser
+                                      ? theme.colorScheme.primary
+                                          .withValues(alpha: 0.15)
+                                      : theme
+                                          .colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: isUser
+                                    ? Text(msg['content'] ?? '')
+                                    : MarkdownText(
+                                        data: msg['content'] ?? '',
+                                        selectable: true,
+                                      ),
+                              ),
                             ),
-                            onSubmitted: (_) => _sendMessage(),
+                          );
+                        },
+                      ),
+                    ),
+                    if (_isTyping)
+                      Semantics(
+                        label: 'Assistant is typing',
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 8),
+                              const CircularProgressIndicator(strokeWidth: 2),
+                              const SizedBox(width: 12),
+                              Text('Assistant is typing...',
+                                  style: theme.textTheme.bodySmall),
+                            ],
                           ),
                         ),
                       ),
-                      Semantics(
-                        label: 'Send message',
-                        button: true,
-                        child: IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: _sendMessage,
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Semantics(
+                              label: 'Type your message',
+                              textField: true,
+                              child: TextField(
+                                controller: _controller,
+                                decoration: const InputDecoration(
+                                  hintText: 'Type your message...',
+                                  border: OutlineInputBorder(),
+                                ),
+                                onSubmitted: (_) => _sendMessage(),
+                              ),
+                            ),
+                          ),
+                          Semantics(
+                            label: 'Send message',
+                            button: true,
+                            child: IconButton(
+                              icon: const Icon(Icons.send),
+                              onPressed: _sendMessage,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
     );
   }
 }

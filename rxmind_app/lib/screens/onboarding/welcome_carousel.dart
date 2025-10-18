@@ -81,7 +81,16 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Removed top image for cleaner look
+                              // SVG illustrations have been removed for simplicity.
+                              // const SizedBox(height: 32),
+                              // SvgPicture.asset(
+                              //   page.illustration,
+                              //   height: 200,
+                              //   width: 200,
+                              //   placeholderBuilder: (context) =>
+                              //       const Icon(Icons.image, size: 100),
+                              // ),
+                              // const SizedBox(height: 48),
                               const SizedBox(height: 32),
                               Text(
                                 page.title,

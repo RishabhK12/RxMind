@@ -17,18 +17,53 @@ class _PermissionsPromptScreenState extends State<PermissionsPromptScreen>
 
   Future<void> _requestPermissions() async {
     setState(() => _requesting = true);
-    // Request camera and storage permissions
+
+    // First try requesting each permission individually
     final cameraStatus = await Permission.camera.request();
     final storageStatus = await Permission.storage.request();
+
+    if (!mounted) return;
+
+    // Check if we have all permissions
+    if (cameraStatus.isGranted && storageStatus.isGranted) {
+      setState(() => _requesting = false);
+      Navigator.pushReplacementNamed(context, '/onboardingProfile');
+      return;
+    }
+
+    // If permissions aren't granted, open app settings
+    if (!cameraStatus.isGranted || !storageStatus.isGranted) {
+      // Show message about which permissions are needed
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Please enable both Camera and Storage permissions in settings'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      // Open app settings directly
+      await openAppSettings();
+    }
+
+    // Check permissions again after user returns from settings
     if (!mounted) return;
     setState(() => _requesting = false);
-    if (cameraStatus.isGranted && storageStatus.isGranted) {
+
+    // Do a final check of permissions status
+    final finalCameraStatus = await Permission.camera.status;
+    final finalStorageStatus = await Permission.storage.status;
+
+    if (finalCameraStatus.isGranted && finalStorageStatus.isGranted) {
       Navigator.pushReplacementNamed(context, '/onboardingProfile');
     } else {
+      // Show more detailed instructions if user still hasn't granted permissions
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Permissions denied. Please enable camera and storage permissions to continue.')),
+        const SnackBar(
+          content: Text(
+              'Please enable both Camera and Storage permissions to continue'),
+          duration: Duration(seconds: 4),
+        ),
       );
     }
   }

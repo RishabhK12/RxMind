@@ -27,10 +27,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       HomeDashboardScreen(
         onNavigateToTab: (int tabIndex) {
           setState(() => _currentIndex = tabIndex);
-          if (tabIndex == 1) {
-            // Animate charts when navigating from home shortcut
-            _complianceStatsKey.currentState?.resetAndAnimateCharts();
-          }
         },
       ),
       ComplianceStatsScreen(key: _complianceStatsKey),
@@ -96,10 +92,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     icon: Icons.show_chart_rounded,
                     label: 'Charts',
                     active: _currentIndex == 1,
-                    onTap: () {
-                      setState(() => _currentIndex = 1);
-                      _complianceStatsKey.currentState?.resetAndAnimateCharts();
-                    },
+                    onTap: () => setState(() => _currentIndex = 1),
                   ),
                 ),
                 Semantics(

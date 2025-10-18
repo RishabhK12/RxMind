@@ -11,24 +11,9 @@ class OnboardingProfileFlow extends StatefulWidget {
 }
 
 class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
-  bool _loading = true;
   @override
   void initState() {
     super.initState();
-    _checkOnboardingStatus();
-  }
-
-  Future<void> _checkOnboardingStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final complete = prefs.getBool('onboardingComplete') ?? false;
-    if (complete && mounted) {
-      // If onboarding is already complete, skip this screen
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/mainNav');
-      });
-    } else {
-      setState(() => _loading = false);
-    }
   }
 
   // Profile data
@@ -349,11 +334,6 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFB),
       resizeToAvoidBottomInset: true,
@@ -372,13 +352,25 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                   child: Column(
                     children: [
                       const SizedBox(height: 16),
-                      // RxMind logo (SVG)
-                      SizedBox(
+                      // RxMind logo (replaced with text)
+                      Container(
                         height: 48,
-                        child: Image.asset(
-                          'assets/illus/logo.svg',
-                          errorBuilder: (context, error, stackTrace) =>
-                              Icon(Icons.error, size: 48, color: Colors.red),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Center(
+                            child: Text(
+                              'RxMind',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       buildProgressBar(),

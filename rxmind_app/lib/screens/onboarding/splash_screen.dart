@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,9 +27,9 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
     Future.delayed(const Duration(milliseconds: 1200), () async {
       if (!mounted) return;
-      final prefs = await SharedPreferences.getInstance();
-      final complete = prefs.getBool('onboardingComplete') ?? false;
-      if (complete) {
+      final profileData = await DischargeDataManager.loadProfileData();
+      final name = profileData['name'];
+      if (name != null && name.isNotEmpty) {
         Navigator.pushReplacementNamed(context, '/mainNav');
       } else {
         Navigator.pushReplacementNamed(context, '/welcomeCarousel');
@@ -46,6 +45,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -56,10 +56,23 @@ class _SplashScreenState extends State<SplashScreen>
                 CurvedAnimation(parent: _controller, curve: Curves.easeOut)),
             child: FadeTransition(
               opacity: _fadeAnimation,
-              child: SvgPicture.asset(
-                'assets/illus/logo.svg',
+              child: Container(
                 width: MediaQuery.of(context).size.width * 0.55,
                 height: MediaQuery.of(context).size.width * 0.55,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    'RxMind',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

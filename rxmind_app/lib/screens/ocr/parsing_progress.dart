@@ -45,15 +45,38 @@ Required JSON structure:
   "follow_ups": [
     {
       "name": "doctor/department name",
-      "date": "appointment date and time"
+      "date": "appointment date and time in YYYY-MM-DD HH:MM format"
     }
   ],
   "instructions": [
     {
       "name": "instruction text"
     }
+  ],
+  "tasks": [
+    {
+      "title": "task title",
+      "dueDate": "due date in YYYY-MM-DD format or null if not specified",
+      "dueTime": "due time in HH:MM format or null if not specified",
+      "isRecurring": true/false,
+      "recurringPattern": "daily/weekly/monthly/etc or null if not recurring",
+      "recurringInterval": number (e.g., 1 for daily, 2 for every other day) or null if not recurring,
+      "startDate": "start date in YYYY-MM-DD format for recurring tasks or null if not applicable"
+    }
   ]
 }
+
+Extract tasks from the instructions or follow-ups that require patient action. For each task:
+1. Include a specific dueDate and dueTime if mentioned (use YYYY-MM-DD and HH:MM format)
+2. Set isRecurring to true for tasks that repeat (like "take temperature daily")
+3. Specify recurringPattern as "daily", "weekly", or "monthly" for recurring tasks
+4. Set recurringInterval (e.g., 1 for daily, 2 for every other day)
+5. For recurring tasks, set a startDate (usually today or the discharge date)
+6. If no specific date/time is mentioned for non-recurring tasks, set those fields to null
+
+Today's date is 2025-10-17. Interpret relative dates accordingly (e.g., "tomorrow" = 2025-10-18).
+If a task mentions "every morning", set dueTime to "08:00" and recurringPattern to "daily".
+If a task mentions "twice daily", create two separate tasks with appropriate times.
 
 Discharge Text:
 $reviewedText

@@ -216,23 +216,37 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
                 children: [
                   Text('Health Glossary', style: theme.textTheme.titleMedium),
                   const SizedBox(height: 8),
-                  ...glossaryTerms.map((term) => Semantics(
-                        button: true,
-                        label: 'Glossary term: $term. Tap for definition.',
-                        child: ListTile(
-                          title: Text(term, style: theme.textTheme.bodyLarge),
-                          trailing: Icon(Icons.info_outline,
-                              color: theme.colorScheme.primary),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    GlossaryDetailScreen(term: term),
-                              ),
-                            );
-                          },
-                        ),
-                      )),
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 300),
+                    child: Scrollbar(
+                      thumbVisibility: true,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: glossaryTerms.length,
+                        itemBuilder: (context, index) {
+                          final term = glossaryTerms[index];
+                          return Semantics(
+                            button: true,
+                            label: 'Glossary term: $term. Tap for definition.',
+                            child: ListTile(
+                              title:
+                                  Text(term, style: theme.textTheme.bodyLarge),
+                              trailing: Icon(Icons.info_outline,
+                                  color: theme.colorScheme.primary),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        GlossaryDetailScreen(term: term),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -295,6 +309,8 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
                         : Text(
                             medGlossary[med['name']]!,
                             style: Theme.of(context).textTheme.bodyMedium,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 10,
                           ),
                   ),
               ],
@@ -433,6 +449,8 @@ class _MedicationCard extends StatelessWidget {
                             fontSize: 16,
                             color: theme.colorScheme.onSurface,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                       const SizedBox(width: 6),

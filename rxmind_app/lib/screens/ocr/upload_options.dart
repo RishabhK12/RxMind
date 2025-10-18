@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:tesseract_ocr/tesseract_ocr.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rxmind_app/services/ocr/text_extraction_service.dart';
+import 'package:path/path.dart' as path;
 
 class UploadOptionsScreen extends StatefulWidget {
   const UploadOptionsScreen({super.key});
@@ -11,10 +13,15 @@ class UploadOptionsScreen extends StatefulWidget {
 }
 
 class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
-  String? _selectedFilePath;
+  final List<String> _selectedFilePaths = [];
   bool _uploading = false;
   bool _uploadComplete = false;
   double _uploadProgress = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   Future<void> _simulateUpload() async {
     setState(() {
@@ -39,7 +46,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
   }
 
   Future<void> _scanDocument() async {
-    if (_selectedFilePath == null) return;
+    if (_selectedFilePaths.isEmpty) return;
 
     try {
       // Show loading indicator
@@ -52,11 +59,116 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
         ),
       );
 
-      final ocrText = await TesseractOcr.extractText(_selectedFilePath!);
+      // Extract text from all selected files
+      String ocrText = '';
+      String? errorMessage;
+      List<String> errorFiles = [];
+
+      for (final filePath in _selectedFilePaths) {
+        try {
+          // Show additional extraction status
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Processing ${filePath.toLowerCase().endsWith('.pdf') ? 'PDF' : 'image'}: ${path.basename(filePath)}',
+              ),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          // Use the TextExtractionService to handle both PDFs and images
+          debugPrint('Extracting text from file: $filePath');
+          final result =
+              await TextExtractionService.extractTextFromFile(filePath);
+
+          if (result.success) {
+            ocrText += '${result.text}\n\n'; // Append text from each file
+            debugPrint('Text extraction successful for $filePath');
+          } else {
+            debugPrint(
+                'Text extraction issue for $filePath: ${result.errorMessage}');
+            errorFiles.add(path.basename(filePath));
+            errorMessage = result.errorMessage;
+          }
+        } catch (extractionError) {
+          // Log error but continue with other files
+          debugPrint('Text extraction error for $filePath: $extractionError');
+          errorFiles.add(path.basename(filePath));
+          errorMessage = 'Unexpected error: $extractionError';
+        }
+      }
 
       if (!mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
-      Navigator.pushNamed(context, '/reviewText', arguments: ocrText);
+
+      // If extraction failed for any file, show a message but allow continuation
+      if (errorFiles.isNotEmpty) {
+        final String troubleshootingAdvice =
+            TextExtractionService.getTroubleshootingAdvice(
+                errorFiles.first, errorMessage);
+
+        final shouldContinue = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            icon: const Icon(
+              Icons.error_outline,
+              color: Colors.orange,
+              size: 36,
+            ),
+            title: Text('Extraction Issue with ${errorFiles.length} file(s)'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Could not extract text from: ${errorFiles.join(', ')}.\n\nError: ${errorMessage ?? 'No text was found in the document.'}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Troubleshooting Tips:',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  troubleshootingAdvice,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Try Again'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Continue with extracted text'),
+              ),
+            ],
+          ),
+        );
+
+        if (shouldContinue == true) {
+          if (!mounted) return;
+          Navigator.pushNamed(context, '/reviewText', arguments: ocrText);
+        }
+      } else if (ocrText.isEmpty) {
+        // All files processed, but no text found
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('No text could be extracted from the selected files.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        // Text extraction successful, proceed normally
+        if (!mounted) return;
+        Navigator.pushNamed(context, '/reviewText', arguments: ocrText);
+      }
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
@@ -120,7 +232,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                     ),
                     elevation: 4,
                   ),
-                  onPressed: _uploadComplete
+                  onPressed: _uploading
                       ? null
                       : () async {
                           // Use image_picker to capture photo from camera
@@ -130,14 +242,14 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                                 source: ImageSource.camera);
                             if (photo != null) {
                               setState(() {
-                                _selectedFilePath = photo.path;
+                                _selectedFilePaths.add(photo.path);
                               });
                               await _simulateUpload();
                             }
                           } catch (e) {
                             if (!mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              const SnackBar(
                                   content: Text(
                                       'Camera not available or permission denied.')),
                             );
@@ -153,7 +265,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                   icon: Icon(Icons.insert_drive_file,
                       size: 24, color: theme.colorScheme.onPrimary),
                   label: Text(
-                    'Select File',
+                    'Select PDF or Image',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.w500,
@@ -168,18 +280,20 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                     ),
                     elevation: 4,
                   ),
-                  onPressed: _uploadComplete
+                  onPressed: _uploading
                       ? null
                       : () async {
                           try {
                             final result = await FilePicker.platform.pickFiles(
                               type: FileType.custom,
                               allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+                              allowMultiple: true,
                             );
-                            if (result != null &&
-                                result.files.single.path != null) {
+                            if (result != null && result.paths.isNotEmpty) {
                               setState(() {
-                                _selectedFilePath = result.files.single.path;
+                                _selectedFilePaths.addAll(result.paths
+                                    .where((p) => p != null)
+                                    .cast<String>());
                               });
                               await _simulateUpload();
                             }
@@ -193,7 +307,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                         },
                 ),
               ),
-              if (_selectedFilePath != null) ...[
+              if (_selectedFilePaths.isNotEmpty) ...[
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -202,75 +316,80 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                     color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: theme.colorScheme.outline.withOpacity(0.3),
+                      color: theme.colorScheme.outline.withAlpha(77),
                     ),
                   ),
                   child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.insert_drive_file,
-                              color: theme.colorScheme.primary),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              _selectedFilePath!.split('/').last,
-                              style: theme.textTheme.bodyMedium,
-                              overflow: TextOverflow.ellipsis,
+                    children: _selectedFilePaths.map((filePath) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              filePath.toLowerCase().endsWith('.pdf')
+                                  ? Icons.picture_as_pdf
+                                  : Icons.image,
+                              color: theme.colorScheme.primary,
                             ),
-                          ),
-                          if (_uploadComplete)
-                            Icon(Icons.check_circle,
-                                color: Colors.green, size: 24),
-                        ],
-                      ),
-                      if (_uploading) ...[
-                        const SizedBox(height: 12),
-                        LinearProgressIndicator(
-                          value: _uploadProgress,
-                          backgroundColor:
-                              theme.colorScheme.surfaceContainerHighest,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    path.basename(filePath),
+                                    style: theme.textTheme.bodyMedium,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    filePath.toLowerCase().endsWith('.pdf')
+                                        ? 'PDF Document'
+                                        : 'Image File',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withAlpha(153)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                setState(() {
+                                  _selectedFilePaths.remove(filePath);
+                                  if (_selectedFilePaths.isEmpty) {
+                                    _uploadComplete = false;
+                                    _uploadProgress = 0.0;
+                                  }
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Uploading... ${(_uploadProgress * 100).toInt()}%',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ],
+                      );
+                    }).toList(),
                   ),
                 ),
               ],
-              if (_uploadComplete) ...[
-                const SizedBox(height: 24),
-                Semantics(
-                  label: 'Scan Document',
-                  button: true,
+              if (_uploading) ...[
+                const SizedBox(height: 16),
+                LinearProgressIndicator(
+                  value: _uploadProgress,
+                  backgroundColor: theme.colorScheme.surfaceContainerLowest,
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                ),
+              ],
+              const SizedBox(height: 32),
+              if (_selectedFilePaths.isNotEmpty && !_uploading)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: ElevatedButton.icon(
-                    icon: Icon(Icons.document_scanner,
-                        size: 24, color: theme.colorScheme.onPrimary),
-                    label: Text(
-                      'Scan Document',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onPrimary,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      minimumSize: const Size(200, 60),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                    ),
+                    icon: const Icon(Icons.document_scanner_outlined),
+                    label: const Text('Scan Document'),
                     onPressed: _scanDocument,
                   ),
                 ),
-              ],
             ],
           ),
         ),

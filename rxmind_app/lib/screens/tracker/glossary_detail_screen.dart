@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../ai/gemini_api_service.dart';
 import '../../gemini_api_key.dart';
+import '../../core/widgets/markdown_text.dart';
 
 class GlossaryDetailScreen extends StatefulWidget {
   final String term;
@@ -79,11 +80,10 @@ Do NOT include any preamble, confirmation, or closing text. Do NOT say things li
       body: Center(
         child: loading
             ? const CircularProgressIndicator()
-            : Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  definition ?? '',
-                  style: theme.textTheme.bodyLarge,
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: MarkdownText(data: definition ?? ''),
                 ),
               ),
       ),

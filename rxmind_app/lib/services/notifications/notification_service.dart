@@ -18,10 +18,12 @@ class NotificationService {
       title,
       body,
       tz.TZDateTime.from(scheduledTime, tz.local),
-      const NotificationDetails(
+      NotificationDetails(
           android:
               AndroidNotificationDetails('main_channel', 'Main Notifications')),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }

@@ -1,7 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+
+// Extension to capitalize first letter of string
+extension StringExtension on String {
+  String capitalize() {
+    return isNotEmpty ? '${this[0].toUpperCase()}${substring(1)}' : this;
+  }
+}
 
 typedef DashboardTabCallback = void Function(int tabIndex);
 
@@ -28,8 +36,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     final prefs = await SharedPreferences.getInstance();
     userName = prefs.getString('userName');
     dischargeUploaded = await DischargeDataManager.isDischargeUploaded();
-    setState(() {
-      if (!dischargeUploaded) {
+
+    if (!dischargeUploaded) {
+      setState(() {
         tasks = [
           {
             'title': 'Upload Discharge Paper',
@@ -37,12 +46,146 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             'uploadTask': true
           },
         ];
-      } else {
-        // Load real tasks from storage or backend
-        // tasks = await fetchTasks();
-        tasks = [];
+      });
+    } else {
+      // Load real tasks from storage
+      final storedTasks = await DischargeDataManager.loadTasks();
+
+      // Filter tasks for today and upcoming tasks
+      final now = DateTime.now();
+      final filteredTasks = <Map<String, dynamic>>[];
+
+      for (final task in storedTasks) {
+        // Skip completed tasks
+        if (task['completed'] == true) continue;
+
+        try {
+          // Handle regular tasks
+          if (task['dueTime'] != null) {
+            final dueTime = DateTime.parse(task['dueTime'].toString());
+            // Only include tasks due today or in the future
+            if (!dueTime.isBefore(DateTime(now.year, now.month, now.day))) {
+              filteredTasks.add({
+                'title': task['title'] ?? 'Task',
+                'progress': 0.0,
+                'dueTime': dueTime,
+              });
+            }
+          }
+
+          // Handle recurring tasks
+          if (task['isRecurring'] == true) {
+            final recurringPattern =
+                task['recurringPattern']?.toString().toLowerCase() ?? 'daily';
+
+            // Calculate next occurrence for recurring task
+            DateTime nextOccurrence;
+            if (task['startDate'] != null) {
+              try {
+                final startDate = DateTime.parse(task['startDate'].toString());
+                final now = DateTime.now();
+                final recurringInterval = task['recurringInterval'] is int
+                    ? task['recurringInterval'] as int
+                    : (task['recurringInterval'] != null
+                        ? int.tryParse(task['recurringInterval'].toString()) ??
+                            1
+                        : 1);
+
+                // Calculate next occurrence based on pattern
+                switch (recurringPattern) {
+                  case 'daily':
+                    final daysSinceStart = now.difference(startDate).inDays;
+                    final daysToAdd = recurringInterval -
+                        (daysSinceStart % recurringInterval);
+                    nextOccurrence = now.add(Duration(
+                        days: daysToAdd == recurringInterval ? 0 : daysToAdd));
+                    break;
+                  case 'weekly':
+                    final weeksSinceStart =
+                        now.difference(startDate).inDays ~/ 7;
+                    final weeksToAdd = recurringInterval -
+                        (weeksSinceStart % recurringInterval);
+                    nextOccurrence = now.add(Duration(
+                        days:
+                            (weeksToAdd == recurringInterval ? 0 : weeksToAdd) *
+                                7));
+                    break;
+                  case 'monthly':
+                    // Simple monthly calculation - can be improved for more complex cases
+                    final monthDiff = (now.year - startDate.year) * 12 +
+                        now.month -
+                        startDate.month;
+                    final monthsToAdd =
+                        recurringInterval - (monthDiff % recurringInterval);
+                    nextOccurrence = DateTime(
+                      now.year,
+                      now.month +
+                          (monthsToAdd == recurringInterval ? 0 : monthsToAdd),
+                      startDate.day,
+                    );
+                    break;
+                  default:
+                    nextOccurrence = now;
+                }
+
+                // For recurring tasks, show them on dashboard with next occurrence date
+                filteredTasks.add({
+                  'title':
+                      '${task['title'] ?? 'Task'} (${recurringPattern.capitalize()})',
+                  'progress': task['completed'] == true ? 1.0 : 0.0,
+                  'recurring': true,
+                  'dueTime': nextOccurrence,
+                });
+                continue;
+              } catch (e) {
+                debugPrint('Error calculating recurring task schedule: $e');
+              }
+            }
+
+            // Fallback if date calculation fails
+            filteredTasks.add({
+              'title':
+                  '${task['title'] ?? 'Task'} (${recurringPattern.capitalize()})',
+              'progress': task['completed'] == true ? 1.0 : 0.0,
+              'recurring': true,
+            });
+          }
+        } catch (e) {
+          debugPrint('Error processing task for dashboard: $e');
+        }
       }
-    });
+
+      // Sort by due time
+      filteredTasks.sort((a, b) {
+        if (a['dueTime'] == null && b['dueTime'] == null) {
+          return 0;
+        }
+        if (a['dueTime'] == null) {
+          return 1;
+        }
+        if (b['dueTime'] == null) {
+          return -1;
+        }
+
+        final aTime = a['dueTime'] as DateTime;
+        final bTime = b['dueTime'] as DateTime;
+        return aTime.compareTo(bTime);
+      });
+
+      // Limit to 5 most important tasks
+      final dashboardTasks = filteredTasks.take(5).toList();
+
+      if (dashboardTasks.isEmpty) {
+        dashboardTasks.add({
+          'title': 'No upcoming tasks',
+          'progress': 1.0,
+        });
+      }
+
+      setState(() {
+        tasks = dashboardTasks;
+      });
+    }
   }
 
   @override
@@ -124,8 +267,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       label:
                           'Task: ${task['title']}, progress ${(task['progress'] * 100).round()} percent',
                       child: GestureDetector(
-                        onTap: () =>
-                            widget.onNavigateToTab?.call(2), // 2 = Tasks tab
+                        onTap: () {
+                          // If it's the upload discharge task, go directly to upload screen
+                          if (task['uploadTask'] == true) {
+                            Navigator.pushNamed(context, '/uploadOptions');
+                          } else {
+                            // Otherwise go to tasks tab
+                            widget.onNavigateToTab?.call(2); // 2 = Tasks tab
+                          }
+                        },
                         child: _TaskCard(
                           title: task['title'],
                           progress: task['progress'],

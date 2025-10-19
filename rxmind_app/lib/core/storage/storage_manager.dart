@@ -21,9 +21,7 @@ class StorageManager {
       await LocalStorage.db!.close();
       await LocalStorage.initDb();
     }
-    // Cancel notifications
     final notifications = FlutterLocalNotificationsPlugin();
     await notifications.cancelAll();
-    // TODO: Redirect to onboarding info flow (handled in UI)
   }
 }

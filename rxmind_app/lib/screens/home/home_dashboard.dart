@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'package:rxmind_app/services/pdf_export_service.dart';
+import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
+import 'dart:convert';
 
 // Extension to capitalize first letter of string
 extension StringExtension on String {
@@ -25,11 +28,61 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   String? userName;
   bool dischargeUploaded = false;
   List<Map<String, dynamic>> tasks = [];
+  List<Map<String, dynamic>> warnings = [];
+  List<Map<String, dynamic>> contacts = [];
 
   @override
   void initState() {
     super.initState();
     _loadUserProfile();
+    _loadWarnings();
+    _loadContacts();
+
+    // Register to receive task updates
+    DischargeDataManager.addTaskUpdateListener(_refreshDashboard);
+  }
+
+  @override
+  void dispose() {
+    // Remove task update listener when screen is disposed
+    DischargeDataManager.removeTaskUpdateListener(_refreshDashboard);
+    super.dispose();
+  }
+
+  void _refreshDashboard() {
+    _loadUserProfile();
+  }
+
+  Future<void> _loadWarnings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? warningsJson = prefs.getString('warnings');
+
+    if (warningsJson != null && warningsJson.isNotEmpty) {
+      try {
+        final List<dynamic> parsedWarnings = jsonDecode(warningsJson);
+        setState(() {
+          warnings = List<Map<String, dynamic>>.from(parsedWarnings);
+        });
+      } catch (e) {
+        // Error parsing warnings data
+      }
+    }
+  }
+
+  Future<void> _loadContacts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? contactsJson = prefs.getString('contacts');
+
+    if (contactsJson != null && contactsJson.isNotEmpty) {
+      try {
+        final List<dynamic> parsedContacts = jsonDecode(contactsJson);
+        setState(() {
+          contacts = List<Map<String, dynamic>>.from(parsedContacts);
+        });
+      } catch (e) {
+        // Error parsing contacts data
+      }
+    }
   }
 
   Future<void> _loadUserProfile() async {
@@ -59,6 +112,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         // Skip completed tasks
         if (task['completed'] == true) continue;
 
+        // Skip warnings - they'll be shown in the warnings widget
+        if (task['type'] == 'warning') continue;
+
         try {
           // Handle regular tasks
           if (task['dueTime'] != null) {
@@ -69,6 +125,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 'title': task['title'] ?? 'Task',
                 'progress': 0.0,
                 'dueTime': dueTime,
+                'taskId': task['id'],
               });
             }
           }
@@ -128,30 +185,33 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     nextOccurrence = now;
                 }
 
-                // For recurring tasks, show them on dashboard with next occurrence date
-                filteredTasks.add({
-                  'title':
-                      '${task['title'] ?? 'Task'} (${recurringPattern.capitalize()})',
-                  'progress': task['completed'] == true ? 1.0 : 0.0,
-                  'recurring': true,
-                  'dueTime': nextOccurrence,
-                });
+                // Only show recurring tasks if they're due within 3 hours (per requirements)
+                // or if they're already overdue
+                final timeDifference = nextOccurrence.difference(now);
+                if (timeDifference.isNegative || timeDifference.inHours <= 3) {
+                  filteredTasks.add({
+                    'title': task['title'] ?? 'Task',
+                    'progress': task['completed'] == true ? 1.0 : 0.0,
+                    'recurring': true,
+                    'dueTime': nextOccurrence,
+                    'taskId': task['id'],
+                  });
+                }
                 continue;
               } catch (e) {
-                debugPrint('Error calculating recurring task schedule: $e');
+                // Error calculating recurring task schedule
               }
             }
 
-            // Fallback if date calculation fails
             filteredTasks.add({
-              'title':
-                  '${task['title'] ?? 'Task'} (${recurringPattern.capitalize()})',
+              'title': task['title'] ?? 'Task',
               'progress': task['completed'] == true ? 1.0 : 0.0,
               'recurring': true,
+              'taskId': task['id'],
             });
           }
         } catch (e) {
-          debugPrint('Error processing task for dashboard: $e');
+          // Error processing task for dashboard
         }
       }
 
@@ -167,8 +227,22 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           return -1;
         }
 
-        final aTime = a['dueTime'] as DateTime;
-        final bTime = b['dueTime'] as DateTime;
+        // Handle both DateTime objects and String representations
+        DateTime aTime;
+        DateTime bTime;
+
+        if (a['dueTime'] is DateTime) {
+          aTime = a['dueTime'] as DateTime;
+        } else {
+          aTime = DateTime.parse(a['dueTime'].toString());
+        }
+
+        if (b['dueTime'] is DateTime) {
+          bTime = b['dueTime'] as DateTime;
+        } else {
+          bTime = DateTime.parse(b['dueTime'].toString());
+        }
+
         return aTime.compareTo(bTime);
       });
 
@@ -286,6 +360,85 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ),
             ),
+
+            // Add warnings widget if we have any warnings
+            if (warnings.isNotEmpty) ...[
+              SliverPadding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                sliver: SliverToBoxAdapter(
+                  child: Semantics(
+                    label: 'Important Reminders',
+                    child: Text(
+                      'Important Reminders',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverToBoxAdapter(
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 2,
+                    color: Colors.amber.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.warning_amber_rounded,
+                                color: Colors.amber.shade700,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Warnings & Restrictions',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: Colors.amber.shade900,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          ...warnings.map((warning) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.circle,
+                                      size: 8,
+                                      color: Colors.amber.shade800,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        warning['text'] ?? '',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                          color: Colors.grey.shade900,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               sliver: SliverGrid(
@@ -334,22 +487,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           widget.onNavigateToTab?.call(1), // 1 = Charts tab
                     ),
                   ),
-                  Semantics(
-                    label: 'Export Data',
-                    button: true,
-                    child: _ActionTile(
-                      icon: Icons.download,
-                      label: 'Export Data',
-                      color: theme.colorScheme.primary,
-                      onTap: () async {
-                        // TODO: Implement PDF export with correct imports
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Export feature coming soon.')),
-                        );
-                      },
-                    ),
-                  ),
                 ]),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -359,157 +496,86 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ),
             ),
+
+            // Export Data - Full Width
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              sliver: SliverToBoxAdapter(
+                child: Semantics(
+                  label: 'Export Data',
+                  button: true,
+                  child: SizedBox(
+                    height: 60,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        try {
+                          // Show loading indicator
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+
+                          // Generate PDF
+                          final pdfFile =
+                              await PdfExportService.generateHealthReport();
+
+                          // Close loading dialog
+                          if (!context.mounted) return;
+                          Navigator.of(context).pop();
+
+                          // Navigate to preview screen
+                          if (!context.mounted) return;
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PdfPreviewScreen(pdfFile: pdfFile),
+                            ),
+                          );
+                        } catch (e) {
+                          // Close loading dialog if still open
+                          if (context.mounted &&
+                              Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
+
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error exporting PDF: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                      icon: Icon(Icons.download,
+                          color: theme.colorScheme.onPrimary),
+                      label: Text(
+                        'Export Health Report',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onPrimary,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
-      floatingActionButton: Semantics(
-        label: 'Add new task',
-        button: true,
-        child: FloatingActionButton(
-          backgroundColor: theme.colorScheme.secondary,
-          child: const Icon(Icons.add, size: 28, color: Colors.white),
-          onPressed: () async {
-            final result = await showDialog<Map<String, dynamic>>(
-              context: context,
-              builder: (context) {
-                final _titleController = TextEditingController();
-                DateTime? _selectedDate;
-                TimeOfDay? _selectedTime;
-                bool _repeat = false;
-                int _repeatEvery = 1;
-                String _repeatPeriod = 'day';
-                return StatefulBuilder(
-                  builder: (context, setState) => AlertDialog(
-                    title: const Text('Create New Task'),
-                    content: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            controller: _titleController,
-                            decoration: const InputDecoration(
-                              labelText: 'Task Title',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    final picked = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(2020),
-                                      lastDate: DateTime(2100),
-                                    );
-                                    if (picked != null) {
-                                      setState(() => _selectedDate = picked);
-                                    }
-                                  },
-                                  child: Text(_selectedDate == null
-                                      ? 'Pick Date'
-                                      : '${_selectedDate!.month}/${_selectedDate!.day}/${_selectedDate!.year}'),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    final picked = await showTimePicker(
-                                      context: context,
-                                      initialTime: TimeOfDay.now(),
-                                    );
-                                    if (picked != null) {
-                                      setState(() => _selectedTime = picked);
-                                    }
-                                  },
-                                  child: Text(_selectedTime == null
-                                      ? 'Pick Time'
-                                      : _selectedTime!.format(context)),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _repeat,
-                                onChanged: (v) =>
-                                    setState(() => _repeat = v ?? false),
-                              ),
-                              const Text('Repeat'),
-                              if (_repeat) ...[
-                                const SizedBox(width: 8),
-                                SizedBox(
-                                  width: 48,
-                                  child: TextField(
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      hintText: '1',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    onChanged: (v) => setState(() =>
-                                        _repeatEvery = int.tryParse(v) ?? 1),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                DropdownButton<String>(
-                                  value: _repeatPeriod,
-                                  items: const [
-                                    DropdownMenuItem(
-                                        value: 'day', child: Text('day')),
-                                    DropdownMenuItem(
-                                        value: 'week', child: Text('week')),
-                                    DropdownMenuItem(
-                                        value: 'month', child: Text('month')),
-                                  ],
-                                  onChanged: (v) => setState(
-                                      () => _repeatPeriod = v ?? 'day'),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Cancel'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_titleController.text.trim().isEmpty ||
-                              _selectedDate == null ||
-                              _selectedTime == null) return;
-                          Navigator.pop(context, {
-                            'title': _titleController.text.trim(),
-                            'date': _selectedDate,
-                            'time': _selectedTime,
-                            'repeat': _repeat,
-                            'repeatEvery': _repeatEvery,
-                            'repeatPeriod': _repeatPeriod,
-                          });
-                        },
-                        child: const Text('Create'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-            if (result != null) {
-              // TODO: Save the new task to persistent storage or state
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Task "${result['title']}" created!')),
-              );
-            }
-          },
-        ),
-      ),
+      // FloatingActionButton removed - task creation is available in the Tasks tab
     );
   }
 }
@@ -537,7 +603,7 @@ class _TaskCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(
@@ -564,13 +630,17 @@ class _TaskCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-              color: theme.colorScheme.onSurface,
+          const SizedBox(height: 12),
+          Flexible(
+            child: Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ),
         ],

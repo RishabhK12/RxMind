@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:timezone/data/latest.dart' as tz;
 import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'screens/onboarding/welcome_carousel.dart';
-import 'screens/onboarding/permissions_prompt.dart';
 import 'screens/onboarding/onboarding_profile_flow.dart';
 import 'screens/profile/profile_setup_screen.dart';
 import 'screens/home/home_dashboard.dart';
@@ -17,10 +17,24 @@ import 'screens/tracker/tasks_screen.dart';
 import 'screens/tracker/medications_screen.dart';
 import 'screens/stats/compliance_stats.dart';
 import 'screens/settings/settings_screen.dart';
+import 'services/notification_service.dart';
+import 'services/discharge_data_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
+
+  // Initialize timezone database for notifications
+  tz.initializeTimeZones();
+
+  // Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+
+  // Schedule notifications for existing tasks
+  final tasks = await DischargeDataManager.loadTasks();
+  await notificationService.scheduleNotificationsForTasks(tasks);
+
   runApp(const RxMindApp());
   // Initialize DB after first frame
   WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -76,7 +90,11 @@ class _RxMindAppState extends State<RxMindApp> {
           routes: {
             '/splash': (context) => const SplashScreen(),
             '/welcomeCarousel': (context) => const WelcomeCarousel(),
-            '/permissionsPrompt': (context) => const PermissionsPromptScreen(),
+            // Removed permissions prompt since app has permissions by default
+            '/permissionsPrompt': (context) => OnboardingProfileFlow(
+                  onComplete: () =>
+                      Navigator.pushReplacementNamed(context, '/mainNav'),
+                ),
             '/onboardingProfile': (context) => OnboardingProfileFlow(
                   onComplete: () =>
                       Navigator.pushReplacementNamed(context, '/mainNav'),

@@ -1,8 +1,29 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../core/storage/local_storage.dart';
 
 /// Manages discharge data persistence across the app
 class DischargeDataManager {
+  // Task update listener functions
+  static final List<Function()> _taskUpdateListeners = [];
+
+  // Register a listener that will be called when tasks are updated
+  static void addTaskUpdateListener(Function() listener) {
+    _taskUpdateListeners.add(listener);
+  }
+
+  // Remove a previously registered listener
+  static void removeTaskUpdateListener(Function() listener) {
+    _taskUpdateListeners.remove(listener);
+  }
+
+  // Notify all listeners that tasks have been updated
+  static void _notifyTaskUpdateListeners() {
+    for (var listener in _taskUpdateListeners) {
+      listener();
+    }
+  }
+
   static const String _keyDischargeUploaded = 'dischargeUploaded';
   static const String _keyMedications = 'medications';
   static const String _keyTasks = 'tasks';
@@ -16,6 +37,8 @@ class DischargeDataManager {
   static const String _keyUserBedtime = 'userBedtime';
   static const String _keyUserWakeTime = 'userWakeTime';
   static const String _keyRawOcrText = 'rawOcrText';
+  static const String _keyContacts = 'contacts';
+  static const String _keyWarnings = 'warnings';
 
   /// Save discharge data to persistent storage
   static Future<void> saveDischargeData({
@@ -104,6 +127,16 @@ class DischargeDataManager {
     return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
+  /// Save medications to storage
+  static Future<void> saveMedications(
+      List<Map<String, dynamic>> medications) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyMedications, jsonEncode(medications));
+
+    // Notify all listeners that medications have been updated
+    _notifyTaskUpdateListeners();
+  }
+
   /// Load tasks from storage
   static Future<List<Map<String, dynamic>>> loadTasks() async {
     final prefs = await SharedPreferences.getInstance();
@@ -112,6 +145,42 @@ class DischargeDataManager {
 
     final List<dynamic> decoded = jsonDecode(tasksJson);
     return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+  }
+
+  /// Save tasks to storage
+  static Future<void> saveTasks(List<Map<String, dynamic>> tasks) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Ensure all DateTime objects are converted to strings before saving
+    final serializableTasks = tasks.map((task) {
+      final serializedTask = Map<String, dynamic>.from(task);
+
+      // Convert DateTime fields to ISO 8601 strings
+      if (serializedTask['dueTime'] is DateTime) {
+        serializedTask['dueTime'] =
+            (serializedTask['dueTime'] as DateTime).toIso8601String();
+      }
+      if (serializedTask['startDate'] is DateTime) {
+        serializedTask['startDate'] =
+            (serializedTask['startDate'] as DateTime).toIso8601String();
+      }
+      if (serializedTask['dueDate'] is DateTime) {
+        serializedTask['dueDate'] =
+            (serializedTask['dueDate'] as DateTime).toIso8601String();
+      }
+
+      return serializedTask;
+    }).toList();
+
+    await prefs.setString(_keyTasks, jsonEncode(serializableTasks));
+
+    // Notify all listeners that tasks have been updated
+    _notifyTaskUpdateListeners();
+  }
+
+  /// Get the most recent task update listeners count - useful for debugging
+  static int getTaskUpdateListenersCount() {
+    return _taskUpdateListeners.length;
   }
 
   /// Load follow-ups from storage
@@ -134,6 +203,38 @@ class DischargeDataManager {
     return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
+  /// Save contacts information
+  static Future<void> saveContacts(List<Map<String, dynamic>> contacts) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyContacts, jsonEncode(contacts));
+  }
+
+  /// Load contacts information
+  static Future<List<Map<String, dynamic>>> loadContacts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final contactsJson = prefs.getString(_keyContacts);
+    if (contactsJson == null) return [];
+
+    final List<dynamic> decoded = jsonDecode(contactsJson);
+    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+  }
+
+  /// Save warnings information
+  static Future<void> saveWarnings(List<Map<String, dynamic>> warnings) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyWarnings, jsonEncode(warnings));
+  }
+
+  /// Load warnings information
+  static Future<List<Map<String, dynamic>>> loadWarnings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final warningsJson = prefs.getString(_keyWarnings);
+    if (warningsJson == null) return [];
+
+    final List<dynamic> decoded = jsonDecode(warningsJson);
+    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+  }
+
   /// Clear all discharge data
   static Future<void> clearDischargeData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -150,5 +251,10 @@ class DischargeDataManager {
     await prefs.remove(_keyUserBedtime);
     await prefs.remove(_keyUserWakeTime);
     await prefs.remove(_keyRawOcrText);
+    await prefs.remove(_keyContacts);
+    await prefs.remove(_keyWarnings);
+
+    // Clear AI chat history
+    await LocalStorage.deleteSecure('ai_chats');
   }
 }

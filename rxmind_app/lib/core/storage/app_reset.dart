@@ -11,8 +11,6 @@ class AppReset {
     tm.taskLogs.clear();
     mm.meds.clear();
     cm.clearHistory();
-    // Wipe storage
     await StorageManager.resetApp();
-    // TODO: Wipe any additional caches, logs, or files
   }
 }

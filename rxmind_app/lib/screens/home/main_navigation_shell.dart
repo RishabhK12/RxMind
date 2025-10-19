@@ -30,7 +30,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         },
       ),
       ComplianceStatsScreen(key: _complianceStatsKey),
-      const TasksScreen(),
+      TasksScreen(complianceStatsKey: _complianceStatsKey),
       const MedicationsScreen(),
       const AiChatScreen(),
       const SettingsScreen(),
@@ -118,12 +118,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                   ),
                 ),
                 Semantics(
-                  label: 'AI Chat tab',
+                  label: 'Health Chat tab',
                   selected: _currentIndex == 4,
                   button: true,
                   child: _NavBarItem(
                     icon: Icons.chat_bubble_outline,
-                    label: 'AI Chat',
+                    label: 'Chat',
                     active: _currentIndex == 4,
                     onTap: () => setState(() => _currentIndex = 4),
                   ),

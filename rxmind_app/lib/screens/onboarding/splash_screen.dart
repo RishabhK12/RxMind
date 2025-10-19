@@ -51,30 +51,42 @@ class _SplashScreenState extends State<SplashScreen>
       body: Center(
         child: Semantics(
           label: 'Loading RxMind',
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.98, end: 1.12).animate(
-                CurvedAnimation(parent: _controller, curve: Curves.easeOut)),
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.55,
-                height: MediaQuery.of(context).size.width * 0.55,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    'RxMind',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ScaleTransition(
+                scale: Tween<double>(begin: 0.98, end: 1.08).animate(
+                    CurvedAnimation(
+                        parent: _controller, curve: Curves.easeOut)),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: MediaQuery.of(context).size.width * 0.55,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback if image not found
+                      return Icon(
+                        Icons.medical_services_rounded,
+                        size: 80,
+                        color: theme.colorScheme.primary,
+                      );
+                    },
                   ),
                 ),
               ),
-            ),
+              const SizedBox(height: 20),
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: Text(
+                  'RxMind',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

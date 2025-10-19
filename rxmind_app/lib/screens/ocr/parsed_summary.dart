@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ParsedSummaryScreen extends StatefulWidget {
   final Map<String, dynamic>? parsedJson;
@@ -16,6 +16,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   List<Map<String, dynamic>> medications = [];
   List<Map<String, dynamic>> followUps = [];
   List<Map<String, dynamic>> instructions = [];
+  List<Map<String, dynamic>> contacts = [];
   bool _loading = true;
   bool _didRun = false;
   String _rawOcrText = '';
@@ -71,6 +72,13 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
         }
+
+        // Extract contacts
+        if (parsed.containsKey('contacts') && parsed['contacts'] is List) {
+          contacts = (parsed['contacts'] as List)
+              .map((e) => Map<String, dynamic>.from(e as Map))
+              .toList();
+        }
       } catch (e) {
         // If parsing fails, use dummy data
         medications = [
@@ -109,7 +117,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   }
 
   void _editItem(Map<String, dynamic> item) {
-    // TODO: Implement edit modal or navigation
+    // Edit functionality to be implemented
   }
 
   @override
@@ -167,61 +175,192 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
                   final Map<String, dynamic> taskMap =
                       Map<String, dynamic>.from(task);
 
-                  // Parse dates
+                  // Skip tasks with type='warning' - they go in warnings section only
+                  final String taskType = taskMap['type']?.toString() ?? 'task';
+                  if (taskType == 'warning') {
+                    continue; // Don't add warnings as tasks
+                  }
+
+                  // Check if this task has a specific date from the discharge paper
+                  final bool hasSpecificDate =
+                      taskMap['hasSpecificDate'] == true;
+
+                  final now = DateTime.now();
+                  final tomorrow = DateTime(now.year, now.month, now.day)
+                      .add(const Duration(days: 1));
+
                   DateTime? dueDateTime;
-                  if (taskMap['dueDate'] != null &&
+
+                  if (hasSpecificDate &&
+                      taskMap['dueDate'] != null &&
                       taskMap['dueDate'].toString() != 'null') {
+                    // This task has a specific date from the discharge paper - USE IT EXACTLY!
                     final dateStr = taskMap['dueDate'].toString();
                     final timeStr = (taskMap['dueTime'] != null &&
                             taskMap['dueTime'].toString() != 'null')
                         ? taskMap['dueTime'].toString()
-                        : '00:00';
+                        : '09:00';
 
                     try {
+                      // Parse and preserve the EXACT date from the discharge paper
                       dueDateTime = DateTime.parse('${dateStr}T$timeStr');
                     } catch (e) {
-                      debugPrint('Error parsing date: $e');
+                      // If parsing fails, fall back to default
+                      dueDateTime = DateTime(
+                        tomorrow.year,
+                        tomorrow.month,
+                        tomorrow.day,
+                        9,
+                        0,
+                      );
                     }
+                  } else if (taskMap['dueDate'] != null &&
+                      taskMap['dueDate'].toString() != 'null') {
+                    // No specific date - this is a recurring task, start tomorrow
+                    final dateStr = taskMap['dueDate'].toString();
+                    final timeStr = (taskMap['dueTime'] != null &&
+                            taskMap['dueTime'].toString() != 'null')
+                        ? taskMap['dueTime'].toString()
+                        : '09:00';
+
+                    try {
+                      // Parse the original time
+                      final parsedTime = DateTime.parse('${dateStr}T$timeStr');
+                      // Set the date to tomorrow to avoid overdue status for recurring tasks
+                      dueDateTime = DateTime(
+                        tomorrow.year,
+                        tomorrow.month,
+                        tomorrow.day,
+                        parsedTime.hour,
+                        parsedTime.minute,
+                      );
+                    } catch (e) {
+                      // Use default if parsing fails - tomorrow at 9 AM
+                      dueDateTime = DateTime(
+                        tomorrow.year,
+                        tomorrow.month,
+                        tomorrow.day,
+                        9,
+                        0,
+                      );
+                    }
+                  } else {
+                    // No date specified - use tomorrow at 9 AM
+                    dueDateTime = DateTime(
+                      tomorrow.year,
+                      tomorrow.month,
+                      tomorrow.day,
+                      9,
+                      0,
+                    );
                   }
 
                   tasksForStorage.add({
                     'id': UniqueKey().toString(),
                     'title': taskMap['title'] ?? 'Task',
-                    'dueTime': dueDateTime?.toIso8601String() ??
-                        DateTime.now().toIso8601String(),
+                    'description': taskMap['description'],
+                    'dueTime': dueDateTime.toIso8601String(),
                     'isOverdue': false,
                     'snoozeCount': 0,
                     'completed': false,
                     'isRecurring': taskMap['isRecurring'] ?? false,
                     'recurringPattern': taskMap['recurringPattern'],
                     'recurringInterval': taskMap['recurringInterval'],
-                    'startDate': taskMap['startDate'] ??
-                        dueDateTime?.toIso8601String() ??
-                        DateTime.now().toIso8601String(),
+                    'startDate': dueDateTime.toIso8601String(),
+                    'type': taskMap['type'] ?? 'task',
+                    'category': taskMap['category'],
+                    'priority': taskMap['priority'],
+                    'hasSpecificDate': hasSpecificDate,
                   });
                 }
               }
             }
+
+            // Process warnings if they exist
+            if (parsed.containsKey('warnings') && parsed['warnings'] is List) {
+              List<Map<String, dynamic>> warningsForStorage = [];
+              final warningsArray = parsed['warnings'] as List;
+
+              for (final warningObj in warningsArray) {
+                if (warningObj is Map) {
+                  final String warningText =
+                      warningObj['text']?.toString() ?? '';
+                  if (warningText.isNotEmpty) {
+                    warningsForStorage.add({
+                      'id': UniqueKey().toString(),
+                      'text': warningText,
+                    });
+                  }
+                }
+              }
+
+              // Save warnings using the same mechanism as other data
+              if (warningsForStorage.isNotEmpty) {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setString(
+                    'warnings', jsonEncode(warningsForStorage));
+              }
+            }
           }
         } catch (e) {
-          debugPrint('Error processing tasks from JSON: $e');
+          // Continue processing
         }
       }
 
       // Add follow-up appointments as tasks if not already added
+      final now = DateTime.now();
+      final tomorrow =
+          DateTime(now.year, now.month, now.day).add(const Duration(days: 1));
+
       for (final followUp in followUps) {
         final String followUpTitle =
             'Follow-up: ${followUp['name'] ?? 'Appointment'}';
         if (tasksForStorage.every((task) => task['title'] != followUpTitle)) {
+          // Check if follow-up has a specific date
+          final bool hasSpecificDate = followUp['hasSpecificDate'] == true;
+
+          DateTime followUpDateTime;
+          try {
+            if (followUp['date'] != null &&
+                followUp['date'].toString().isNotEmpty) {
+              // Try to parse the date string in various formats
+              String dateStr = followUp['date'].toString();
+
+              // Handle "YYYY-MM-DD HH:MM" format
+              if (dateStr.contains(' ')) {
+                final parts = dateStr.split(' ');
+                followUpDateTime = DateTime.parse('${parts[0]}T${parts[1]}');
+              } else {
+                // Just a date without time
+                followUpDateTime = DateTime.parse(dateStr);
+              }
+
+              // If this has a specific date from discharge paper, DON'T override it
+              // Only ensure it's not in the past for non-specific dates
+              if (!hasSpecificDate && followUpDateTime.isBefore(tomorrow)) {
+                followUpDateTime =
+                    DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9, 0);
+              }
+            } else {
+              followUpDateTime =
+                  DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9, 0);
+            }
+          } catch (e) {
+            followUpDateTime =
+                DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9, 0);
+          }
+
           tasksForStorage.add({
             'id': UniqueKey().toString(),
             'title': followUpTitle,
-            'dueTime': followUp['date'] ??
-                DateTime.now().add(const Duration(days: 7)).toIso8601String(),
+            'description':
+                'Follow-up appointment for ${followUp['name'] ?? 'medical care'}',
+            'dueTime': followUpDateTime.toIso8601String(),
             'isOverdue': false,
             'snoozeCount': 0,
             'completed': false,
             'isRecurring': false,
+            'hasSpecificDate': hasSpecificDate,
           });
         }
       }
@@ -232,10 +371,15 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
             instruction['name'] ?? instruction['instruction'] ?? 'Task';
         if (tasksForStorage
             .every((task) => task['title'] != instructionTitle)) {
+          // Set all instruction tasks to tomorrow at 9 AM
+          final tomorrowMorning =
+              DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9, 0);
+
           tasksForStorage.add({
             'id': UniqueKey().toString(),
             'title': instructionTitle,
-            'dueTime': DateTime.now().toIso8601String(),
+            'description': instruction['description'] ?? instructionTitle,
+            'dueTime': tomorrowMorning.toIso8601String(),
             'isOverdue': false,
             'snoozeCount': 0,
             'completed': false,
@@ -252,6 +396,24 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         instructions: instructions,
         rawOcrText: _rawOcrText,
       );
+
+      // Save contacts separately
+      if (contacts.isNotEmpty) {
+        // Load existing contacts and merge with new ones (avoiding duplicates)
+        final existingContacts = await DischargeDataManager.loadContacts();
+        final allContacts = [...existingContacts, ...contacts];
+
+        // Remove duplicates based on phone number
+        final uniqueContacts = <String, Map<String, dynamic>>{};
+        for (final contact in allContacts) {
+          final phone = contact['phone']?.toString() ?? '';
+          if (phone.isNotEmpty) {
+            uniqueContacts[phone] = contact;
+          }
+        }
+
+        await DischargeDataManager.saveContacts(uniqueContacts.values.toList());
+      }
 
       if (!mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
@@ -285,7 +447,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         actions: [
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.robot),
-            tooltip: 'Chat with AI Assistant',
+            tooltip: 'Chat with Health Assistant',
             onPressed: () {
               Navigator.pushNamed(context, '/chat',
                   arguments: {'initial_context': _rawOcrText});
@@ -297,7 +459,6 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Scrollbar(
               controller: _scrollController,
-              thumbVisibility: true,
               child: ListView(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(16.0),

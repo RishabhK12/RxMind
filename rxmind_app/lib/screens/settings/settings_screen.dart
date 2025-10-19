@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../main.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
-import 'package:archive/archive_io.dart';
+import 'package:rxmind_app/main.dart'; // Use RxMindSettings from main
+import 'package:rxmind_app/screens/settings/contacts_screen.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'package:rxmind_app/services/pdf_export_service.dart';
+import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
+import 'package:rxmind_app/services/notification_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -25,31 +24,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
   TimeOfDay? _bedtime;
   TimeOfDay? _wakeTime;
 
+  // Notification settings
+  bool _notificationsEnabled = true;
+  List<int> _selectedNotificationTimes = [
+    120,
+    30,
+    5
+  ]; // Default: 2hr, 30min, 5min
+  final NotificationService _notificationService = NotificationService();
+
   @override
   void initState() {
     super.initState();
     _loadProfileData();
+    _loadNotificationSettings();
+  }
+
+  Future<void> _loadNotificationSettings() async {
+    final enabled = await _notificationService.areNotificationsEnabled();
+    final times = await _notificationService.getNotificationTimes();
+
+    if (mounted) {
+      setState(() {
+        _notificationsEnabled = enabled;
+        _selectedNotificationTimes = times;
+      });
+    }
   }
 
   Future<void> _loadProfileData() async {
     final data = await DischargeDataManager.loadProfileData();
-    setState(() {
-      _name = data['name'];
-      _height = data['height'];
-      _weight = data['weight'];
-      _age = data['age'];
-      _sex = data['sex'];
-      if (data['bedtime'] != null) {
-        final parts = (data['bedtime'] as String).split(':');
-        _bedtime =
-            TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-      }
-      if (data['wakeTime'] != null) {
-        final parts = (data['wakeTime'] as String).split(':');
-        _wakeTime =
-            TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _name = data['name'];
+        _height = data['height'];
+        _weight = data['weight'];
+        _age = data['age'];
+        _sex = data['sex'];
+        if (data['bedtime'] != null) {
+          final parts = (data['bedtime'] as String).split(':');
+          _bedtime =
+              TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        }
+        if (data['wakeTime'] != null) {
+          final parts = (data['wakeTime'] as String).split(':');
+          _wakeTime =
+              TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        }
+      });
+    }
   }
 
   Future<void> _saveProfileData() async {
@@ -195,7 +218,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () async {
               final picked = await showTimePicker(
                   context: context,
-                  initialTime: _bedtime ?? TimeOfDay(hour: 22, minute: 0));
+                  initialTime:
+                      _bedtime ?? const TimeOfDay(hour: 22, minute: 0));
               if (picked != null) {
                 setState(() => _bedtime = picked);
                 await _saveProfileData();
@@ -213,7 +237,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () async {
               final picked = await showTimePicker(
                   context: context,
-                  initialTime: _wakeTime ?? TimeOfDay(hour: 7, minute: 0));
+                  initialTime:
+                      _wakeTime ?? const TimeOfDay(hour: 7, minute: 0));
               if (picked != null) {
                 setState(() => _wakeTime = picked);
                 await _saveProfileData();
@@ -230,92 +255,100 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text('Data',
                 style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6))),
+                    color: theme.colorScheme.onSurface.withAlpha(153))),
           ),
-          ListTile(
-            leading: Icon(Icons.download, color: theme.colorScheme.primary),
-            title: const Text('Export Data'),
-            onTap: () async {
-              // Export logic: gather all secure storage and database, zip, and save
-              final storage = FlutterSecureStorage();
-              final allData = await storage.readAll();
-              // Export database file if exists
-              String? dbPath;
-              try {
-                dbPath = await getDatabasesPath();
-                dbPath = join(dbPath, 'rxmind.db');
-              } catch (_) {}
-              final archive = Archive();
-              archive.addFile(ArchiveFile('secure_storage.json',
-                  allData.toString().length, allData.toString().codeUnits));
-              if (dbPath != null && await File(dbPath).exists()) {
-                final dbBytes = await File(dbPath).readAsBytes();
-                archive
-                    .addFile(ArchiveFile('rxmind.db', dbBytes.length, dbBytes));
-              }
-              final zipData = ZipEncoder().encode(archive) ?? [];
-              final output = await FilePicker.platform.saveFile(
-                  dialogTitle: 'Export RxMind Data',
-                  fileName: 'rxmind_export.zip');
-              if (!mounted) return;
-              if (output != null) {
-                await File(output).writeAsBytes(zipData);
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Export successful!')));
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Export cancelled.')));
-              }
-            },
-            subtitle: Semantics(
-              label: 'Export all your data as a backup zip file',
-              child: const SizedBox.shrink(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _exportData,
+                icon: Icon(Icons.download, color: theme.colorScheme.onPrimary),
+                label: Text(
+                  'Export Data',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+              ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _showDeleteConfirmation(context);
+                },
+                icon: Icon(Icons.delete_forever, color: Colors.white),
+                label: Text(
+                  'Delete All Data',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.error,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+            child: Text('Medical Contacts',
+                style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface.withAlpha(153))),
+          ),
           ListTile(
-            leading: Icon(Icons.delete_forever, color: theme.colorScheme.error),
-            title: const Text('Delete All Data'),
+            leading: const Icon(Icons.local_hospital),
+            title: const Text('Doctor/Hospital Contacts'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              _showDeleteConfirmation(context);
+              _showContactsScreen(context);
             },
-            subtitle: Semantics(
-              label: 'Delete all your data from this device',
-              child: const SizedBox.shrink(),
-            ),
+            subtitle: const Text('Add and manage medical contacts'),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Text('Theme',
                 style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6))),
+                    color: theme.colorScheme.onSurface.withAlpha(153))),
           ),
-          ListTile(
+          RadioListTile<ThemeMode>(
             title: Text('Light Mode', style: theme.textTheme.bodyMedium),
-            leading: Radio<ThemeMode>(
-              value: ThemeMode.light,
-              groupValue: settings.themeMode,
-              onChanged: (v) => settings.updateTheme(v!),
-            ),
-            onTap: () => settings.updateTheme(ThemeMode.light),
+            value: ThemeMode.light,
+            groupValue: settings.themeMode,
+            onChanged: (v) => settings.updateTheme(v!),
           ),
-          ListTile(
+          RadioListTile<ThemeMode>(
             title: Text('Dark Mode', style: theme.textTheme.bodyMedium),
-            leading: Radio<ThemeMode>(
-              value: ThemeMode.dark,
-              groupValue: settings.themeMode,
-              onChanged: (v) => settings.updateTheme(v!),
-            ),
-            onTap: () => settings.updateTheme(ThemeMode.dark),
+            value: ThemeMode.dark,
+            groupValue: settings.themeMode,
+            onChanged: (v) => settings.updateTheme(v!),
           ),
-          ListTile(
+          RadioListTile<ThemeMode>(
             title: Text('System Default', style: theme.textTheme.bodyMedium),
-            leading: Radio<ThemeMode>(
-              value: ThemeMode.system,
-              groupValue: settings.themeMode,
-              onChanged: (v) => settings.updateTheme(v!),
-            ),
-            onTap: () => settings.updateTheme(ThemeMode.system),
+            value: ThemeMode.system,
+            groupValue: settings.themeMode,
+            onChanged: (v) => settings.updateTheme(v!),
           ),
           SwitchListTile(
             value: settings.highContrast,
@@ -328,6 +361,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Icon(Icons.contrast),
             ),
           ),
+          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+            child: Text('Notifications',
+                style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface.withAlpha(153))),
+          ),
+          SwitchListTile(
+            value: _notificationsEnabled,
+            onChanged: (v) async {
+              if (!v) {
+                // Show warning before disabling
+                final confirm = await _showDisableNotificationsDialog(context);
+                if (confirm != true) return;
+              }
+
+              // Check system permissions when enabling
+              if (v) {
+                final status = await Permission.notification.status;
+                if (!status.isGranted) {
+                  final requested =
+                      await _notificationService.checkAndRequestPermissions();
+                  if (!requested) {
+                    // Show dialog to open settings
+                    if (!mounted) return;
+                    await _showPermissionDialog(context);
+                    return;
+                  }
+                }
+
+                // For Android, also check exact alarm permission
+                final canScheduleExact =
+                    await _notificationService.canScheduleExactAlarms();
+                if (!canScheduleExact) {
+                  if (!mounted) return;
+                  await _showExactAlarmPermissionDialog(context);
+                  // Continue anyway - inexact alarms will be used
+                }
+              }
+
+              setState(() => _notificationsEnabled = v);
+              await _notificationService.setNotificationsEnabled(v);
+
+              // Reschedule notifications if enabled
+              if (v) {
+                final tasks = await DischargeDataManager.loadTasks();
+                await _notificationService.scheduleNotificationsForTasks(tasks);
+              }
+            },
+            title:
+                Text('Enable Notifications', style: theme.textTheme.bodyMedium),
+            subtitle: const Text('Receive reminders for upcoming tasks'),
+            secondary: const Icon(Icons.notifications_active),
+          ),
+          if (_notificationsEnabled) ...[
+            ListTile(
+              leading: const Icon(Icons.access_time),
+              title: const Text('Notification Times'),
+              subtitle:
+                  Text(_formatNotificationTimes(_selectedNotificationTimes)),
+              trailing: const Icon(Icons.edit, size: 20),
+              onTap: () => _showNotificationTimesDialog(context),
+            ),
+          ],
+          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Text(
@@ -378,7 +477,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text('About',
                 style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6))),
+                    color: theme.colorScheme.onSurface.withAlpha(153))),
           ),
           ListTile(
             leading: Icon(Icons.info_outline,
@@ -403,6 +502,287 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<bool?> _showDisableNotificationsDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Disable Notifications?'),
+        content: const Text(
+          'You will no longer receive reminders for your tasks. '
+          'You can re-enable notifications anytime from settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              'Disable',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPermissionDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Notification Permission Required'),
+        content: const Text(
+          'RxMind needs notification permission to remind you about upcoming tasks. '
+          'Please enable notifications in your device settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _notificationService.openNotificationSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showExactAlarmPermissionDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Exact Alarm Permission'),
+        content: const Text(
+          'For more precise notification timing, RxMind needs permission to schedule exact alarms. '
+          'Without this permission, notifications may be slightly delayed.\n\n'
+          'You can grant this permission in your device settings under:\n'
+          'Settings → Apps → RxMind → Alarms & reminders',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Use Inexact Timing'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _notificationService.openNotificationSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatNotificationTimes(List<int> times) {
+    if (times.isEmpty) return 'None';
+
+    final formatted = times.map((minutes) {
+      if (minutes < 60) {
+        return '${minutes}min';
+      } else {
+        final hours = minutes ~/ 60;
+        final mins = minutes % 60;
+        if (mins == 0) {
+          return '${hours}h';
+        }
+        return '${hours}h ${mins}min';
+      }
+    }).toList();
+
+    return formatted.join(', ');
+  }
+
+  Future<void> _showNotificationTimesDialog(BuildContext context) async {
+    // Available preset times (in minutes)
+    final presetTimes = [
+      {'value': 5, 'label': '5 minutes before'},
+      {'value': 10, 'label': '10 minutes before'},
+      {'value': 15, 'label': '15 minutes before'},
+      {'value': 30, 'label': '30 minutes before'},
+      {'value': 60, 'label': '1 hour before'},
+      {'value': 120, 'label': '2 hours before'},
+      {'value': 180, 'label': '3 hours before'},
+      {'value': 360, 'label': '6 hours before'},
+      {'value': 720, 'label': '12 hours before'},
+      {'value': 1440, 'label': '1 day before'},
+    ];
+
+    final selectedTimes = List<int>.from(_selectedNotificationTimes);
+    int? customTime;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Notification Times'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Select when to receive notifications:',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 16),
+                      ...presetTimes.map((preset) {
+                        final value = preset['value'] as int;
+                        final label = preset['label'] as String;
+                        return CheckboxListTile(
+                          title: Text(label),
+                          value: selectedTimes.contains(value),
+                          onChanged: (checked) {
+                            setDialogState(() {
+                              if (checked == true) {
+                                selectedTimes.add(value);
+                                selectedTimes.sort((a, b) =>
+                                    b.compareTo(a)); // Sort descending
+                              } else {
+                                selectedTimes.remove(value);
+                              }
+                            });
+                          },
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                        );
+                      }),
+                      const Divider(height: 32),
+                      const Text(
+                        'Custom time:',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Minutes before',
+                                hintText: 'e.g., 45',
+                                border: OutlineInputBorder(),
+                                isDense: true,
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                customTime = int.tryParse(value);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (customTime != null && customTime! > 0) {
+                                setDialogState(() {
+                                  if (!selectedTimes.contains(customTime)) {
+                                    selectedTimes.add(customTime!);
+                                    selectedTimes
+                                        .sort((a, b) => b.compareTo(a));
+                                  }
+                                  customTime = null;
+                                });
+                              }
+                            },
+                            child: const Text('Add'),
+                          ),
+                        ],
+                      ),
+                      if (selectedTimes.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Selected times:',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: selectedTimes.map((time) {
+                            return Chip(
+                              label: Text(_formatSingleTime(time)),
+                              deleteIcon: const Icon(Icons.close, size: 18),
+                              onDeleted: () {
+                                setDialogState(() {
+                                  selectedTimes.remove(time);
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    setState(() {
+                      _selectedNotificationTimes = selectedTimes;
+                    });
+                    await _notificationService
+                        .setNotificationTimes(selectedTimes);
+
+                    // Reschedule all task notifications with new times
+                    final tasks = await DischargeDataManager.loadTasks();
+                    await _notificationService
+                        .scheduleNotificationsForTasks(tasks);
+
+                    if (!mounted) return;
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _formatSingleTime(int minutes) {
+    if (minutes < 60) {
+      return '$minutes min';
+    } else if (minutes < 1440) {
+      final hours = minutes ~/ 60;
+      final mins = minutes % 60;
+      if (mins == 0) {
+        return '$hours hour${hours == 1 ? '' : 's'}';
+      }
+      return '$hours hour${hours == 1 ? '' : 's'} $mins min';
+    } else {
+      final days = minutes ~/ 1440;
+      return '$days day${days == 1 ? '' : 's'}';
+    }
+  }
+
+  void _showContactsScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ContactsScreen(),
+      ),
+    );
+  }
+
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
@@ -423,9 +803,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(color: Theme.of(context).colorScheme.error)),
               onPressed: () async {
                 await DischargeDataManager.clearDischargeData();
-                Navigator.of(ctx).pop(); // Close the dialog
-                // Check if widget is still mounted before using BuildContext
                 if (!mounted) return;
+                Navigator.of(ctx).pop(); // Close the dialog
                 // Navigate to a fresh start, e.g., the splash screen
                 Navigator.of(context).pushNamedAndRemoveUntil(
                     '/splash', (Route<dynamic> route) => false);
@@ -496,5 +875,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _exportData() async {
+    try {
+      // Show loading indicator
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Generate PDF
+      final pdfFile = await PdfExportService.generateHealthReport();
+
+      // Close loading dialog
+      if (!mounted) return;
+      Navigator.of(context).pop();
+
+      // Navigate to preview screen
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PdfPreviewScreen(pdfFile: pdfFile),
+        ),
+      );
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error exporting PDF: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

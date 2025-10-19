@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// ...existing code...
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class OnboardingProfileFlow extends StatefulWidget {
   final VoidCallback onComplete;
@@ -17,7 +17,8 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   }
 
   // Profile data
-  String? userName;
+  String? firstName;
+  String? lastName;
   int? heightCm;
   int? weightKg;
   bool useMetric = true;
@@ -40,7 +41,10 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   bool get canContinue {
     switch (currentStep) {
       case 0:
-        return userName != null && userName!.isNotEmpty;
+        return firstName != null &&
+            firstName!.isNotEmpty &&
+            lastName != null &&
+            lastName!.isNotEmpty;
       case 1:
         return heightCm != null;
       case 2:
@@ -64,10 +68,21 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('onboardingComplete', true);
-      // Save user name to storage
-      if (userName != null && userName!.isNotEmpty) {
-        await prefs.setString('userName', userName!);
-      }
+
+      // Save all profile data using DischargeDataManager
+      await DischargeDataManager.saveProfileData(
+        name: firstName != null && lastName != null
+            ? '$firstName $lastName'
+            : null,
+        height: heightCm,
+        weight: weightKg,
+        age: age,
+        sex: sex,
+        bedtime: bedtime != null ? '${bedtime!.hour}:${bedtime!.minute}' : null,
+        wakeTime:
+            wakeTime != null ? '${wakeTime!.hour}:${wakeTime!.minute}' : null,
+      );
+
       widget.onComplete();
     }
   }
@@ -118,9 +133,9 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                         color: const Color(0xFF212121))),
                 const SizedBox(height: 32),
                 TextField(
-                  onChanged: (val) => setState(() => userName = val),
+                  onChanged: (val) => setState(() => firstName = val),
                   decoration: InputDecoration(
-                    labelText: 'Your Name',
+                    labelText: 'First Name',
                     hintText: 'Enter your first name',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -129,6 +144,19 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                   ),
                   textCapitalization: TextCapitalization.words,
                   autofocus: true,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  onChanged: (val) => setState(() => lastName = val),
+                  decoration: InputDecoration(
+                    labelText: 'Last Name',
+                    hintText: 'Enter your last name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  textCapitalization: TextCapitalization.words,
                 ),
               ],
             ),
@@ -352,27 +380,6 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                   child: Column(
                     children: [
                       const SizedBox(height: 16),
-                      // RxMind logo (replaced with text)
-                      Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Center(
-                            child: Text(
-                              'RxMind',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                       buildProgressBar(),
                       Expanded(
                         child: AnimatedSwitcher(
@@ -697,54 +704,52 @@ class _ActivityLevelCard extends StatelessWidget {
               style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w700, color: const Color(0xFF212121))),
           const SizedBox(height: 32),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: options.map((opt) {
-                final selected = value == opt['label'];
-                return Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: GestureDetector(
-                    onTap: () => onChanged(opt['label'] as String),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 18),
-                      decoration: BoxDecoration(
-                        color:
-                            selected ? theme.colorScheme.primary : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                            color: selected
-                                ? theme.colorScheme.primary
-                                : Colors.grey.shade300,
-                            width: 2),
-                        boxShadow: selected
-                            ? [
-                                BoxShadow(
-                                    color: theme.colorScheme.primary
-                                        .withOpacity(0.08),
-                                    blurRadius: 8)
-                              ]
-                            : [],
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(opt['icon'] as IconData,
-                              color: selected ? Colors.white : Colors.grey,
-                              size: 32),
-                          const SizedBox(height: 8),
-                          Text(opt['label'] as String,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: selected ? Colors.white : Colors.grey,
-                                  fontWeight: FontWeight.w600)),
-                        ],
-                      ),
+          Column(
+            children: options.map((opt) {
+              final selected = value == opt['label'];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: GestureDetector(
+                  onTap: () => onChanged(opt['label'] as String),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 18),
+                    decoration: BoxDecoration(
+                      color:
+                          selected ? theme.colorScheme.primary : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: selected
+                              ? theme.colorScheme.primary
+                              : Colors.grey.shade300,
+                          width: 2),
+                      boxShadow: selected
+                          ? [
+                              BoxShadow(
+                                  color: theme.colorScheme.primary
+                                      .withOpacity(0.08),
+                                  blurRadius: 8)
+                            ]
+                          : [],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(opt['icon'] as IconData,
+                            color: selected ? Colors.white : Colors.grey,
+                            size: 32),
+                        const SizedBox(width: 16),
+                        Text(opt['label'] as String,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                                color: selected ? Colors.white : Colors.grey,
+                                fontWeight: FontWeight.w600)),
+                      ],
                     ),
                   ),
-                );
-              }).toList(),
-            ),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),

@@ -9,12 +9,9 @@ class StatsManager {
     return total == 0 ? 0 : (completed / total) * 100;
   }
 
-  // Example: Calculate med adherence rate
   static double medAdherenceRate(MedManager mm) {
     final total = mm.meds.length;
     final adherent = mm.meds.where((m) => m.adherencePercent >= 80).length;
     return total == 0 ? 0 : (adherent / total) * 100;
   }
-
-  // TODO: Prepare daily/weekly trend arrays, summary objects for UI
 }

@@ -5,10 +5,12 @@ class GeminiApiService {
   final String apiKey;
   GeminiApiService({required this.apiKey});
 
-  Future<String> sendMessage(String message) async {
+  Future<String> sendMessage(String message,
+      {String? systemInstruction}) async {
     final url = Uri.parse(
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey');
-    final body = jsonEncode({
+
+    final Map<String, dynamic> requestBody = {
       "contents": [
         {
           "role": "user",
@@ -16,8 +18,26 @@ class GeminiApiService {
             {"text": message}
           ]
         }
-      ]
-    });
+      ],
+      "generationConfig": {
+        "temperature": 0.7,
+        "topK": 40,
+        "topP": 0.95,
+        "maxOutputTokens": 2048,
+      }
+    };
+
+    // Add system instruction if provided
+    if (systemInstruction != null && systemInstruction.isNotEmpty) {
+      requestBody["systemInstruction"] = {
+        "parts": [
+          {"text": systemInstruction}
+        ]
+      };
+    }
+
+    final body = jsonEncode(requestBody);
+
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},

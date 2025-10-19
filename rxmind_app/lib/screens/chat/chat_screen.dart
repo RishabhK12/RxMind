@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
@@ -43,9 +42,6 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _loadInitialContext() async {
     if (_initialContext == null) {
       _initialContext = await DischargeDataManager.loadRawOcrText();
-      debugPrint(_initialContext != null
-          ? "Loaded raw OCR text: ${_initialContext!.length > 100 ? _initialContext!.substring(0, 100) + '...' : _initialContext}"
-          : "No OCR text was loaded");
     }
 
     if (_initialContext != null && _initialContext!.isNotEmpty) {
@@ -60,9 +56,6 @@ class _ChatScreenState extends State<ChatScreen> {
         _messages.add(
             Message(isUser: false, text: "Hello! How can I help you today?"));
       });
-
-      // If context is missing, log the issue
-      debugPrint("Warning: Missing discharge context in chat");
     }
   }
 
@@ -97,8 +90,6 @@ class _ChatScreenState extends State<ChatScreen> {
         _messages.add(Message(isUser: false, text: 'Error: ${e.toString()}'));
         _loading = false;
       });
-      // Using logger would be better in production
-      debugPrint("Chat API error: ${e.toString()}");
     }
   }
 
@@ -106,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AI Assistant'),
+        title: const Text('Health Assistant'),
       ),
       body: Column(
         children: [

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'text_extraction_service.dart';
 import 'package:file_picker/file_picker.dart';
@@ -56,13 +55,11 @@ class PdfExtractionTest {
         );
       }
     } catch (e) {
-      // Hide loading dialog if shown
       try {
         Navigator.of(context, rootNavigator: true).pop();
       } catch (_) {}
 
       _showMessage(context, 'Error testing PDF extraction: $e');
-      debugPrint('PDF extraction test error: $e');
     }
   }
 
@@ -101,7 +98,7 @@ class PdfExtractionTest {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title),
-          content: Container(
+          content: SizedBox(
             width: double.maxFinite,
             height: 400,
             child: SingleChildScrollView(

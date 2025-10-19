@@ -18,7 +18,6 @@ class _PermissionsPromptScreenState extends State<PermissionsPromptScreen>
   Future<void> _requestPermissions() async {
     setState(() => _requesting = true);
 
-    // First try requesting each permission individually
     final cameraStatus = await Permission.camera.request();
     final storageStatus = await Permission.storage.request();
 

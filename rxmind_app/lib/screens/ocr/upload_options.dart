@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,8 +14,9 @@ class UploadOptionsScreen extends StatefulWidget {
 class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
   final List<String> _selectedFilePaths = [];
   bool _uploading = false;
-  bool _uploadComplete = false;
   double _uploadProgress = 0.0;
+  bool _hasUsedCamera = false;
+  bool _hasUsedFilePicker = false;
 
   @override
   void initState() {
@@ -41,7 +41,6 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
 
     setState(() {
       _uploading = false;
-      _uploadComplete = true;
     });
   }
 
@@ -77,23 +76,16 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
             ),
           );
 
-          // Use the TextExtractionService to handle both PDFs and images
-          debugPrint('Extracting text from file: $filePath');
           final result =
               await TextExtractionService.extractTextFromFile(filePath);
 
           if (result.success) {
-            ocrText += '${result.text}\n\n'; // Append text from each file
-            debugPrint('Text extraction successful for $filePath');
+            ocrText += '${result.text}\n\n';
           } else {
-            debugPrint(
-                'Text extraction issue for $filePath: ${result.errorMessage}');
             errorFiles.add(path.basename(filePath));
             errorMessage = result.errorMessage;
           }
         } catch (extractionError) {
-          // Log error but continue with other files
-          debugPrint('Text extraction error for $filePath: $extractionError');
           errorFiles.add(path.basename(filePath));
           errorMessage = 'Unexpected error: $extractionError';
         }
@@ -211,13 +203,13 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Semantics(
-                label: 'Take Photo',
+                label: _hasUsedCamera ? 'Take Another Photo' : 'Take Photo',
                 button: true,
                 child: ElevatedButton.icon(
                   icon: Icon(Icons.camera_alt,
                       size: 24, color: theme.colorScheme.onPrimary),
                   label: Text(
-                    'Take Photo',
+                    _hasUsedCamera ? 'Take Another Photo' : 'Take Photo',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.w500,
@@ -243,6 +235,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                             if (photo != null) {
                               setState(() {
                                 _selectedFilePaths.add(photo.path);
+                                _hasUsedCamera = true;
                               });
                               await _simulateUpload();
                             }
@@ -259,13 +252,17 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
               ),
               const SizedBox(height: 24),
               Semantics(
-                label: 'Select File',
+                label: _hasUsedFilePicker
+                    ? 'Select Another PDF or Image'
+                    : 'Select File',
                 button: true,
                 child: ElevatedButton.icon(
                   icon: Icon(Icons.insert_drive_file,
                       size: 24, color: theme.colorScheme.onPrimary),
                   label: Text(
-                    'Select PDF or Image',
+                    _hasUsedFilePicker
+                        ? 'Select Another PDF or Image'
+                        : 'Select PDF or Image',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.w500,
@@ -294,6 +291,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                                 _selectedFilePaths.addAll(result.paths
                                     .where((p) => p != null)
                                     .cast<String>());
+                                _hasUsedFilePicker = true;
                               });
                               await _simulateUpload();
                             }
@@ -358,7 +356,6 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                                 setState(() {
                                   _selectedFilePaths.remove(filePath);
                                   if (_selectedFilePaths.isEmpty) {
-                                    _uploadComplete = false;
                                     _uploadProgress = 0.0;
                                   }
                                 });

@@ -1,0 +1,96 @@
+**Context & Overview**
+
+Provide Copilot with this comprehensive header so every generated module aligns with both the original roadmap and your chosen enhancements—fully on-device, privacy-first, and delightfully engaging.
+
+---
+
+### App Name & Tagline
+
+**Discharge Assistant**
+“Your On-Device Guide to Safe Hospital Discharge”
+
+---
+
+### Target Users & Problem
+
+* **Who:** Patients recently discharged from hospitals, including those with visual impairments or limited tech comfort.
+* **Why:** Paper discharge instructions are confusing, easily lost, and rarely reviewed—leading to missed medications or follow-ups.
+* **Goal:** Deliver a seamless, interactive companion that captures, clarifies, and helps act on every instruction without ever sending personal data off the device.
+
+---
+
+### Core Functionality Recap
+
+1. **Offline OCR Capture**
+
+   * Photograph or import discharge documents; text extraction runs fully on-device via `google_ml_kit` or `tesseract_ocr`.
+2. **One-Shot AI Parsing**
+
+   * Send user-reviewed text to Gemini 2.0 Flash API; receive structured JSON (medications, dosages, appointments, notes).
+3. **Local Task & Medication Management**
+
+   * Create, snooze, and track reminders; mark tasks complete with timestamps; medication tracker with manual dose confirmations.
+4. **Encrypted On-Device Storage**
+
+   * Secure all data (profile, scans, parsed JSON, tasks, logs) via `flutter_secure_storage` or encrypted SQLite.
+5. **Optional Manual Report Export**
+
+   * Generate weekly summaries as PDF or text; share via user’s email client only when explicitly requested.
+
+---
+
+### Phase 1 Enhancements (Selected)
+
+To elevate the app experience and maximize impact—while keeping everything local—we’ll integrate:
+
+#### A. Advanced Reminder Logic & Smart Snooze
+
+* **Context-Aware Snoozes:** If a reminder is dismissed early or late, auto-reschedule by a configurable offset (e.g., +1 hour).
+* **Escalation Paths:** After a configurable number of missed reminders, notifications become more urgent or prompt the user to consult a caregiver.
+
+#### B. Local Health Resources & Glossary
+
+* **Offline Glossary:** Bundle definitions of common medical terms.
+* **In-Text Lookup:** Parsed instruction text becomes tappable; tapping a term opens its definition in a bottom sheet—no internet needed.
+
+#### C. Offline-First Data Export & Backup
+
+* **Encrypted ZIP Export:** Package all app state (profile, scans, parsed data, tasks, meds, logs) into an AES-encrypted ZIP stored on device or SD card.
+* **Secure Import:** Allow users to restore a full backup after reinstall—no cloud.
+
+#### D. Health Trend Analytics
+
+* **Pattern Detection:** On-device algorithms determine most frequently missed medications and time-of-day compliance trends.
+* **Custom Health Score:** A rolling 0–100 metric reflecting adherence over the past week, visualized in the stats screen.
+
+#### E. Customizable Themes & Accessibility Profiles
+
+* **Themes:** Light, Dark, High-Contrast, and Teal-Emphasis modes; persisted locally.
+* **Accessibility:** Large-text mode and Screen Reader Mode that enlarges touch targets and adds extra semantic labels.
+
+---
+
+### UX Principles & Technical Constraints
+
+* **Privacy-First:** No user data, logs, or analytics ever leave the device.
+* **Offline-First:** All core features and enhancements work without internet, except the single AI Parsing call.
+* **Clarity & Trust:** Use consistent iconography, clear microcopy, and visual encryption cues.
+* **Engagement & Accessibility:** Delight with subtle animations, tappable glossary terms, and theme presets that accommodate all users.
+
+---
+
+### Framework & Key Packages
+
+* **Flutter 3.x+** targeting **iOS 15+** and **Android 8+**
+* **Storage:** `flutter_secure_storage`, `sqflite` + encryption wrapper
+* **OCR:** `google_ml_kit` or `tesseract_ocr`
+* **AI API:** Gemini 2.0 Flash via secure HTTPS call
+* **Notifications:** `flutter_local_notifications`
+* **Glossary Lookup:** Local Dart JSON + bottom-sheet UI
+* **ZIP Export/Import:** `archive` package
+* **Analytics:** Pure Dart algorithms, charts via `syncfusion_flutter_charts` or `charts_flutter`
+* **Theming & Accessibility:** Custom `ThemeData` variants, `Provider` or `Riverpod` for state persistence
+
+---
+
+With this full-context header, GitHub Copilot will generate every screen, widget, and service in alignment with your privacy-first, offline-capable vision—complete with advanced reminders, an embedded health glossary, secure backup, trend analytics, and comprehensive theming.

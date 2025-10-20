@@ -6,7 +6,7 @@ RxMind is a mobile app designed to help patients manage their post-discharge car
 
 ## What Does It Do?
 
-- **Smart Document Scanning**: Take a photo of your discharge papers and RxMind extracts all the important info automatically
+- **Smart Document Scanning**: Take a photo of your discharge papers and RxMind extracts all the important information automatically
 - **Medication Tracking**: Never forget a dose again with automatic reminders and a simple check-off system
 - **Task Management**: All your recovery instructions in one place - wound care, physical therapy exercises, dietary restrictions, you name it
 - **Follow-up Appointments**: Keep track of when and where you need to go for checkups

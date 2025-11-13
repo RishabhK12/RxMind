@@ -93,11 +93,14 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
   void initState() {
     super.initState();
     _loadDischargeStatus();
+    // Refresh medications when related tasks/meds updates occur elsewhere
+    DischargeDataManager.addTaskUpdateListener(_loadDischargeStatus);
   }
 
   @override
   void dispose() {
     _glossaryScrollController.dispose();
+    DischargeDataManager.removeTaskUpdateListener(_loadDischargeStatus);
     super.dispose();
   }
 
@@ -197,7 +200,7 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
       if (med['lastTaken'] != null && med['takenToday'] == true) {
         final lastTakenStr = med['lastTaken'] as String;
         final lastTaken = DateTime.parse(lastTakenStr);
-        final frequency = med['frequency'] as String;
+        final String frequency = (med['frequency']?.toString() ?? 'As needed');
         final resetDuration = _parseFrequency(frequency);
 
         // Check if enough time has passed to reset
@@ -251,7 +254,9 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
 
         // For recurring tasks, set the next occurrence based on medication frequency
         if (task['isRecurring'] == true && markComplete) {
-          final frequency = medicationsList[medIndex]['frequency'] as String;
+          final String frequency =
+              (medicationsList[medIndex]['frequency']?.toString() ??
+                  'As needed');
           final intervalDuration = _parseFrequency(frequency);
           final now = DateTime.now();
 
@@ -271,7 +276,8 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
     final now = DateTime.now();
 
     // Calculate next dose based on frequency
-    final frequency = medicationsList[index]['frequency'] as String;
+    final String frequency =
+        (medicationsList[index]['frequency']?.toString() ?? 'As needed');
     final nextDoseDuration = _parseFrequency(frequency);
 
     setState(() {
@@ -315,7 +321,8 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
     final lastTaken = medicationsList[index]['lastTaken'];
     if (lastTaken == null) return;
 
-    final frequency = medicationsList[index]['frequency'] as String;
+    final String frequency =
+        (medicationsList[index]['frequency']?.toString() ?? 'As needed');
     final resetDuration = _parseFrequency(frequency);
 
     DateTime parsedLastTaken;
@@ -341,6 +348,9 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
 
     // Save medications
     await DischargeDataManager.saveMedications(medicationsList);
+
+    // Also unmark the related task as incomplete
+    await _updateRelatedTask(index, false);
   }
 
   @override
@@ -494,22 +504,47 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
                           TextEditingController();
                       final TextEditingController instructionsController =
                           TextEditingController();
+                      final TextEditingController frequencyController =
+                          TextEditingController(text: 'As needed');
                       return AlertDialog(
                         title: const Text('Add Medication'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextField(
-                              controller: nameController,
-                              decoration: const InputDecoration(
-                                  labelText: 'Medication Name'),
+                        content: StatefulBuilder(
+                          builder: (context, setInnerState) =>
+                              SingleChildScrollView(
+                            padding: EdgeInsets.zero,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                // Ensure dialog content can scroll instead of overflow
+                                maxWidth: 400,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
+                                    controller: nameController,
+                                    decoration: const InputDecoration(
+                                        labelText: 'Medication Name'),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    controller: frequencyController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Frequency (free text)',
+                                      hintText:
+                                          'e.g., Once daily, Every 8 hours, with breakfast',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    controller: instructionsController,
+                                    decoration: const InputDecoration(
+                                        labelText: 'Instructions'),
+                                  ),
+                                ],
+                              ),
                             ),
-                            TextField(
-                              controller: instructionsController,
-                              decoration: const InputDecoration(
-                                  labelText: 'Instructions'),
-                            ),
-                          ],
+                          ),
                         ),
                         actions: [
                           TextButton(
@@ -521,17 +556,28 @@ Do NOT include any extra text, preamble, or confirmation. Only output the JSON o
                               final name = nameController.text.trim();
                               final instructions =
                                   instructionsController.text.trim();
+                              final freqText =
+                                  frequencyController.text.trim().isEmpty
+                                      ? 'As needed'
+                                      : frequencyController.text.trim();
                               if (name.isNotEmpty) {
+                                final nextDur = _parseFrequency(freqText);
                                 setState(() {
                                   medicationsList.add({
                                     'name': name,
                                     'instructions': instructions,
+                                    'frequency': freqText,
+                                    'takenToday': false,
+                                    'completionHistory': <String>[],
                                     'nextDoseTime': DateTime.now()
-                                        .add(const Duration(hours: 24))
+                                        .add(nextDur)
                                         .toIso8601String(),
                                     'isOverdue': false,
                                   });
                                 });
+                                // Persist immediately so other screens reflect new med
+                                DischargeDataManager.saveMedications(
+                                    medicationsList);
                                 Navigator.pop(ctx);
                               }
                             },
@@ -630,6 +676,27 @@ class _MedicationCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 6),
+                  if ((med['frequency']?.toString().isNotEmpty ?? false))
+                    Row(
+                      children: [
+                        Icon(Icons.repeat,
+                            size: 16, color: theme.colorScheme.secondary),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Frequency: ${med['frequency']}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.7),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 8),
                   Row(
                     children: [

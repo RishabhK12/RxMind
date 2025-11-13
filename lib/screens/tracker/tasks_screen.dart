@@ -27,6 +27,87 @@ class _TasksScreenState extends State<TasksScreen> {
     DischargeDataManager.addTaskUpdateListener(_loadDischargeStatus);
   }
 
+  // Best-effort frequency parser similar to Medications screen
+  Duration _parseFrequency(String frequency) {
+    final lower = frequency.toLowerCase();
+    if (lower.contains('hour')) {
+      final match = RegExp(r'(\d+)\s*hour').firstMatch(lower);
+      if (match != null) {
+        final hours = int.tryParse(match.group(1) ?? '24') ?? 24;
+        return Duration(hours: hours);
+      }
+    }
+    if (lower.contains('once') || lower.contains('daily') || lower.contains('day')) {
+      if (lower.contains('twice') || lower.contains('2')) return const Duration(hours: 12);
+      if (lower.contains('three') || lower.contains('3')) return const Duration(hours: 8);
+      if (lower.contains('four') || lower.contains('4')) return const Duration(hours: 6);
+      return const Duration(hours: 24);
+    }
+    if (lower.contains('week')) return const Duration(days: 7);
+    if (lower.contains('month')) return const Duration(days: 30);
+    return const Duration(hours: 24);
+  }
+
+  /// Update the related medication when a task is marked complete/incomplete
+  Future<void> _updateRelatedMedication(
+      Map<String, dynamic> task, bool markComplete) async {
+    try {
+      final meds = await DischargeDataManager.loadMedications();
+      if (meds.isEmpty) return;
+      final titleLower = (task['title']?.toString() ?? '').toLowerCase();
+      bool changed = false;
+      final now = DateTime.now();
+
+      for (final med in meds) {
+        final medName = med['name']?.toString() ?? '';
+        final medNameLower = medName.toLowerCase();
+        if (medNameLower.isEmpty) continue;
+
+        if (titleLower.contains(medNameLower) ||
+            titleLower.contains('take $medNameLower')) {
+          if (markComplete) {
+            med['takenToday'] = true;
+            med['lastTaken'] = now.toIso8601String();
+            final freq = (med['frequency']?.toString() ?? 'As needed');
+            final dur = _parseFrequency(freq);
+            med['nextDoseTime'] = now.add(dur).toIso8601String();
+            med['isOverdue'] = false;
+            List<dynamic> history = med['completionHistory'] ?? [];
+            history.add(now.toIso8601String());
+            med['completionHistory'] = history;
+          } else {
+            final lastTaken = med['lastTaken'];
+            final freq = (med['frequency']?.toString() ?? 'As needed');
+            final resetDur = _parseFrequency(freq);
+            DateTime last;
+            if (lastTaken is String) {
+              last = DateTime.tryParse(lastTaken) ?? now;
+            } else if (lastTaken is DateTime) {
+              last = lastTaken;
+            } else {
+              last = now;
+            }
+            med['nextDoseTime'] = last.add(resetDur).toIso8601String();
+            med['takenToday'] = false;
+            med['lastTaken'] = null;
+            List<dynamic> history = med['completionHistory'] ?? [];
+            if (history.isNotEmpty) {
+              history.removeLast();
+              med['completionHistory'] = history;
+            }
+          }
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        await DischargeDataManager.saveMedications(meds);
+      }
+    } catch (_) {
+      // Ignore sync errors silently for now
+    }
+  }
+
   @override
   void dispose() {
     // Remove the listener when screen is disposed
@@ -350,6 +431,9 @@ class _TasksScreenState extends State<TasksScreen> {
         }
       }
 
+  // Sync to related medication (e.g., Take [med])
+  await _updateRelatedMedication(updatedTaskInfo, true);
+
       // Refresh stats screen immediately
       widget.complianceStatsKey?.currentState?.refreshStats();
 
@@ -593,6 +677,10 @@ class _TasksScreenState extends State<TasksScreen> {
                                           widget
                                               .complianceStatsKey?.currentState
                                               ?.refreshStats();
+
+                                          // Sync back to medication as incomplete
+                                          await _updateRelatedMedication(
+                                              updatedTask, false);
                                         }
                                       },
                                     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -60,11 +61,11 @@ class _SplashScreenState extends State<SplashScreen>
                         parent: _controller, curve: Curves.easeOut)),
                 child: FadeTransition(
                   opacity: _fadeAnimation,
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: MediaQuery.of(context).size.width * 0.55,
+                  child: SvgPicture.asset(
+                    'assets/illus/logo.svg',
+                    width: MediaQuery.of(context).size.width * 0.7,
                     errorBuilder: (context, error, stackTrace) {
-                      // Fallback if image not found
+                      // Fallback if SVG not found
                       return Icon(
                         Icons.medical_services_rounded,
                         size: 80,

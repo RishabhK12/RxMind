@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'gemini_api_service.dart';
-import '../../gemini_api_key.dart';
 import '../../core/ai/chat_manager.dart';
 import '../../core/widgets/markdown_text.dart';
 import '../../services/discharge_data_manager.dart';
@@ -13,8 +12,7 @@ class AiChatScreen extends StatefulWidget {
 }
 
 class _AiChatScreenState extends State<AiChatScreen> {
-  late final GeminiApiService _geminiApi =
-      GeminiApiService(apiKey: geminiApiKey);
+  late final GeminiApiService _geminiApi = GeminiApiService();
   final ChatManager _chatManager = ChatManager();
   final TextEditingController _controller = TextEditingController();
   bool _isTyping = false;

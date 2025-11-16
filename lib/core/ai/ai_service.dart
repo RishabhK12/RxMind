@@ -1,33 +1,27 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:rxmind_app/services/ai/gemini_backend_client.dart';
 
+/// Legacy AI service refactored to use backend proxy instead of direct API key.
 class AiService {
-  final String apiKey;
-  AiService([String? key]) : apiKey = key ?? dotenv.env['GEMINI_API_KEY'] ?? '';
+  AiService();
 
+  /// Sends raw text to Gemini via backend, attempting to decode JSON if returned.
   Future<Map<String, dynamic>?> parseDischargeText(String text) async {
-    final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$apiKey');
-    final prompt = {
-      'contents': [
-        {
-          'parts': [
-            {'text': text}
-          ]
+    try {
+      final responseText = await GeminiBackendClient.I.generateText(text);
+      // Attempt to parse as JSON if model happened to return structured data.
+      final trimmed = responseText.trim();
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        try {
+          final decoded = jsonDecode(trimmed);
+          if (decoded is Map<String, dynamic>) return decoded;
+        } catch (_) {
+          // Not valid JSON; fall through
         }
-      ]
-    };
-    final response = await http.post(url,
-        body: jsonEncode(prompt),
-        headers: {'Content-Type': 'application/json'});
-    if (response.statusCode == 200) {
-      try {
-        return jsonDecode(response.body);
-      } catch (_) {
-        return null;
       }
+      return null; // No structured JSON parsed
+    } catch (_) {
+      return null;
     }
-    return null;
   }
 }

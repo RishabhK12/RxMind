@@ -1,6 +1,6 @@
 Cloudflare Worker: Gemini Proxy
 
-This Worker holds your Gemini API key on the server and proxies requests from the app.
+This Worker holds the Gemini API key on the server and proxies requests from the app.
 
 Setup
 1) Install Wrangler (CLI): https://developers.cloudflare.com/workers/wrangler/install-and-update/

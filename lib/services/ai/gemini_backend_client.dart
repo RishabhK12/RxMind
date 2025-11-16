@@ -24,6 +24,11 @@ class GeminiBackendClient {
     if (_baseUrl.isEmpty) {
       throw StateError('BACKEND_BASE_URL not set. Add it to your .env file.');
     }
+    // Enforce HTTPS for encryption-in-transit between app and worker
+    if (!_baseUrl.toLowerCase().startsWith('https://')) {
+      throw StateError(
+          'BACKEND_BASE_URL must use https:// for transport security.');
+    }
 
     final uri = Uri.parse(_baseUrl.endsWith('/') ? '${_baseUrl}gemini/generate' : '$_baseUrl/gemini/generate');
 

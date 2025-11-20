@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
 
 class ParsingProgressScreen extends StatefulWidget {
@@ -24,7 +25,7 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
       return;
     }
     try {
-    final GeminiApiService geminiService = GeminiApiService();
+      final GeminiApiService geminiService = GeminiApiService();
 
       final String prompt = '''
 You are a medical data extraction specialist. Your job is to parse hospital discharge summaries into structured JSON format with EXTREME PRECISION.
@@ -471,6 +472,16 @@ Response (JSON only):''';
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Semantics(
+                    label: 'RxMind logo',
+                    child: SvgPicture.asset(
+                      'assets/illus/logo.svg',
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   Semantics(
                     label: 'Progress indicator',
                     child: CircularProgressIndicator(

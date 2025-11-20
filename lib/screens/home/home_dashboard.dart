@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -297,13 +296,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ),
             const SizedBox(width: 12),
             Semantics(
-              label: userName != null && userName!.isNotEmpty
-                  ? 'Welcome $userName'
-                  : 'Welcome to RxMind',
+              label: 'Welcome to RxMind',
               child: Text(
-                userName != null && userName!.isNotEmpty
-                    ? 'Welcome $userName'
-                    : 'Welcome to RxMind',
+                'Welcome to RxMind',
                 style: theme.textTheme.titleLarge
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),

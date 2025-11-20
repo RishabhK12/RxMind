@@ -92,11 +92,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
       );
       if (aiResponse.isEmpty) {
         errorMsg = 'Could not get a response. Please try again.';
+        setState(() {
+          _chatManager.addMessage('assistant', errorMsg);
+          _isTyping = false;
+        });
+      } else {
+        setState(() {
+          _chatManager.addMessage('assistant', aiResponse);
+          _isTyping = false;
+        });
       }
-      setState(() {
-        _chatManager.addMessage('assistant', errorMsg);
-        _isTyping = false;
-      });
     } catch (e) {
       errorMsg = 'Something went wrong: ${e.toString()}';
       setState(() {

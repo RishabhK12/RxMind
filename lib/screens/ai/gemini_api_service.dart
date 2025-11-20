@@ -1,4 +1,5 @@
 import 'package:rxmind_app/services/ai/gemini_backend_client.dart';
+import 'package:rxmind_app/core/ai/rate_limiter.dart';
 
 /// Updated Gemini API service that delegates all requests to the backend proxy.
 /// The mobile app no longer holds or transmits the Gemini API key directly.
@@ -7,7 +8,11 @@ class GeminiApiService {
 
   /// Sends a prompt to the backend which forwards to Gemini.
   /// Returns the generated text (may be empty string on failure).
-  Future<String> sendMessage(String message, {String? systemInstruction}) async {
+  Future<String> sendMessage(String message,
+      {String? systemInstruction}) async {
+    if (!await RateLimiter.canMakeRequest()) {
+      throw Exception('Rate limit exceeded. Please try again later.');
+    }
     try {
       final text = await GeminiBackendClient.I.generateText(
         message,

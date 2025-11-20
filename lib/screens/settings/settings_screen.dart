@@ -250,6 +250,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
+          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Text('Data',
@@ -918,4 +919,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
   }
+
 }

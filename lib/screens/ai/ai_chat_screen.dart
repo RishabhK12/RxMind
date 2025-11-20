@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'gemini_api_service.dart';
-import '../../gemini_api_key.dart';
 import '../../core/ai/chat_manager.dart';
 import '../../core/widgets/markdown_text.dart';
 import '../../services/discharge_data_manager.dart';
@@ -13,8 +12,7 @@ class AiChatScreen extends StatefulWidget {
 }
 
 class _AiChatScreenState extends State<AiChatScreen> {
-  late final GeminiApiService _geminiApi =
-      GeminiApiService(apiKey: geminiApiKey);
+  late final GeminiApiService _geminiApi = GeminiApiService();
   final ChatManager _chatManager = ChatManager();
   final TextEditingController _controller = TextEditingController();
   bool _isTyping = false;
@@ -94,11 +92,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
       );
       if (aiResponse.isEmpty) {
         errorMsg = 'Could not get a response. Please try again.';
+        setState(() {
+          _chatManager.addMessage('assistant', errorMsg);
+          _isTyping = false;
+        });
+      } else {
+        setState(() {
+          _chatManager.addMessage('assistant', aiResponse);
+          _isTyping = false;
+        });
       }
-      setState(() {
-        _chatManager.addMessage('assistant', errorMsg);
-        _isTyping = false;
-      });
     } catch (e) {
       errorMsg = 'Something went wrong: ${e.toString()}';
       setState(() {

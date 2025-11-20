@@ -1,0 +1,13 @@
+name = "rxmind-gemini-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-10-01"
+
+# Set your deployment route later, or use workers.dev during testing
+# routes = [ { pattern = "your.domain.com/gemini/*", zone_name = "your.zone" } ]
+
+[vars]
+# Optional: lock down who can call the worker from your app with a shared secret
+# Leave unset to disable header check
+# BACKEND_SHARED_SECRET = ""
+# Optional: allow CORS from your web app origin; for Flutter mobile, CORS is not enforced
+# ALLOWED_ORIGIN = "*"

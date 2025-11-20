@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
-import 'package:rxmind_app/gemini_api_key.dart';
 
 class ParsingProgressScreen extends StatefulWidget {
   const ParsingProgressScreen({super.key});
@@ -25,8 +24,7 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
       return;
     }
     try {
-      final GeminiApiService geminiService =
-          GeminiApiService(apiKey: geminiApiKey);
+    final GeminiApiService geminiService = GeminiApiService();
 
       final String prompt = '''
 You are a medical data extraction specialist. Your job is to parse hospital discharge summaries into structured JSON format with EXTREME PRECISION.

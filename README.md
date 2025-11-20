@@ -23,7 +23,8 @@ You'll need:
 - Flutter SDK (version 3.0 or higher)
 - Dart SDK
 - Android Studio or VS Code
-- A Gemini API key (see setup below)
+- (Optional) Access to the RxMind Cloudflare Worker URL if you plan to use a
+  custom backend environment
 
 ### Installation
 
@@ -40,17 +41,28 @@ cd RxMind/rxmind_app
 flutter pub get
 ```
 
-3. Set up your Gemini API key:
+3. Deploy the Cloudflare Worker (Required for AI features):
 
-   - Copy `sample.env` to `.env`:
-     ```bash
-     cp sample.env .env
-     ```
-   - Open `.env` and add your key:
-     ```
-     GEMINI_API_KEY=your-actual-api-key-here
-     ```
-   - Get a free API key at [Google AI Studio](https://makersuite.google.com/app/apikey)
+   RxMind proxies all Gemini API requests through a Cloudflare Worker to keep the API key secure.
+   **The bundled worker URL will not work until you deploy it.**
+
+   Quick setup:
+
+   ```bash
+   cd cloudflare-worker
+   npm install
+   npx wrangler login
+   npx wrangler secret put GEMINI_API_KEY
+   # Paste your Gemini API key from https://aistudio.google.com/apikey
+   npx wrangler deploy
+   ```
+
+   After deploying, either:
+
+   - Update `lib/config/backend_config.dart` line 17 with your live `*.workers.dev` URL, **OR**
+   - Create `.env` (copy `.env.example`) and set `BACKEND_BASE_URL=https://your-worker.workers.dev`
+
+   See [`BACKEND_SETUP.md`](./BACKEND_SETUP.md) for detailed instructions and troubleshooting.
 
 4. Run the app:
 
@@ -59,6 +71,11 @@ flutter run
 ```
 
 That's it! The app should launch on your connected device or emulator.
+
+### Important: AI Features Require Backend Deployment
+
+The app defaults to `https://rxmind-gemini-proxy.rishabhk12.workers.dev`, but this URL **is not deployed by default**.
+You must deploy the Cloudflare Worker (step 3 above) before AI features work. See [`BACKEND_SETUP.md`](./BACKEND_SETUP.md) for help.
 
 ## Privacy & Security
 

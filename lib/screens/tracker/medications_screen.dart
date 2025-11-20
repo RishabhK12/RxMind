@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/screens/tracker/glossary_detail_screen.dart';
 import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
-import 'package:rxmind_app/gemini_api_key.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'dart:convert';
 
@@ -29,8 +28,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
   Future<void> _fetchMedInfo(String name, int index) async {
     if (medGlossary.containsKey(name)) return;
-    final GeminiApiService geminiService =
-        GeminiApiService(apiKey: geminiApiKey);
+  final GeminiApiService geminiService = GeminiApiService();
     String prompt = '''
 You are a medical assistant. Please provide ONLY the following JSON object for the medication "$name":
 {

@@ -17,6 +17,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   List<Map<String, dynamic>> followUps = [];
   List<Map<String, dynamic>> instructions = [];
   List<Map<String, dynamic>> contacts = [];
+  List<Map<String, dynamic>> warnings = [];
+  List<Map<String, dynamic>> tasks = [];
   bool _loading = true;
   bool _didRun = false;
   String _rawOcrText = '';
@@ -32,15 +34,12 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   }
 
   Future<void> _parseDischargeData() async {
-    // Get the parsed JSON from the route arguments
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     _rawOcrText = args?['ocrText'] as String? ?? '';
     final parsedJsonString = args?['parsedJson'] as String? ?? '';
 
     if (parsedJsonString.isNotEmpty) {
       try {
-        // Extract JSON from the response (handle markdown code blocks)
         String jsonStr = parsedJsonString;
         final jsonStart = parsedJsonString.indexOf('{');
         final jsonEnd = parsedJsonString.lastIndexOf('}');
@@ -51,8 +50,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         final Map<String, dynamic> parsed = jsonDecode(jsonStr);
 
         // Extract medications
-        if (parsed.containsKey('medications') &&
-            parsed['medications'] is List) {
+        if (parsed.containsKey('medications') && parsed['medications'] is List) {
           medications = (parsed['medications'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
@@ -66,49 +64,73 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         }
 
         // Extract instructions
-        if (parsed.containsKey('instructions') &&
-            parsed['instructions'] is List) {
+        if (parsed.containsKey('instructions') && parsed['instructions'] is List) {
           instructions = (parsed['instructions'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
         }
 
-        // Extract contacts
-        if (parsed.containsKey('contacts') && parsed['contacts'] is List) {
-          contacts = (parsed['contacts'] as List)
+        // Extract warnings and restrictions dynamically
+        if (parsed.containsKey('tasks') && parsed['tasks'] is List) {
+          final List<Map<String, dynamic>> allTasks = (parsed['tasks'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
+
+          tasks = [];
+          warnings = [];
+
+          for (final task in allTasks) {
+            final description = task['description']?.toString().toLowerCase() ?? '';
+
+            // Check for keywords to categorize as warnings/restrictions
+            if (description.contains('do not') ||
+                description.contains('no driving') ||
+                description.contains('use crutches')) {
+              warnings.add(task);
+            } else {
+              tasks.add(task);
+            }
+          } // Ensure this closing brace is present and properly aligned
         }
+
+        // Simplify language dynamically
+        final Map<String, String> simplifications = {
+          'ambulation': 'walking',
+          'submerge': 'immerse',
+          'orthopedics': 'bone doctor',
+        };
+
+        tasks = tasks.map((task) {
+          if (task['description'] != null) {
+            String description = task['description'];
+            simplifications.forEach((complex, simple) {
+              description = description.replaceAll(complex, simple);
+            });
+            task['description'] = description;
+          }
+          return task;
+        }).toList();
+
+        warnings = warnings.map((warning) {
+          if (warning['description'] != null) {
+            String description = warning['description'];
+            simplifications.forEach((complex, simple) {
+              description = description.replaceAll(complex, simple);
+            });
+            warning['description'] = description;
+          }
+          return warning;
+        }).toList();
       } catch (e) {
-        // If parsing fails, use dummy data
-        medications = [
-          {'name': 'Aspirin', 'dose': '81mg', 'frequency': 'Daily'},
-          {'name': 'Lisinopril', 'dose': '10mg', 'frequency': 'Morning'},
-        ];
-        followUps = [
-          {'name': 'Cardiology', 'date': '2025-08-10 10:00 AM'},
-        ];
-        instructions = [
-          {'name': 'No heavy lifting for 2 weeks.'},
-          {'name': 'Monitor blood pressure daily.'},
-        ];
+        medications = [];
+        followUps = [];
+        instructions = [];
+        warnings = [];
+        tasks = [];
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error parsing data: $e')),
         );
       }
-    } else {
-      // Use dummy data if no parsed data available
-      medications = [
-        {'name': 'Aspirin', 'dose': '81mg', 'frequency': 'Daily'},
-        {'name': 'Lisinopril', 'dose': '10mg', 'frequency': 'Morning'},
-      ];
-      followUps = [
-        {'name': 'Cardiology', 'date': '2025-08-10 10:00 AM'},
-      ];
-      instructions = [
-        {'name': 'No heavy lifting for 2 weeks.'},
-        {'name': 'Monitor blood pressure daily.'},
-      ];
     }
 
     setState(() {

@@ -18,6 +18,7 @@ import 'screens/tracker/tasks_screen.dart';
 import 'screens/tracker/medications_screen.dart';
 import 'screens/stats/compliance_stats.dart';
 import 'screens/settings/settings_screen.dart';
+import 'screens/settings/privacy_terms_screen.dart';
 import 'services/notification_service.dart';
 import 'services/discharge_data_manager.dart';
 
@@ -65,6 +66,44 @@ class _RxMindAppState extends State<RxMindApp> {
   bool _highContrast = false;
   double _textScale = 1.0;
   bool _reducedMotion = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, _showPrivacyTermsDialog);
+  }
+
+  void _showPrivacyTermsDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Accept Privacy Policy & Terms'),
+        content: const Text(
+          'Please review and accept our Privacy Policy and Terms of Service to continue using the app.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PrivacyTermsScreen(),
+                ),
+              );
+            },
+            child: const Text('View Documents'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Accept'),
+          ),
+        ],
+      ),
+    );
+  }
 
   void updateTheme(ThemeMode mode) => setState(() => _themeMode = mode);
   void updateHighContrast(bool v) => setState(() => _highContrast = v);

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
@@ -18,7 +19,7 @@ import 'screens/tracker/tasks_screen.dart';
 import 'screens/tracker/medications_screen.dart';
 import 'screens/stats/compliance_stats.dart';
 import 'screens/settings/settings_screen.dart';
-import 'screens/settings/privacy_terms_screen.dart';
+import 'screens/settings/privacy_gate_screen.dart';
 import 'services/notification_service.dart';
 import 'services/discharge_data_manager.dart';
 
@@ -47,7 +48,11 @@ void main() async {
   final tasks = await DischargeDataManager.loadTasks();
   await notificationService.scheduleNotificationsForTasks(tasks);
 
-  runApp(const RxMindApp());
+  // Read privacy acceptance before building app
+  final prefs = await SharedPreferences.getInstance();
+  final hasAcceptedPrivacy = prefs.getBool('privacy_terms_accepted') ?? false;
+
+  runApp(RxMindApp(showPrivacyGate: !hasAcceptedPrivacy));
   // Initialize DB after first frame
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     await LocalStorage.initDb();
@@ -55,55 +60,28 @@ void main() async {
 }
 
 class RxMindApp extends StatefulWidget {
-  const RxMindApp({super.key});
+  final bool showPrivacyGate;
+  const RxMindApp({super.key, required this.showPrivacyGate});
 
   @override
   State<RxMindApp> createState() => _RxMindAppState();
 }
 
 class _RxMindAppState extends State<RxMindApp> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   ThemeMode _themeMode = ThemeMode.light;
   bool _highContrast = false;
   double _textScale = 1.0;
   bool _reducedMotion = false;
+  late final String _initialRoute;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, _showPrivacyTermsDialog);
+    _initialRoute = widget.showPrivacyGate ? '/privacyGate' : '/splash';
   }
 
-  void _showPrivacyTermsDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Accept Privacy Policy & Terms'),
-        content: const Text(
-          'Please review and accept our Privacy Policy and Terms of Service to continue using the app.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PrivacyTermsScreen(),
-                ),
-              );
-            },
-            child: const Text('View Documents'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Accept'),
-          ),
-        ],
-      ),
-    );
-  }
+  // No-op: privacy gate handled via initialRoute for reliability
 
   void updateTheme(ThemeMode mode) => setState(() => _themeMode = mode);
   void updateHighContrast(bool v) => setState(() => _highContrast = v);
@@ -123,6 +101,7 @@ class _RxMindAppState extends State<RxMindApp> {
       updateReducedMotion: updateReducedMotion,
       child: Builder(
         builder: (context) => MaterialApp(
+          navigatorKey: _navigatorKey,
           title: 'RxMind',
           debugShowCheckedModeBanner: false,
           theme:
@@ -136,8 +115,9 @@ class _RxMindAppState extends State<RxMindApp> {
             ),
             child: child!,
           ),
-          initialRoute: '/splash',
+          initialRoute: _initialRoute,
           routes: {
+            '/privacyGate': (context) => const PrivacyGateScreen(),
             '/splash': (context) => const SplashScreen(),
             '/welcomeCarousel': (context) => const WelcomeCarousel(),
             // Removed permissions prompt since app has permissions by default

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
@@ -70,37 +71,69 @@ class _RxMindAppState extends State<RxMindApp> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, _showPrivacyTermsDialog);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowPrivacyTermsDialog();
+    });
+  }
+
+  Future<void> _checkAndShowPrivacyTermsDialog() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasAccepted = prefs.getBool('privacy_terms_accepted') ?? false;
+    
+    if (!hasAccepted && mounted) {
+      _showPrivacyTermsDialog();
+    }
   }
 
   void _showPrivacyTermsDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Accept Privacy Policy & Terms'),
-        content: const Text(
-          'Please review and accept our Privacy Policy and Terms of Service to continue using the app.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PrivacyTermsScreen(),
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          title: const Text('Accept Privacy Policy & Terms'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Welcome to RxMind!\n\nBefore you continue, please review and accept our Privacy Policy and Terms of Service.',
+                  style: TextStyle(fontSize: 14),
                 ),
-              );
-            },
-            child: const Text('View Documents'),
+                SizedBox(height: 12),
+                Text(
+                  'By clicking "Accept", you agree to both documents.',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Accept'),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacyTermsScreen(),
+                  ),
+                );
+              },
+              child: const Text('View Documents'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('privacy_terms_accepted', true);
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Accept'),
+            ),
+          ],
+        ),
       ),
     );
   }

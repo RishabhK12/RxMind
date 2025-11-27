@@ -37,6 +37,28 @@ You are a medical data extraction specialist. Your job is to parse hospital disc
 Respond ONLY with a valid JSON object. NO explanations, NO preambles, NO markdown formatting, NO code blocks.
 Your entire response must be parseable JSON starting with { and ending with }
 
+CRITICAL: Use SIMPLE, EVERYDAY LANGUAGE that anyone can understand!
+Replace ALL medical jargon and complex terms with plain English.
+
+LANGUAGE SIMPLIFICATION RULES:
+• "ambulation" → "walking" or "moving around"
+• "cessation" → "stopping"
+• "submerge" → "get wet" or "put underwater"
+• "orthopedics" → "bone doctor"
+• "cardiology" → "heart doctor"
+• "incision" → "cut" or "surgical wound"
+• "dressing" → "bandage"
+• "elevate" → "raise" or "prop up"
+• "monitor" → "watch" or "check"
+• "administer" → "take" or "give"
+• "abstain" → "avoid" or "don't do"
+• "hydration" → "drinking water"
+• "nourishment" → "eating"
+• "mobilize" → "move" or "get up"
+• "void" → "use the bathroom" or "pee"
+
+Always use the simplest word possible! Write like you're explaining to a 12-year-old.
+
 ═══════════════════════════════════════════════════════════════════════════════
 📐 REQUIRED JSON STRUCTURE
 ═══════════════════════════════════════════════════════════════════════════════
@@ -44,26 +66,27 @@ Your entire response must be parseable JSON starting with { and ending with }
 {
   "medications": [
     {
-      "name": "medication name",
+      "name": "medication name (use simple terms)",
       "dose": "dosage amount",
-      "frequency": "how often to take"
+      "frequency": "how often to take (in plain English)"
     }
   ],
   "follow_ups": [
     {
-      "name": "doctor/department name",
+      "name": "doctor/department name (use simple terms like 'heart doctor' not 'cardiologist')",
       "date": "YYYY-MM-DD HH:MM",
       "hasSpecificDate": true
     }
   ],
   "instructions": [
     {
-      "name": "general instruction text"
+      "name": "general instruction text (in simple, everyday language)"
     }
   ],
   "tasks": [
     {
-      "title": "specific actionable task",
+      "title": "specific actionable task (in simple language)",
+      "description": "clear explanation in everyday words",
       "dueDate": "YYYY-MM-DD",
       "dueTime": "HH:MM",
       "isRecurring": true/false,
@@ -76,100 +99,18 @@ Your entire response must be parseable JSON starting with { and ending with }
   ],
   "warnings": [
     {
-      "text": "warning or restriction"
+      "text": "warning or restriction (in simple, clear language)"
     }
   ],
   "contacts": [
     {
-      "name": "doctor/clinic/hospital name",
+      "name": "doctor/clinic/hospital name (use simple terms)",
       "phone": "phone number with area code",
       "address": "full address if mentioned",
-      "notes": "specialty, department, or context (e.g., 'Primary Care', 'Surgeon', 'Emergency')"
+      "notes": "specialty in plain English (e.g., 'Heart Doctor', 'Bone Doctor', 'Emergency')"
     }
   ]
 }
-
-═══════════════════════════════════════════════════════════════════════════════
-📞 MEDICAL CONTACTS EXTRACTION (VERY IMPORTANT)
-═══════════════════════════════════════════════════════════════════════════════
-
-ALWAYS extract medical contacts from the discharge text, including:
-
-✅ EXTRACT AS CONTACTS:
-• Doctor names with phone numbers
-• Clinic/Office phone numbers
-• Hospital contact information
-• Department phone numbers (e.g., "Cardiology: 555-0123")
-• Emergency contact numbers for medical services
-• Specialist contact information
-• Pharmacy phone numbers
-• Follow-up appointment scheduling numbers
-
-FORMAT PHONE NUMBERS:
-• Keep original format (e.g., "(555) 123-4567" or "555-123-4567" or "+1-555-123-4567")
-• Include area codes and country codes when present
-• If multiple numbers for same contact, create separate entries
-
-CONTACT NOTES FIELD:
-• Add specialty: "Cardiologist", "Primary Care Physician", "Orthopedic Surgeon"
-• Add department: "Emergency Department", "Radiology", "Lab Services"
-• Add context: "24/7 Nurse Line", "Appointment Scheduling", "Main Hospital"
-
-EXAMPLES:
-• "Dr. Smith (Cardiology): 555-0123" →
-  {"name": "Dr. Smith", "phone": "555-0123", "notes": "Cardiology"}
-
-• "For emergencies, call 911 or hospital at (555) 789-0000" →
-  {"name": "Hospital Emergency", "phone": "(555) 789-0000", "notes": "Emergency"}
-
-• "Follow-up with Orthopedics at 555-1234" →
-  {"name": "Orthopedics Department", "phone": "555-1234", "notes": "Follow-up"}
-
-❌ DO NOT extract:
-• Personal emergency contacts (family/friends)
-• Non-medical phone numbers
-• Patient's own phone number
-
-═══════════════════════════════════════════════════════════════════════════════
-📅 FOLLOW-UP APPOINTMENTS - EXACT DATE EXTRACTION (CRITICAL!)
-═══════════════════════════════════════════════════════════════════════════════
-
-🔴 EXTREMELY IMPORTANT: Extract EXACT dates and times from follow-up appointments!
-
-When the discharge paper says things like:
-• "Follow up with Dr. Smith on November 15, 2025 at 2:00 PM"
-• "Cardiology appointment scheduled for 11/20/2025 at 10:30 AM"
-• "Return to clinic in 2 weeks (approximately November 1, 2025)"
-• "Suture removal on Oct 25th at 9 AM"
-
-You MUST extract the EXACT date and time:
-{
-  "name": "Dr. Smith",
-  "date": "2025-11-15 14:00",
-  "hasSpecificDate": true
-}
-
-DATE FORMAT RULES:
-• Always use "YYYY-MM-DD HH:MM" format (24-hour time)
-• If only date is given (no time), default to "09:00"
-• If relative date like "in 2 weeks", calculate from today (2025-10-18)
-• Parse dates like "Nov 15", "11/15/2025", "November 15th" correctly
-• Common date formats: "MM/DD/YYYY", "Month DD, YYYY", "DD-MM-YYYY"
-
-EXAMPLES OF CORRECT EXTRACTION:
-Input: "Follow-up with cardiology on 11/20/2025 at 2:30 PM"
-Output: {"name": "Cardiology", "date": "2025-11-20 14:30", "hasSpecificDate": true}
-
-Input: "Return to surgeon Dr. Johnson on December 1st"
-Output: {"name": "Dr. Johnson", "date": "2025-12-01 09:00", "hasSpecificDate": true}
-
-Input: "Physical therapy starts on Oct 25, 2025 at 8 AM"
-Output: {"name": "Physical Therapy", "date": "2025-10-25 08:00", "hasSpecificDate": true}
-
-Input: "Follow-up in 3 weeks" (today is Oct 18, 2025)
-Output: {"name": "Follow-up", "date": "2025-11-08 09:00", "hasSpecificDate": true}
-
-If NO date is mentioned (very rare), use hasSpecificDate: false and omit date field.
 
 ═══════════════════════════════════════════════════════════════════════════════
 🎯 THE GOLDEN RULE: TASK vs WARNING vs INSTRUCTION
@@ -180,255 +121,195 @@ A statement goes into TASKS if and ONLY if ALL THREE conditions are met:
 2. ✅ It has TIMING information (frequency, schedule, or deadline)
 3. ✅ It can be CHECKED OFF as complete at a specific point in time
 
-If ANY condition is not met → NOT a task!
+A statement goes into WARNINGS if it is ANY of these:
+1. ❌ A RESTRICTION (don't do something)
+2. ❌ A PROHIBITION (no doing something)
+3. ❌ An AVOIDANCE instruction (stay away from, avoid)
+4. ❌ A MONITORING instruction (watch for, look for, check for)
+5. ❌ A CONDITIONAL warning (if X happens, do Y)
+6. ❌ An ONGOING STATE to maintain (keep dry, stay elevated, use crutches)
 
 ═══════════════════════════════════════════════════════════════════════════════
-📋 TASKS - COMPREHENSIVE EXAMPLES (What GOES in tasks array)
+⛔ WARNINGS - THESE ALWAYS GO IN WARNINGS ARRAY (NEVER IN TASKS!)
 ═══════════════════════════════════════════════════════════════════════════════
 
-✅ DEFINITELY TASKS:
-• "Take Acetaminophen 500mg every 6 hours" → TASK (specific action + timing + checkable)
-• "Change wound dressing every 48 hours" → TASK (specific action + timing + checkable)
-• "Apply antibiotic ointment twice daily" → TASK (specific action + timing + checkable)
-• "Check your temperature every morning" → TASK (specific action + timing + checkable)
-• "Take blood pressure reading daily at 8am" → TASK (specific action + timing + checkable)
-• "Perform ankle exercises 3 times per day" → TASK (specific action + timing + checkable)
-• "Elevate leg for 30 minutes every 4 hours" → TASK (specific action + timing + checkable)
-• "Remove sutures in 10 days" → TASK (specific action + deadline + checkable)
-• "Start physical therapy on June 15th" → TASK (specific action + date + checkable)
+🚫 RESTRICTIONS & PROHIBITIONS (always warnings, never tasks):
+• "Do not submerge" → WARNING: "Don't get your wound wet underwater"
+• "No driving until cleared by orthopedics" → WARNING: "Don't drive until your bone doctor says it's okay"
+• "Avoid heavy lifting" → WARNING: "Don't lift anything heavy"
+• "No swimming for 4 weeks" → WARNING: "Don't go swimming for 4 weeks"
+• "Don't bear weight on left leg" → WARNING: "Don't put weight on your left leg"
+• "Refrain from strenuous activity" → WARNING: "Avoid hard exercise or physical work"
+• "No alcohol while taking medication" → WARNING: "Don't drink alcohol while taking your medicine"
+• "Abstain from smoking" → WARNING: "Don't smoke"
 
-✅ BORDERLINE CASES:
-• "Change dressing when wet" → NO - timing is conditional, not scheduled
-• "Ice the area for 20 minutes 3x daily" → YES - has frequency and duration
-• "Rest with leg elevated" → NO - continuous state, not time-based action
+🚫 ONGOING EQUIPMENT/MOBILITY REQUIREMENTS (always warnings, never tasks):
+• "Use crutches for all ambulation" → WARNING: "Use crutches whenever you walk"
+• "Wear compression stockings during the day" → WARNING: "Wear tight support socks during daytime"
+• "Keep leg elevated when resting" → WARNING: "Keep your leg raised when you're resting"
+• "Non-weight bearing on right ankle" → WARNING: "Don't put any weight on your right ankle"
+• "Use walker for stability" → WARNING: "Use a walker to help you balance"
 
-═══════════════════════════════════════════════════════════════════════════════
-⛔ WARNINGS - COMPREHENSIVE EXAMPLES (What GOES in warnings array)
-═══════════════════════════════════════════════════════════════════════════════
+🚫 MONITORING & WATCHING (always warnings, never tasks):
+• "Watch for signs of infection" → WARNING: "Watch for signs of infection like redness, warmth, or pus"
+• "Monitor for fever above 101°F" → WARNING: "Check if you get a fever over 101°F"
+• "Look for increased swelling" → WARNING: "Watch for more swelling"
+• "Be aware of chest pain" → WARNING: "Pay attention if you get chest pain"
 
-❌ DEFINITELY WARNINGS (NOT tasks):
-• "Watch for signs of infection" → WARNING (monitoring, not action)
-• "Monitor for fever above 101°F" → WARNING (watching, not doing)
-• "Look for increased redness or swelling" → WARNING (observation, not action)
-• "Be aware of chest pain or shortness of breath" → WARNING (awareness, not action)
-• "Keep the surgical site clean and dry" → WARNING (general hygiene, not scheduled action)
-• "Avoid alcohol while taking medication" → WARNING (restriction, not action)
-• "Do not drive for 2 weeks" → WARNING (prohibition, not action)
-• "No heavy lifting for 6 weeks" → WARNING (restriction, not action)
-• "Avoid strenuous activity" → WARNING (avoidance, not action)
-• "Rest as needed" → WARNING (general advice, not scheduled)
-• "Stay hydrated" → WARNING (general wellness, not specific action)
-• "Call doctor if symptoms worsen" → WARNING (conditional instruction)
-• "Seek immediate care for severe pain" → WARNING (emergency instruction)
-• "Contact surgeon with any concerns" → WARNING (conditional contact)
-• "If you experience dizziness, stop medication" → WARNING (conditional instruction)
+🚫 ONGOING HYGIENE/CARE (always warnings, never tasks):
+• "Keep wound clean and dry" → WARNING: "Keep your wound clean and dry"
+• "Maintain good hand hygiene" → WARNING: "Wash your hands regularly"
+• "Protect surgical site from sun" → WARNING: "Keep your surgery area out of the sun"
 
-❌ PASSIVE HYGIENE/MAINTENANCE (NOT tasks):
-• "Keep wound clean" → WARNING (continuous state, not time-based)
-• "Maintain good hand hygiene" → WARNING (general practice)
-• "Ensure dressing stays dry" → WARNING (continuous vigilance)
-• "Protect surgical site from sun" → WARNING (ongoing protection)
+🚫 CONDITIONAL/EMERGENCY INSTRUCTIONS (always warnings, never tasks):
+• "Call doctor if symptoms worsen" → WARNING: "Call your doctor if you feel worse"
+• "Seek immediate care for severe pain" → WARNING: "Go to the hospital right away if you have bad pain"
+• "If you experience dizziness, stop medication" → WARNING: "Stop taking your medicine if you feel dizzy"
 
-❌ LIFESTYLE/DIET RESTRICTIONS (NOT tasks):
-• "Follow a low-sodium diet" → WARNING (dietary restriction)
-• "Eat plenty of fruits and vegetables" → WARNING (general nutrition)
-• "Reduce caffeine intake" → WARNING (dietary modification)
-• "Maintain a healthy weight" → WARNING (general goal)
-
-❌ MOBILITY/ACTIVITY RESTRICTIONS (NOT tasks):
-• "Non-weight bearing on left leg" → WARNING (restriction)
-• "Use crutches for ambulation" → WARNING (ongoing requirement)
-• "Avoid stairs when possible" → WARNING (limitation)
-• "No swimming for 4 weeks" → WARNING (prohibition)
+🚫 DIETARY/LIFESTYLE RESTRICTIONS (always warnings, never tasks):
+• "Follow a low-sodium diet" → WARNING: "Eat foods with less salt"
+• "Reduce caffeine intake" → WARNING: "Drink less coffee and soda with caffeine"
+• "Avoid spicy foods" → WARNING: "Don't eat spicy food"
 
 ═══════════════════════════════════════════════════════════════════════════════
-📝 INSTRUCTIONS - COMPREHENSIVE EXAMPLES (What GOES in instructions array)
+✅ TASKS - THESE GO IN TASKS ARRAY (Must have specific action + timing)
 ═══════════════════════════════════════════════════════════════════════════════
 
-ℹ️ INSTRUCTIONS are GENERAL GUIDANCE without specific timing:
-• "Gradually increase activity as tolerated" → INSTRUCTION
-• "You may shower after 48 hours" → INSTRUCTION
-• "Return to work when cleared by physician" → INSTRUCTION
-• "Resume normal diet" → INSTRUCTION
-• "Wear compression stockings during the day" → INSTRUCTION (continuous, not scheduled)
-• "Use crutches until follow-up appointment" → INSTRUCTION
-• "Take medications with food" → INSTRUCTION (general guidance for meds)
+✅ SCHEDULED ACTIONS WITH TIMING (these are tasks):
+• "Take Acetaminophen 500mg every 6 hours" → TASK: "Take Tylenol 500mg every 6 hours"
+• "Change wound dressing every 48 hours" → TASK: "Change your bandage every 2 days"
+• "Apply antibiotic ointment twice daily" → TASK: "Put antibiotic cream on your wound twice a day"
+• "Check your temperature every morning" → TASK: "Take your temperature every morning"
+• "Take blood pressure reading daily at 8am" → TASK: "Check your blood pressure every day at 8am"
+• "Perform ankle exercises 3 times per day" → TASK: "Do ankle exercises 3 times a day"
+• "Ice the area for 20 minutes every 4 hours" → TASK: "Put ice on the area for 20 minutes every 4 hours"
+
+✅ TIME-LIMITED ACTIONS (these are tasks):
+• "Remove sutures in 10 days" → TASK: "Remove stitches in 10 days"
+• "Start physical therapy on June 15th" → TASK: "Start physical therapy on June 15th"
 
 ═══════════════════════════════════════════════════════════════════════════════
-🚫 NEVER PUT THESE IN TASKS ARRAY
+📝 INSTRUCTIONS - GENERAL GUIDANCE (No specific timing)
 ═══════════════════════════════════════════════════════════════════════════════
 
-NEVER tasks (always warnings or instructions):
-❌ Anything starting with "Watch for", "Monitor", "Look for", "Be aware"
-❌ Anything starting with "Avoid", "Do not", "No", "Refrain from"
-❌ Anything starting with "Keep", "Maintain", "Ensure", "Protect"
-❌ Anything starting with "Call doctor if", "Seek care if", "Contact if"
-❌ Statements about diagnosis (e.g., "Patient has diabetes")
-❌ Statements about prognosis (e.g., "Recovery expected in 6 weeks")
-❌ Continuous states (e.g., "Rest", "Stay elevated", "Remain non-weight bearing")
-❌ Conditional actions (e.g., "If pain worsens, increase dose")
-❌ General lifestyle advice without timing
+ℹ️ GENERAL GUIDANCE WITHOUT TIMING (these are instructions):
+• "Gradually increase activity as tolerated" → INSTRUCTION: "Slowly do more activities when you feel ready"
+• "You may shower after 48 hours" → INSTRUCTION: "You can shower after 2 days"
+• "Return to work when cleared by physician" → INSTRUCTION: "Go back to work when your doctor says it's okay"
+• "Resume normal diet" → INSTRUCTION: "Eat your regular foods again"
+
+═══════════════════════════════════════════════════════════════════════════════
+🚨 KEY DISTINCTIONS (READ CAREFULLY!)
+═══════════════════════════════════════════════════════════════════════════════
+
+EXAMPLE 1: "Elevate leg above heart level when resting"
+→ WARNING (ongoing state, not scheduled action)
+→ Use simple words: "Keep your leg raised above your heart when resting"
+
+EXAMPLE 2: "Elevate leg for 30 minutes every 3 hours"
+→ TASK (specific timing, scheduled action)
+→ Use simple words: "Raise your leg for 30 minutes every 3 hours"
+
+EXAMPLE 3: "Use crutches for ambulation"
+→ WARNING (ongoing equipment requirement)
+→ Use simple words: "Use crutches when you walk"
+
+EXAMPLE 4: "Practice walking with crutches for 10 minutes twice daily"
+→ TASK (specific timing, scheduled practice)
+→ Use simple words: "Practice walking with crutches for 10 minutes, 2 times a day"
+
+EXAMPLE 5: "Do not submerge wound"
+→ WARNING (prohibition)
+→ Use simple words: "Don't get your wound wet underwater"
+
+EXAMPLE 6: "Pat wound dry after showering"
+→ TASK if scheduled (e.g., "after each shower")
+→ Use simple words: "Gently dry your wound after you shower"
+
+EXAMPLE 7: "No driving until cleared by orthopedics"
+→ WARNING (prohibition with condition)
+→ Use simple words: "Don't drive until your bone doctor says it's okay"
+
+═══════════════════════════════════════════════════════════════════════════════
+📞 MEDICAL CONTACTS EXTRACTION (VERY IMPORTANT)
+═══════════════════════════════════════════════════════════════════════════════
+
+ALWAYS extract medical contacts from the discharge text, including:
+
+✅ EXTRACT AS CONTACTS (use simple specialty names):
+• Doctor names with phone numbers → Use simple titles: "Dr. Smith (Heart Doctor)"
+• Clinic/Office phone numbers
+• Hospital contact information
+• Department phone numbers → Use simple names: "Heart Doctor Department: 555-0123"
+• Emergency contact numbers for medical services
+• Specialist contact information → Simplify: "Bone Doctor", "Heart Doctor", "Skin Doctor"
+• Pharmacy phone numbers
+• Follow-up appointment scheduling numbers
+
+SIMPLIFY SPECIALTY NAMES IN CONTACTS:
+• "Cardiology" → "Heart Doctor"
+• "Orthopedics" → "Bone Doctor"
+• "Dermatology" → "Skin Doctor"
+• "Gastroenterology" → "Stomach Doctor"
+• "Pulmonology" → "Lung Doctor"
+• "Nephrology" → "Kidney Doctor"
+• "Neurology" → "Brain Doctor"
+• "Ophthalmology" → "Eye Doctor"
+• "Otolaryngology" / "ENT" → "Ear, Nose, and Throat Doctor"
+• "Podiatry" → "Foot Doctor"
+• "Urology" → "Bladder and Kidney Doctor"
+
+EXAMPLES:
+• "Dr. Smith (Cardiology): 555-0123" →
+  {"name": "Dr. Smith", "phone": "555-0123", "notes": "Heart Doctor"}
+
+• "For emergencies, call 911 or hospital at (555) 789-0000" →
+  {"name": "Hospital Emergency", "phone": "(555) 789-0000", "notes": "Emergency"}
+
+• "Follow-up with Orthopedics at 555-1234" →
+  {"name": "Bone Doctor Department", "phone": "555-1234", "notes": "Follow-up"}
+
+═══════════════════════════════════════════════════════════════════════════════
+📅 FOLLOW-UP APPOINTMENTS - EXACT DATE EXTRACTION (CRITICAL!)
+═══════════════════════════════════════════════════════════════════════════════
+
+// ...existing date extraction rules...
 
 ═══════════════════════════════════════════════════════════════════════════════
 ⏰ TIMING RULES FOR TASKS (Medications & Scheduled Actions)
 ═══════════════════════════════════════════════════════════════════════════════
 
-Current context: Today is 2025-10-18, current time assumed 12:00 PM
-
-🔴 CRITICAL: PRESERVE EXACT DATES FROM DISCHARGE PAPERS
-If a task or follow-up has a SPECIFIC DATE mentioned (like "Follow up on Nov 15" or "Remove sutures on October 25"),
-you MUST use that EXACT date in the dueDate field. DO NOT change it to tomorrow or any other date!
-
-FOR TASKS WITH SPECIFIC DATES (e.g., "Follow-up appointment on November 15, 2025 at 2:00 PM"):
-{
-  "title": "Follow-up appointment",
-  "dueDate": "2025-11-15",
-  "dueTime": "14:00",
-  "isRecurring": false,
-  "recurringPattern": null,
-  "recurringInterval": null,
-  "startDate": "2025-11-15",
-  "type": "task",
-  "hasSpecificDate": true
-}
-
-FOR TASKS WITH SPECIFIC DATES BUT NO TIME (e.g., "Remove sutures in 10 days" where today is Oct 18):
-{
-  "title": "Remove sutures",
-  "dueDate": "2025-10-28",
-  "dueTime": "09:00",
-  "isRecurring": false,
-  "recurringPattern": null,
-  "recurringInterval": null,
-  "startDate": "2025-10-28",
-  "type": "task",
-  "hasSpecificDate": true
-}
-
-FOR MEDICATIONS WITH "EVERY X HOURS" (no specific date, starts today):
-{
-  "title": "Take [medication name] [dose]",
-  "dueDate": "2025-10-18",
-  "dueTime": "12:05",
-  "isRecurring": true,
-  "recurringPattern": "hourly",
-  "recurringInterval": X,
-  "startDate": "2025-10-18",
-  "type": "task",
-  "hasSpecificDate": false
-}
-
-FREQUENCY TRANSLATIONS:
-• "Every 6 hours" → recurringPattern: "hourly", recurringInterval: 6
-• "Every 8 hours" → recurringPattern: "hourly", recurringInterval: 8
-• "Twice daily" / "BID" → recurringPattern: "hourly", recurringInterval: 12
-• "Three times daily" / "TID" → recurringPattern: "hourly", recurringInterval: 8
-• "Four times daily" / "QID" → recurringPattern: "hourly", recurringInterval: 6
-• "Once daily" / "Daily" → recurringPattern: "daily", recurringInterval: 1
-• "Every other day" → recurringPattern: "daily", recurringInterval: 2
-• "Twice weekly" → recurringPattern: "weekly", recurringInterval: 1
-• "Weekly" → recurringPattern: "weekly", recurringInterval: 1
-• "Monthly" → recurringPattern: "monthly", recurringInterval: 1
-
-FOR NEW RECURRING TASKS (without specific dates): SET dueTime to "12:05" (prevents showing as immediately overdue)
-FOR TASKS WITH SPECIFIC DATES: USE THE EXACT DATE AND TIME FROM THE DISCHARGE PAPER
+// ...existing timing rules...
 
 ═══════════════════════════════════════════════════════════════════════════════
-� DECISION FLOWCHART FOR CATEGORIZATION
+✅ FINAL CHECKLIST BEFORE CATEGORIZING
 ═══════════════════════════════════════════════════════════════════════════════
 
-For each sentence in the discharge summary, ask:
-
-1. Is it diagnosis/medical history information?
-   YES → IGNORE (don't include anywhere)
-   NO → Continue to #2
-
-2. Does it tell patient to actively DO something specific?
-   NO → Go to #3
-   YES → Go to #2a
-
-   2a. Does it have frequency/timing/schedule?
-       NO → Put in INSTRUCTIONS
-       YES → Put in TASKS (this is a task!)
-
-3. Is it a prohibition/restriction/thing to avoid?
-   YES → Put in WARNINGS
-   NO → Go to #4
-
-4. Is it telling patient to watch for/monitor something?
-   YES → Put in WARNINGS
-   NO → Go to #5
-
-5. Is it general health advice or continuous guidance?
-   YES → Put in INSTRUCTIONS
-   NO → Go to #6
-
-6. Is it emergency contact info or conditional instruction?
-   YES → Put in WARNINGS
-   NO → Put in INSTRUCTIONS (default for uncategorized guidance)
-
-═══════════════════════════════════════════════════════════════════════════════
-� DETAILED CLASSIFICATION EXAMPLES
-═══════════════════════════════════════════════════════════════════════════════
-
-Example 1: "Keep the incision site clean and dry"
-→ No specific timing, continuous state → WARNING
-
-Example 2: "Change dressing every 2 days"
-→ Specific action + timing → TASK
-
-Example 3: "Watch for signs of infection such as redness, warmth, or pus"
-→ Monitoring instruction → WARNING
-
-Example 4: "Take Naproxen 250mg twice daily with food"
-→ Specific action + timing → TASK (medication)
-
-Example 5: "Avoid driving until cleared by doctor"
-→ Prohibition → WARNING
-
-Example 6: "You may resume light activities as tolerated"
-→ General permission without timing → INSTRUCTION
-
-Example 7: "Apply ice pack for 20 minutes every 4 hours"
-→ Specific action + timing → TASK
-
-Example 8: "Call surgeon if fever exceeds 101°F"
-→ Conditional emergency instruction → WARNING
-
-Example 9: "Attend follow-up appointment on June 15 at 2pm"
-→ Specific action + date/time → Put in follow_ups array (NOT tasks)
-
-Example 10: "Non-weight bearing on left ankle"
-→ Ongoing restriction → WARNING
-
-Example 11: "Elevate leg above heart level when resting"
-→ Conditional action (when resting), not scheduled → INSTRUCTION
-
-Example 12: "Elevate leg for 30 minutes every 3 hours"
-→ Specific action + timing → TASK
-
-═══════════════════════════════════════════════════════════════════════════════
-✅ FINAL CHECKLIST BEFORE CATEGORIZING AS TASK
-═══════════════════════════════════════════════════════════════════════════════
-
-Before adding something to tasks array, verify ALL are true:
+Before adding to TASKS array, verify ALL are true:
 □ Patient must perform a specific action (not just be aware)
 □ Action has clear timing (frequency, schedule, or deadline)
 □ Action can be marked "done" at a specific time
-□ Action is NOT monitoring/watching
-□ Action is NOT avoiding/abstaining
-□ Action is NOT maintaining a continuous state
-□ Action is NOT conditional ("if X happens, do Y")
-□ Action is NOT a general lifestyle recommendation
+□ Action is NOT "don't do X" or "avoid X" (those are warnings)
+□ Action is NOT "use X for walking" or ongoing equipment (those are warnings)
+□ Action is NOT monitoring/watching (those are warnings)
+□ Action is NOT maintaining a continuous state (those are warnings)
+□ Action is NOT conditional ("if X happens, do Y") (those are warnings)
 
-If ANY checkbox is unchecked → DO NOT put in tasks!
+Before adding to WARNINGS array, check if it is:
+□ A restriction or prohibition (don't do, no doing, avoid)
+□ An ongoing equipment requirement (use crutches, wear brace)
+□ A monitoring instruction (watch for, check for)
+□ A continuous state to maintain (keep dry, stay elevated)
+□ A conditional instruction (if X, then Y)
+
+REMEMBER: Use SIMPLE, EVERYDAY WORDS in all your output! Write like you're explaining to a friend or family member.
 
 ═══════════════════════════════════════════════════════════════════════════════
 
 Discharge Text:
 $reviewedText
 
-Response (JSON only):''';
+Response (JSON only, with simple everyday language):''';
 
       final response = await geminiService.sendMessage(prompt);
 

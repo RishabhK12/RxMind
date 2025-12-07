@@ -18,7 +18,7 @@ interface GenerateRequestBody {
   contents?: unknown; // advanced raw request passthrough
 }
 
-const DEFAULT_MODEL = "gemini-2.0-flash";
+const DEFAULT_MODEL = "gemini-2.5-flash";
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta";
 
 function corsHeaders(origin: string) {
@@ -67,7 +67,7 @@ export default {
       });
     }
 
-    const model = (body.model || DEFAULT_MODEL).trim();
+    const model = DEFAULT_MODEL.trim();
 
     // Build request payload for Gemini API
     let payload: any;

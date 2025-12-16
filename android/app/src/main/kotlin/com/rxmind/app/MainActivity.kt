@@ -1,4 +1,4 @@
-package com.example.rxmind_app
+package com.rxmind.app
 
 import io.flutter.embedding.android.FlutterActivity
 

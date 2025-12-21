@@ -53,8 +53,9 @@ class ChatManager {
   }
 
   void addMessage(String role, String content) {
-    if (_chats.isEmpty)
+    if (_chats.isEmpty) {
       _chats.add({'name': 'Chat 1', 'messages': <Map<String, dynamic>>[]});
+    }
 
     final currentMessages = _chats[_activeChatIndex]['messages'];
     List<Map<String, dynamic>> messages;

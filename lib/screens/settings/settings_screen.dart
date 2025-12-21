@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxmind_app/main.dart'; // Use RxMindSettings from main
 import 'package:rxmind_app/screens/settings/contacts_screen.dart';
+import 'package:rxmind_app/screens/settings/privacy_terms_screen.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
@@ -250,6 +251,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
+          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Text('Data',
@@ -496,6 +498,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             leading: Icon(Icons.people, color: theme.colorScheme.secondary),
             title: const Text('Credits'),
             subtitle: const Text('Created by the RxMind team.'),
+          ),
+          ListTile(
+            leading: Icon(Icons.privacy_tip_outlined, color: theme.colorScheme.primary),
+            title: const Text('Privacy Policy & Terms'),
+            subtitle: const Text('View our privacy policy and terms of service'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const PrivacyTermsScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -918,4 +933,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
   }
+
 }

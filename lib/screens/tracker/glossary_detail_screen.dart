@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../ai/gemini_api_service.dart';
-import '../../gemini_api_key.dart';
 import '../../core/widgets/markdown_text.dart';
 
 class GlossaryDetailScreen extends StatefulWidget {
@@ -12,8 +11,7 @@ class GlossaryDetailScreen extends StatefulWidget {
 }
 
 class _GlossaryDetailScreenState extends State<GlossaryDetailScreen> {
-  late final GeminiApiService _geminiApi =
-      GeminiApiService(apiKey: geminiApiKey);
+  late final GeminiApiService _geminiApi = GeminiApiService();
   String? definition;
   bool loading = true;
 

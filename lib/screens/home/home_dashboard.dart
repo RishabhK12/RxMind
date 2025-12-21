@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
@@ -296,19 +296,29 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ),
             const SizedBox(width: 12),
             Semantics(
-              label: userName != null && userName!.isNotEmpty
-                  ? 'Welcome $userName'
-                  : 'Welcome to RxMind',
+              label: 'Welcome to RxMind',
               child: Text(
-                userName != null && userName!.isNotEmpty
-                    ? 'Welcome $userName'
-                    : 'Welcome to RxMind',
+                'Welcome to RxMind',
                 style: theme.textTheme.titleLarge
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ],
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Semantics(
+              label: 'RxMind logo',
+              child: SvgPicture.asset(
+                'assets/illus/logo.svg',
+                width: 64,
+                height: 64,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ],
       ),
       body: AnimatedScale(
         scale: 1.0,

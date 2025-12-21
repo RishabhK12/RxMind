@@ -22,9 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     // Instead of using GoogleGemini directly, use our wrapper service
-    _model = GeminiApiService(
-      apiKey: const String.fromEnvironment('GEMINI_API_KEY'),
-    );
+    _model = GeminiApiService();
   }
 
   @override
@@ -40,9 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _loadInitialContext() async {
-    if (_initialContext == null) {
-      _initialContext = await DischargeDataManager.loadRawOcrText();
-    }
+    _initialContext ??= await DischargeDataManager.loadRawOcrText();
 
     if (_initialContext != null && _initialContext!.isNotEmpty) {
       setState(() {

@@ -34,23 +34,26 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   }
 
   Future<void> _parseDischargeData() async {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     _rawOcrText = args?['ocrText'] as String? ?? '';
     final parsedJsonString = args?['parsedJson'] as String? ?? '';
 
     if (parsedJsonString.isNotEmpty) {
       try {
-        String jsonStr = parsedJsonString;
-        final jsonStart = parsedJsonString.indexOf('{');
-        final jsonEnd = parsedJsonString.lastIndexOf('}');
-        if (jsonStart != -1 && jsonEnd != -1) {
-          jsonStr = parsedJsonString.substring(jsonStart, jsonEnd + 1);
+        String jsonStr = _extractAndCleanJson(parsedJsonString);
+
+        Map<String, dynamic> parsed;
+        try {
+          parsed = jsonDecode(jsonStr);
+        } catch (_) {
+          // If extraction/cleanup still failed, use empty structure
+          parsed = jsonDecode(_getEmptyJsonStructure());
         }
 
-        final Map<String, dynamic> parsed = jsonDecode(jsonStr);
-
         // Extract medications
-        if (parsed.containsKey('medications') && parsed['medications'] is List) {
+        if (parsed.containsKey('medications') &&
+            parsed['medications'] is List) {
           medications = (parsed['medications'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
@@ -64,7 +67,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         }
 
         // Extract instructions
-        if (parsed.containsKey('instructions') && parsed['instructions'] is List) {
+        if (parsed.containsKey('instructions') &&
+            parsed['instructions'] is List) {
           instructions = (parsed['instructions'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
@@ -80,7 +84,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           warnings = [];
 
           for (final task in allTasks) {
-            final description = task['description']?.toString().toLowerCase() ?? '';
+            final description =
+                task['description']?.toString().toLowerCase() ?? '';
 
             // Check for keywords to categorize as warnings/restrictions
             if (description.contains('do not') ||
@@ -136,6 +141,97 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
     setState(() {
       _loading = false;
     });
+  }
+
+  /// Extracts and cleans JSON from a potentially messy LLM response
+  String _extractAndCleanJson(String input) {
+    String text = input.trim();
+
+    // Remove markdown code blocks if present
+    text = text.replaceAll(RegExp(r'```json\s*'), '');
+    text = text.replaceAll(RegExp(r'```\s*'), '');
+
+    // Find the JSON object
+    final jsonStart = text.indexOf('{');
+    final jsonEnd = text.lastIndexOf('}');
+
+    if (jsonStart == -1 || jsonEnd == -1 || jsonEnd <= jsonStart) {
+      // Return a default empty structure if no JSON found
+      return _getEmptyJsonStructure();
+    }
+
+    String jsonStr = text.substring(jsonStart, jsonEnd + 1);
+
+    // Clean up common issues in LLM-generated JSON
+    // Fix trailing commas before closing brackets/braces
+    jsonStr = jsonStr.replaceAll(RegExp(r',\s*}'), '}');
+    jsonStr = jsonStr.replaceAll(RegExp(r',\s*\]'), ']');
+
+    // Replace smart quotes with regular quotes
+    jsonStr =
+        jsonStr.replaceAll('"', '"').replaceAll('"', '"').replaceAll(''', "'")
+        .replaceAll(''', "'");
+
+    // Try to validate the JSON, return empty structure if invalid
+    try {
+      jsonDecode(jsonStr);
+      return jsonStr;
+    } catch (e) {
+      // Try to repair incomplete JSON by closing unclosed brackets
+      String repaired = _tryRepairJson(jsonStr);
+      try {
+        jsonDecode(repaired);
+        return repaired;
+      } catch (_) {
+        // If repair fails, return empty structure
+        return _getEmptyJsonStructure();
+      }
+    }
+  }
+
+  /// Returns empty but valid JSON structure
+  String _getEmptyJsonStructure() {
+    return '{"medications":[],"follow_ups":[],"instructions":[],"tasks":[],"warnings":[],"contacts":[]}';
+  }
+
+  /// Attempts to repair truncated/incomplete JSON
+  String _tryRepairJson(String json) {
+    String repaired = json;
+
+    // Count brackets
+    int openBraces = '{'.allMatches(repaired).length;
+    int closeBraces = '}'.allMatches(repaired).length;
+    int openBrackets = '['.allMatches(repaired).length;
+    int closeBrackets = ']'.allMatches(repaired).length;
+
+    // Remove incomplete last property (common truncation issue)
+    // Look for patterns like: ,"key": or ,"key":[ that are incomplete
+    repaired = repaired.replaceAll(RegExp(r',\s*"[^"]*":\s*$'), '');
+    repaired = repaired.replaceAll(RegExp(r',\s*"[^"]*":\s*\[\s*$'), '');
+    repaired = repaired.replaceAll(RegExp(r',\s*"[^"]*":\s*\{\s*$'), '');
+
+    // Remove trailing incomplete string values
+    repaired = repaired.replaceAll(RegExp(r':\s*"[^"]*$'), ': ""');
+
+    // Recount after cleanup
+    openBraces = '{'.allMatches(repaired).length;
+    closeBraces = '}'.allMatches(repaired).length;
+    openBrackets = '['.allMatches(repaired).length;
+    closeBrackets = ']'.allMatches(repaired).length;
+
+    // Add missing closing brackets
+    while (closeBrackets < openBrackets) {
+      repaired += ']';
+      closeBrackets++;
+    }
+
+    // Add missing closing braces
+    while (closeBraces < openBraces) {
+      repaired += '}';
+      closeBraces++;
+    }
+
+    return repaired;
   }
 
   void _editItem(Map<String, dynamic> item) {

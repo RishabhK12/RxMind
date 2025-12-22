@@ -238,6 +238,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
+  flutter_llama:
+    dependency: "direct main"
+    description:
+      name: flutter_llama
+      sha256: c347703791c2b27685aa324f2896bd4215ffe808daee423c040f2ad4a4ca582b
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   flutter_local_notifications:
     dependency: "direct main"
     description:
@@ -368,14 +376,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "10.9.0"
-  google_gemini:
-    dependency: "direct main"
-    description:
-      name: google_gemini
-      sha256: a99e14ba2d497ec8e2b4c83e483204709a4ce3ec6c0a6021b3c4a9b2cd671150
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.2"
   google_ml_kit:
     dependency: "direct main"
     description:

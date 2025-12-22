@@ -1,12 +1,14 @@
-import 'package:rxmind_app/services/ai/gemini_backend_client.dart';
+import 'package:rxmind_app/services/ai/local_llm_service.dart';
 import 'package:rxmind_app/core/ai/rate_limiter.dart';
 
-/// Updated Gemini API service that delegates all requests to the backend proxy.
-/// The mobile app no longer holds or transmits the Gemini API key directly.
+/// AI service that uses a local on-device LLM for complete privacy.
+/// All inference runs locally - no data is sent to external servers.
 class GeminiApiService {
   GeminiApiService();
 
-  /// Sends a prompt to the backend which forwards to Gemini.
+  final LocalLlmService _localLlm = LocalLlmService.I;
+
+  /// Sends a prompt to the local LLM.
   /// Returns the generated text (may be empty string on failure).
   Future<String> sendMessage(String message,
       {String? systemInstruction}) async {
@@ -14,19 +16,33 @@ class GeminiApiService {
       throw Exception('Rate limit exceeded. Please try again later.');
     }
     try {
-      final text = await GeminiBackendClient.I.generateText(
+      final text = await _localLlm.generateText(
         message,
         systemInstruction: systemInstruction,
-        // Preserve prior defaults
         temperature: 0.7,
         topK: 40,
         topP: 0.95,
-        maxOutputTokens: 2048,
+        maxTokens: 1024,
       );
       return text.trim();
     } catch (e) {
-      // Bubble up as Exception to match previous behavior
-      throw Exception('Gemini backend error: $e');
+      throw Exception('AI error: $e');
     }
+  }
+
+  /// Check if the AI model is ready
+  Future<bool> isModelReady() async {
+    return _localLlm.isModelLoaded;
+  }
+
+  /// Initialize the AI model with progress callback
+  Future<bool> initialize(
+      {Function(double progress, String status)? onProgress}) async {
+    return await _localLlm.initialize(onProgress: onProgress);
+  }
+
+  /// Check if model is downloaded
+  Future<bool> isModelDownloaded() async {
+    return await _localLlm.isModelDownloaded();
   }
 }

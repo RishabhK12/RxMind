@@ -1,18 +1,21 @@
 import 'dart:convert';
-import 'package:rxmind_app/services/ai/gemini_backend_client.dart';
+import 'package:rxmind_app/services/ai/local_llm_service.dart';
 import 'rate_limiter.dart';
 
-/// Legacy AI service refactored to use backend proxy instead of direct API key.
+/// AI service for parsing discharge text using local on-device LLM.
+/// All data stays on device for complete privacy.
 class AiService {
   AiService();
 
-  /// Sends raw text to Gemini via backend, attempting to decode JSON if returned.
+  final LocalLlmService _localLlm = LocalLlmService.I;
+
+  /// Sends raw text to local LLM, attempting to decode JSON if returned.
   Future<Map<String, dynamic>?> parseDischargeText(String text) async {
     if (!await RateLimiter.canMakeRequest()) {
       throw Exception('Rate limit exceeded. Please try again later.');
     }
     try {
-      final responseText = await GeminiBackendClient.I.generateText(text);
+      final responseText = await _localLlm.generateText(text);
       // Attempt to parse as JSON if model happened to return structured data.
       final trimmed = responseText.trim();
       if (trimmed.startsWith('{') || trimmed.startsWith('[')) {

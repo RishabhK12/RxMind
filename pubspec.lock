@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
+  background_downloader:
+    dependency: transitive
+    description:
+      name: background_downloader
+      sha256: "2d17c211eb9bf1f947f154fb85d1bea96944fb1efb1b0714851caac993c02dc8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.4.3"
   barcode:
     dependency: transitive
     description:
@@ -222,6 +230,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.1"
+  flutter_gemma:
+    dependency: "direct main"
+    description:
+      name: flutter_gemma
+      sha256: "8c981cbef6560104a75ee97a5ac064a249da92071bfe8b828c79aeb98477c26d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.11.13"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -238,14 +254,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_llama:
-    dependency: "direct main"
-    description:
-      name: flutter_llama
-      sha256: c347703791c2b27685aa324f2896bd4215ffe808daee423c040f2ad4a4ca582b
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.2"
   flutter_local_notifications:
     dependency: "direct main"
     description:
@@ -608,6 +616,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.9.0"
+  large_file_handler:
+    dependency: transitive
+    description:
+      name: large_file_handler
+      sha256: c2ecaf552e8039119bbe3a094d15aecbafe833899f30b2dcfbb513eddf76b36f
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -640,6 +656,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.0"
   markdown:
     dependency: transitive
     description:

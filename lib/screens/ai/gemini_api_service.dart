@@ -10,8 +10,14 @@ class GeminiApiService {
 
   /// Sends a prompt to the local LLM.
   /// Returns the generated text (may be empty string on failure).
-  Future<String> sendMessage(String message,
-      {String? systemInstruction}) async {
+  Future<String> sendMessage(
+    String message, {
+    String? systemInstruction,
+    double temperature = 0.7,
+    int topK = 40,
+    double topP = 0.95,
+    int maxTokens = 1024,
+  }) async {
     if (!await RateLimiter.canMakeRequest()) {
       throw Exception('Rate limit exceeded. Please try again later.');
     }
@@ -19,10 +25,10 @@ class GeminiApiService {
       final text = await _localLlm.generateText(
         message,
         systemInstruction: systemInstruction,
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxTokens: 1024,
+        temperature: temperature,
+        topK: topK,
+        topP: topP,
+        maxTokens: maxTokens,
       );
       return text.trim();
     } catch (e) {

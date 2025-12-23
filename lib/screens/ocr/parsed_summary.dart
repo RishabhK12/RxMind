@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'dart:convert';
@@ -24,6 +25,20 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   String _rawOcrText = '';
   final ScrollController _scrollController = ScrollController();
 
+  static const List<String> _expectedTopLevelKeys = <String>[
+    'medications',
+    'follow_ups',
+    'instructions',
+    'tasks',
+    'warnings',
+    'contacts',
+  ];
+
+  String _clipForLog(String s, {int maxChars = 4000}) {
+    if (s.length <= maxChars) return s;
+    return '${s.substring(0, maxChars)}\n\n[TRUNCATED LOG: ${s.length - maxChars} chars omitted]';
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -39,17 +54,17 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
     _rawOcrText = args?['ocrText'] as String? ?? '';
     final parsedJsonString = args?['parsedJson'] as String? ?? '';
 
+    if (kDebugMode) {
+      debugPrint(
+          '[ParsedSummary] parsedJsonString length: ${parsedJsonString.length}');
+      debugPrint(
+          '[ParsedSummary] parsedJsonString (clipped):\n${_clipForLog(parsedJsonString)}');
+    }
+
     if (parsedJsonString.isNotEmpty) {
       try {
-        String jsonStr = _extractAndCleanJson(parsedJsonString);
-
-        Map<String, dynamic> parsed;
-        try {
-          parsed = jsonDecode(jsonStr);
-        } catch (_) {
-          // If extraction/cleanup still failed, use empty structure
-          parsed = jsonDecode(_getEmptyJsonStructure());
-        }
+        final Map<String, dynamic> parsed =
+            _decodeAndNormalizeParsedJson(parsedJsonString);
 
         // Extract medications
         if (parsed.containsKey('medications') &&
@@ -189,6 +204,394 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
     }
   }
 
+  Map<String, dynamic> _decodeAndNormalizeParsedJson(String parsedJsonString) {
+    dynamic decoded = _tryDecodeRawJson(parsedJsonString);
+    decoded ??= _tryDecodeRawJson(_extractAndCleanJson(parsedJsonString));
+
+    // If the model output is truncated (common when it invents huge fields like
+    // URLs/descriptions), JSON decoding can fail. Salvage meds from the raw
+    // string so the UI still shows something.
+    if (decoded == null) {
+      final salvagedMeds = _salvageMedicationsFromText(parsedJsonString);
+      if (salvagedMeds.isNotEmpty) {
+        final out = _emptyExpectedStructure();
+        out['medications'] = salvagedMeds;
+        if (kDebugMode) {
+          debugPrint(
+              '[ParsedSummary] JSON decode failed; salvaged meds: ${salvagedMeds.length}');
+        }
+        return out;
+      }
+      decoded = jsonDecode(_getEmptyJsonStructure());
+    }
+
+    final Map<String, dynamic> normalized = _normalizeToExpectedSchema(decoded);
+
+    if (kDebugMode) {
+      debugPrint(
+          '[ParsedSummary] normalized keys: ${normalized.keys.toList()}');
+      debugPrint(
+          '[ParsedSummary] normalized meds: ${(normalized['medications'] as List).length}, '
+          'tasks: ${(normalized['tasks'] as List).length}');
+    }
+
+    return normalized;
+  }
+
+  List<Map<String, dynamic>> _salvageMedicationsFromText(String input) {
+    // 1) Try to extract a full medications array: "medications": [ ... ]
+    final medsArray = _tryExtractJsonArrayForKey(input, 'medications');
+    if (medsArray != null) {
+      return _normalizeMedications(medsArray);
+    }
+
+    // 2) Try to extract the first medication object from within a medications array.
+    final firstObj =
+        _tryExtractFirstJsonObjectInArrayForKey(input, 'medications');
+    if (firstObj != null) {
+      return _normalizeMedications(<dynamic>[firstObj]);
+    }
+
+    // 3) Some alternate schemas use "medication".
+    final medsArrayAlt = _tryExtractJsonArrayForKey(input, 'medication');
+    if (medsArrayAlt != null) {
+      return _normalizeMedications(medsArrayAlt);
+    }
+    final firstObjAlt =
+        _tryExtractFirstJsonObjectInArrayForKey(input, 'medication');
+    if (firstObjAlt != null) {
+      return _normalizeMedications(<dynamic>[firstObjAlt]);
+    }
+
+    return <Map<String, dynamic>>[];
+  }
+
+  List<dynamic>? _tryExtractJsonArrayForKey(String input, String key) {
+    final idx = input.indexOf('"$key"');
+    if (idx == -1) return null;
+
+    final colon = input.indexOf(':', idx);
+    if (colon == -1) return null;
+
+    int i = colon + 1;
+    while (i < input.length && _isWhitespace(input.codeUnitAt(i))) {
+      i++;
+    }
+    if (i >= input.length || input.codeUnitAt(i) != 0x5B /* [ */) return null;
+
+    final end = _findMatchingJsonBracket(input, i);
+    if (end == -1) return null;
+
+    final candidate = input.substring(i, end + 1);
+    try {
+      final decoded = jsonDecode(candidate);
+      return decoded is List ? decoded : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Map<String, dynamic>? _tryExtractFirstJsonObjectInArrayForKey(
+      String input, String key) {
+    final idx = input.indexOf('"$key"');
+    if (idx == -1) return null;
+    final colon = input.indexOf(':', idx);
+    if (colon == -1) return null;
+
+    // Find first '{' after the key.
+    int i = colon + 1;
+    while (i < input.length && input.codeUnitAt(i) != 0x7B /* { */) {
+      i++;
+    }
+    if (i >= input.length) return null;
+
+    final end = _findMatchingJsonBrace(input, i);
+    if (end == -1) return null;
+
+    final candidate = input.substring(i, end + 1);
+    try {
+      final decoded = jsonDecode(candidate);
+      return decoded is Map ? Map<String, dynamic>.from(decoded) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool _isWhitespace(int c) {
+    return c == 0x20 /* space */ ||
+        c == 0x0A /* \n */ ||
+        c == 0x0D /* \r */ ||
+        c == 0x09 /* \t */;
+  }
+
+  int _findMatchingJsonBracket(String s, int startIndex) {
+    int depth = 0;
+    bool inString = false;
+    bool escaped = false;
+
+    for (int i = startIndex; i < s.length; i++) {
+      final int c = s.codeUnitAt(i);
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (c == 0x5C /* \\ */) {
+          escaped = true;
+          continue;
+        }
+        if (c == 0x22 /* " */) {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (c == 0x22 /* " */) {
+        inString = true;
+        continue;
+      }
+
+      if (c == 0x5B /* [ */) depth++;
+      if (c == 0x5D /* ] */) {
+        depth--;
+        if (depth == 0) return i;
+        if (depth < 0) return -1;
+      }
+    }
+    return -1;
+  }
+
+  int _findMatchingJsonBrace(String s, int startIndex) {
+    int depth = 0;
+    bool inString = false;
+    bool escaped = false;
+
+    for (int i = startIndex; i < s.length; i++) {
+      final int c = s.codeUnitAt(i);
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (c == 0x5C /* \\ */) {
+          escaped = true;
+          continue;
+        }
+        if (c == 0x22 /* " */) {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (c == 0x22 /* " */) {
+        inString = true;
+        continue;
+      }
+
+      if (c == 0x7B /* { */) depth++;
+      if (c == 0x7D /* } */) {
+        depth--;
+        if (depth == 0) return i;
+        if (depth < 0) return -1;
+      }
+    }
+    return -1;
+  }
+
+  dynamic _tryDecodeRawJson(String input) {
+    final String text = input.trim();
+    if (text.isEmpty) return null;
+    try {
+      return jsonDecode(text);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Map<String, dynamic> _emptyExpectedStructure() {
+    return <String, dynamic>{
+      'medications': <dynamic>[],
+      'follow_ups': <dynamic>[],
+      'instructions': <dynamic>[],
+      'tasks': <dynamic>[],
+      'warnings': <dynamic>[],
+      'contacts': <dynamic>[],
+    };
+  }
+
+  bool _looksLikeExpectedSchema(Map<String, dynamic> map) {
+    for (final key in _expectedTopLevelKeys) {
+      if (!map.containsKey(key)) return false;
+    }
+    return true;
+  }
+
+  Map<String, dynamic> _normalizeToExpectedSchema(dynamic decoded) {
+    // The UI expects a single object with the expected keys.
+    // Some models return arrays or different key names; adapt those here.
+    Map<String, dynamic>? root;
+
+    if (decoded is Map) {
+      root = Map<String, dynamic>.from(decoded);
+    } else if (decoded is List && decoded.isNotEmpty && decoded.first is Map) {
+      root = Map<String, dynamic>.from(decoded.first as Map);
+    }
+
+    if (root == null) {
+      return _emptyExpectedStructure();
+    }
+
+    if (_looksLikeExpectedSchema(root)) {
+      // Ensure arrays exist.
+      for (final key in _expectedTopLevelKeys) {
+        if (root[key] is! List) root[key] = <dynamic>[];
+      }
+      return root;
+    }
+
+    final Map<String, dynamic> out = _emptyExpectedStructure();
+
+    // Support alternate schemas seen in the wild.
+    // Example: { checkup: { medication: [...] , notes: ... } }
+    Map<String, dynamic> checkup = <String, dynamic>{};
+    if (root['checkup'] is Map) {
+      checkup = Map<String, dynamic>.from(root['checkup'] as Map);
+    }
+
+    final dynamic medsCandidate = root['medications'] ??
+        root['medication'] ??
+        checkup['medications'] ??
+        checkup['medication'];
+    final List<Map<String, dynamic>> meds =
+        _normalizeMedications(medsCandidate);
+    out['medications'] = meds;
+
+    // Convert free-form notes into a basic task/instruction so the UI shows something.
+    final String? notes =
+        (root['notes'] ?? checkup['notes'])?.toString().trim().isEmpty == true
+            ? null
+            : (root['notes'] ?? checkup['notes'])?.toString().trim();
+    final String? medicationNotes =
+        (root['medication_notes'] ?? checkup['medication_notes'])
+                    ?.toString()
+                    .trim()
+                    .isEmpty ==
+                true
+            ? null
+            : (root['medication_notes'] ?? checkup['medication_notes'])
+                ?.toString()
+                .trim();
+
+    final List<Map<String, dynamic>> tasksOut = <Map<String, dynamic>>[];
+    final List<Map<String, dynamic>> instructionsOut = <Map<String, dynamic>>[];
+
+    void addNoteAsInstructionOrTask(String text) {
+      final t = text.trim();
+      if (t.isEmpty) return;
+      // If it looks like an action verb, put it into tasks; otherwise into instructions.
+      final lower = t.toLowerCase();
+      final looksAction = lower.startsWith('call ') ||
+          lower.startsWith('contact ') ||
+          lower.startsWith('carry ') ||
+          lower.startsWith('take ') ||
+          lower.startsWith('do ') ||
+          lower.startsWith('avoid ') ||
+          lower.startsWith('monitor ') ||
+          lower.contains('follow up') ||
+          lower.contains('follow-up');
+
+      if (looksAction) {
+        tasksOut.add(_basicTaskFromText(t));
+      } else {
+        instructionsOut.add(<String, dynamic>{'name': t});
+      }
+    }
+
+    if (notes != null) addNoteAsInstructionOrTask(notes);
+    if (medicationNotes != null) addNoteAsInstructionOrTask(medicationNotes);
+
+    out['tasks'] = tasksOut;
+    out['instructions'] = instructionsOut;
+
+    return out;
+  }
+
+  List<Map<String, dynamic>> _normalizeMedications(dynamic medsCandidate) {
+    final List<Map<String, dynamic>> out = <Map<String, dynamic>>[];
+    if (medsCandidate is! List) return out;
+
+    for (final item in medsCandidate) {
+      if (item is Map) {
+        final map = Map<String, dynamic>.from(item);
+        final String name =
+            (map['name'] ?? map['drug'] ?? map['medication'] ?? '')
+                .toString()
+                .trim();
+        final String rawDose =
+            (map['dose'] ?? map['dosage'] ?? map['strength'] ?? '')
+                .toString()
+                .trim();
+        final String rawFreq = (map['frequency'] ?? '').toString().trim();
+        final String mergedDose = rawDose.isNotEmpty
+            ? rawDose
+            : (map['dosage'] ?? map['dose'] ?? map['instructions'] ?? '')
+                .toString()
+                .trim();
+
+        final String derivedFreq =
+            rawFreq.isNotEmpty ? rawFreq : _deriveFrequencyFromText(mergedDose);
+
+        if (name.isEmpty && mergedDose.isEmpty) continue;
+        out.add(<String, dynamic>{
+          'name': name.isEmpty ? 'Medication' : name,
+          'dose': mergedDose,
+          'frequency': derivedFreq,
+        });
+      } else if (item is String) {
+        final s = item.trim();
+        if (s.isEmpty) continue;
+        out.add(<String, dynamic>{'name': s, 'dose': '', 'frequency': ''});
+      }
+    }
+
+    return out;
+  }
+
+  String _deriveFrequencyFromText(String text) {
+    final lower = text.toLowerCase();
+    if (lower.contains('night') ||
+        lower.contains('bedtime') ||
+        lower.contains('qhs')) return 'nightly';
+    if (lower.contains('daily') ||
+        lower.contains('once a day') ||
+        lower.contains('qd')) return 'daily';
+    if (lower.contains('twice') || lower.contains('bid')) return 'twice daily';
+    if (lower.contains('three') || lower.contains('tid'))
+      return 'three times daily';
+    if (lower.contains('as needed') || lower.contains('prn'))
+      return 'as needed';
+    return '';
+  }
+
+  Map<String, dynamic> _basicTaskFromText(String text) {
+    // Minimal task structure matching what the UI expects.
+    final title = text.length <= 60 ? text : '${text.substring(0, 60)}…';
+    return <String, dynamic>{
+      'title': title,
+      'description': text,
+      'dueDate': '',
+      'dueTime': '',
+      'isRecurring': false,
+      'recurringPattern': '',
+      'recurringInterval': 0,
+      'startDate': '',
+      'type': 'task',
+      'hasSpecificDate': false,
+    };
+  }
+
   /// Returns empty but valid JSON structure
   String _getEmptyJsonStructure() {
     return '{"medications":[],"follow_ups":[],"instructions":[],"tasks":[],"warnings":[],"contacts":[]}';
@@ -277,93 +680,48 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           args['parsedJson'] is String) {
         try {
           final jsonStr = args['parsedJson'] as String;
-          final jsonStart = jsonStr.indexOf('{');
-          final jsonEnd = jsonStr.lastIndexOf('}');
+          final Map<String, dynamic> parsed =
+              _decodeAndNormalizeParsedJson(jsonStr);
 
-          if (jsonStart != -1 && jsonEnd != -1) {
-            final extractedJson = jsonStr.substring(jsonStart, jsonEnd + 1);
-            final Map<String, dynamic> parsed = jsonDecode(extractedJson);
+          // Handle parsed tasks
+          if (parsed.containsKey('tasks') && parsed['tasks'] is List) {
+            final tasks = parsed['tasks'] as List;
+            for (final task in tasks) {
+              if (task is Map) {
+                // Convert task to proper format
+                final Map<String, dynamic> taskMap =
+                    Map<String, dynamic>.from(task);
 
-            // Handle parsed tasks
-            if (parsed.containsKey('tasks') && parsed['tasks'] is List) {
-              final tasks = parsed['tasks'] as List;
-              for (final task in tasks) {
-                if (task is Map) {
-                  // Convert task to proper format
-                  final Map<String, dynamic> taskMap =
-                      Map<String, dynamic>.from(task);
+                // Skip tasks with type='warning' - they go in warnings section only
+                final String taskType = taskMap['type']?.toString() ?? 'task';
+                if (taskType == 'warning') {
+                  continue; // Don't add warnings as tasks
+                }
 
-                  // Skip tasks with type='warning' - they go in warnings section only
-                  final String taskType = taskMap['type']?.toString() ?? 'task';
-                  if (taskType == 'warning') {
-                    continue; // Don't add warnings as tasks
-                  }
+                // Check if this task has a specific date from the discharge paper
+                final bool hasSpecificDate = taskMap['hasSpecificDate'] == true;
 
-                  // Check if this task has a specific date from the discharge paper
-                  final bool hasSpecificDate =
-                      taskMap['hasSpecificDate'] == true;
+                final now = DateTime.now();
+                final tomorrow = DateTime(now.year, now.month, now.day)
+                    .add(const Duration(days: 1));
 
-                  final now = DateTime.now();
-                  final tomorrow = DateTime(now.year, now.month, now.day)
-                      .add(const Duration(days: 1));
+                DateTime? dueDateTime;
 
-                  DateTime? dueDateTime;
+                if (hasSpecificDate &&
+                    taskMap['dueDate'] != null &&
+                    taskMap['dueDate'].toString() != 'null') {
+                  // This task has a specific date from the discharge paper - USE IT EXACTLY!
+                  final dateStr = taskMap['dueDate'].toString();
+                  final timeStr = (taskMap['dueTime'] != null &&
+                          taskMap['dueTime'].toString() != 'null')
+                      ? taskMap['dueTime'].toString()
+                      : '09:00';
 
-                  if (hasSpecificDate &&
-                      taskMap['dueDate'] != null &&
-                      taskMap['dueDate'].toString() != 'null') {
-                    // This task has a specific date from the discharge paper - USE IT EXACTLY!
-                    final dateStr = taskMap['dueDate'].toString();
-                    final timeStr = (taskMap['dueTime'] != null &&
-                            taskMap['dueTime'].toString() != 'null')
-                        ? taskMap['dueTime'].toString()
-                        : '09:00';
-
-                    try {
-                      // Parse and preserve the EXACT date from the discharge paper
-                      dueDateTime = DateTime.parse('${dateStr}T$timeStr');
-                    } catch (e) {
-                      // If parsing fails, fall back to default
-                      dueDateTime = DateTime(
-                        tomorrow.year,
-                        tomorrow.month,
-                        tomorrow.day,
-                        9,
-                        0,
-                      );
-                    }
-                  } else if (taskMap['dueDate'] != null &&
-                      taskMap['dueDate'].toString() != 'null') {
-                    // No specific date - this is a recurring task, start tomorrow
-                    final dateStr = taskMap['dueDate'].toString();
-                    final timeStr = (taskMap['dueTime'] != null &&
-                            taskMap['dueTime'].toString() != 'null')
-                        ? taskMap['dueTime'].toString()
-                        : '09:00';
-
-                    try {
-                      // Parse the original time
-                      final parsedTime = DateTime.parse('${dateStr}T$timeStr');
-                      // Set the date to tomorrow to avoid overdue status for recurring tasks
-                      dueDateTime = DateTime(
-                        tomorrow.year,
-                        tomorrow.month,
-                        tomorrow.day,
-                        parsedTime.hour,
-                        parsedTime.minute,
-                      );
-                    } catch (e) {
-                      // Use default if parsing fails - tomorrow at 9 AM
-                      dueDateTime = DateTime(
-                        tomorrow.year,
-                        tomorrow.month,
-                        tomorrow.day,
-                        9,
-                        0,
-                      );
-                    }
-                  } else {
-                    // No date specified - use tomorrow at 9 AM
+                  try {
+                    // Parse and preserve the EXACT date from the discharge paper
+                    dueDateTime = DateTime.parse('${dateStr}T$timeStr');
+                  } catch (e) {
+                    // If parsing fails, fall back to default
                     dueDateTime = DateTime(
                       tomorrow.year,
                       tomorrow.month,
@@ -372,52 +730,89 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
                       0,
                     );
                   }
+                } else if (taskMap['dueDate'] != null &&
+                    taskMap['dueDate'].toString() != 'null') {
+                  // No specific date - this is a recurring task, start tomorrow
+                  final dateStr = taskMap['dueDate'].toString();
+                  final timeStr = (taskMap['dueTime'] != null &&
+                          taskMap['dueTime'].toString() != 'null')
+                      ? taskMap['dueTime'].toString()
+                      : '09:00';
 
-                  tasksForStorage.add({
+                  try {
+                    // Parse the original time
+                    final parsedTime = DateTime.parse('${dateStr}T$timeStr');
+                    // Set the date to tomorrow to avoid overdue status for recurring tasks
+                    dueDateTime = DateTime(
+                      tomorrow.year,
+                      tomorrow.month,
+                      tomorrow.day,
+                      parsedTime.hour,
+                      parsedTime.minute,
+                    );
+                  } catch (e) {
+                    // Use default if parsing fails - tomorrow at 9 AM
+                    dueDateTime = DateTime(
+                      tomorrow.year,
+                      tomorrow.month,
+                      tomorrow.day,
+                      9,
+                      0,
+                    );
+                  }
+                } else {
+                  // No date specified - use tomorrow at 9 AM
+                  dueDateTime = DateTime(
+                    tomorrow.year,
+                    tomorrow.month,
+                    tomorrow.day,
+                    9,
+                    0,
+                  );
+                }
+
+                tasksForStorage.add({
+                  'id': UniqueKey().toString(),
+                  'title': taskMap['title'] ?? 'Task',
+                  'description': taskMap['description'],
+                  'dueTime': dueDateTime.toIso8601String(),
+                  'isOverdue': false,
+                  'snoozeCount': 0,
+                  'completed': false,
+                  'isRecurring': taskMap['isRecurring'] ?? false,
+                  'recurringPattern': taskMap['recurringPattern'],
+                  'recurringInterval': taskMap['recurringInterval'],
+                  'startDate': dueDateTime.toIso8601String(),
+                  'type': taskMap['type'] ?? 'task',
+                  'category': taskMap['category'],
+                  'priority': taskMap['priority'],
+                  'hasSpecificDate': hasSpecificDate,
+                });
+              }
+            }
+          }
+
+          // Process warnings if they exist
+          if (parsed.containsKey('warnings') && parsed['warnings'] is List) {
+            List<Map<String, dynamic>> warningsForStorage = [];
+            final warningsArray = parsed['warnings'] as List;
+
+            for (final warningObj in warningsArray) {
+              if (warningObj is Map) {
+                final String warningText = warningObj['text']?.toString() ?? '';
+                if (warningText.isNotEmpty) {
+                  warningsForStorage.add({
                     'id': UniqueKey().toString(),
-                    'title': taskMap['title'] ?? 'Task',
-                    'description': taskMap['description'],
-                    'dueTime': dueDateTime.toIso8601String(),
-                    'isOverdue': false,
-                    'snoozeCount': 0,
-                    'completed': false,
-                    'isRecurring': taskMap['isRecurring'] ?? false,
-                    'recurringPattern': taskMap['recurringPattern'],
-                    'recurringInterval': taskMap['recurringInterval'],
-                    'startDate': dueDateTime.toIso8601String(),
-                    'type': taskMap['type'] ?? 'task',
-                    'category': taskMap['category'],
-                    'priority': taskMap['priority'],
-                    'hasSpecificDate': hasSpecificDate,
+                    'text': warningText,
                   });
                 }
               }
             }
 
-            // Process warnings if they exist
-            if (parsed.containsKey('warnings') && parsed['warnings'] is List) {
-              List<Map<String, dynamic>> warningsForStorage = [];
-              final warningsArray = parsed['warnings'] as List;
-
-              for (final warningObj in warningsArray) {
-                if (warningObj is Map) {
-                  final String warningText =
-                      warningObj['text']?.toString() ?? '';
-                  if (warningText.isNotEmpty) {
-                    warningsForStorage.add({
-                      'id': UniqueKey().toString(),
-                      'text': warningText,
-                    });
-                  }
-                }
-              }
-
-              // Save warnings using the same mechanism as other data
-              if (warningsForStorage.isNotEmpty) {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setString(
-                    'warnings', jsonEncode(warningsForStorage));
-              }
+            // Save warnings using the same mechanism as other data
+            if (warningsForStorage.isNotEmpty) {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('warnings', jsonEncode(warningsForStorage));
             }
           }
         } catch (e) {

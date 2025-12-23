@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/storage/local_storage.dart';
@@ -35,6 +36,12 @@ Future<void> _safeLoadDotEnv() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterGemma.initialize(
+    huggingFaceToken: const String.fromEnvironment('HUGGINGFACE_TOKEN'),
+    maxDownloadRetries: 10,
+  );
+
   await _safeLoadDotEnv();
 
   // Initialize timezone database for notifications

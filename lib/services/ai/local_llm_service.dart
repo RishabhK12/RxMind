@@ -1,150 +1,134 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_llama/flutter_llama.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
-import 'package:http/http.dart' as http;
+import 'package:flutter_gemma/flutter_gemma.dart';
 
-/// Local LLM service using llama.cpp with TinyLlama model.
+/// Local LLM service using `flutter_gemma` (MediaPipe GenAI / LiteRT).
 /// All inference runs 100% on-device for complete privacy.
 class LocalLlmService {
   LocalLlmService._();
   static final I = LocalLlmService._();
 
-  final FlutterLlama _llama = FlutterLlama.instance;
   bool _isModelLoaded = false;
   bool _isLoading = false;
-  String? _modelPath;
 
-  /// Model file name - TinyLlama 1.1B Chat Q4_K_S quantization (~640MB)
-  /// Small enough for mobile, good quality for medical Q&A
-  static const String _modelFileName = 'tinyllama-1.1b-chat-v1.0.Q4_K_S.gguf';
+  String? _lastInitError;
 
-  /// Download URL for the model from HuggingFace
+  InferenceModel? _model;
+
+  // The underlying MediaPipe GenAI session currently behaves like a global
+  // single-flight resource on some devices/builds. If two requests overlap, or
+  // a previous session isn't properly closed after an error, subsequent calls
+  // can fail with:
+  //   PredictDone() AddQueryChunk should not be called before PredictDone
+  // Serialize all inference calls to keep the engine in a consistent state.
+  Future<void> _inferenceQueue = Future.value();
+
+  Future<T> _enqueueInference<T>(Future<T> Function() op) {
+    final completer = Completer<T>();
+
+    _inferenceQueue = _inferenceQueue.then((_) async {
+      try {
+        final result = await op();
+        completer.complete(result);
+      } catch (e, st) {
+        completer.completeError(e, st);
+      }
+    }).catchError((_) {
+      // Swallow errors in the queue chain so future requests still run.
+    });
+
+    return completer.future;
+  }
+
+  /// Model file name (installed via flutter_gemma).
+  /// Public repo, no HuggingFace token required.
+  static const String _modelFileName =
+      'TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task';
+
+  /// Download URL for the model from HuggingFace.
   static const String _modelDownloadUrl =
-      'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_S.gguf';
+      'https://huggingface.co/litert-community/TinyLlama-1.1B-Chat-v1.0/resolve/main/TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task';
+
+  // This specific .task variant is built with KV-cache size 1280 (ekv1280).
+  // Passing a larger maxTokens will fail during engine init.
+  static const int _modelMaxContextTokens = 1280;
+
+  // Token budgeting: LiteRT counts (input tokens + output tokens) against
+  // maxTokens. We must reserve headroom for the model response and some
+  // internal/system overhead.
+  static const int _contextOverheadTokens = 128;
+
+  // Conservative heuristic: ~3 characters per token. This intentionally
+  // underestimates the allowed input size to avoid OUT_OF_RANGE at runtime.
+  static const int _charsPerTokenEstimate = 3;
 
   bool get isModelLoaded => _isModelLoaded;
   bool get isLoading => _isLoading;
+  String? get lastInitError => _lastInitError;
 
-  /// Initialize and load the model
+  /// Initialize and load the model.
+  ///
+  /// If the model is not installed yet, this will download and install it.
   Future<bool> initialize(
       {Function(double progress, String status)? onProgress}) async {
     if (_isModelLoaded) return true;
     if (_isLoading) return false;
 
     _isLoading = true;
-
+    _lastInitError = null;
     try {
-      // Get the model path
-      _modelPath = await _getModelPath();
+      final installed = await FlutterGemma.isModelInstalled(_modelFileName);
+      final hasActive = FlutterGemma.hasActiveModel();
 
-      // Check if model exists, download if not
-      final modelFile = File(_modelPath!);
-      if (!await modelFile.exists()) {
+      // `flutter_gemma` does not guarantee the active model is persisted across
+      // app restarts. If the model file is already installed but there's no
+      // active spec, calling installModel().install() will *skip download* and
+      // set the active model spec.
+      if (!installed) {
         onProgress?.call(0.0, 'Downloading AI model...');
-        final success = await _downloadModel(onProgress);
-        if (!success) {
-          _isLoading = false;
-          return false;
-        }
+        await FlutterGemma.installModel(modelType: ModelType.llama)
+            .fromNetwork(_modelDownloadUrl)
+            .withProgress((progress) {
+          onProgress?.call(
+              progress / 100.0, 'Downloading AI model ($progress%)...');
+        }).install();
+      } else if (!hasActive) {
+        onProgress?.call(0.0, 'Activating AI model...');
+        await FlutterGemma.installModel(modelType: ModelType.llama)
+            .fromNetwork(_modelDownloadUrl)
+            .install();
       }
 
-      onProgress?.call(0.9, 'Loading AI model...');
+      onProgress?.call(0.95, 'Loading AI model...');
 
-      // Configure and load the model
-      final config = LlamaConfig(
-        modelPath: _modelPath!,
-        nThreads: 4, // Conservative for mobile
-        nGpuLayers: -1, // Use GPU if available
-        contextSize: 2048, // Sufficient for medical Q&A
-        batchSize: 512,
-        useGpu: true, // Enable GPU acceleration
-        verbose: kDebugMode,
+      // Force CPU backend.
+      // The OpenCL/ML_DRIFT_CL GPU delegate can fail at runtime on some
+      // devices and may trigger a native crash after a delegate failure.
+      _model = await FlutterGemma.getActiveModel(
+        maxTokens: _modelMaxContextTokens,
+        preferredBackend: PreferredBackend.cpu,
       );
 
-      final success = await _llama.loadModel(config);
-      _isModelLoaded = success;
+      _isModelLoaded = true;
       _isLoading = false;
+      onProgress?.call(1.0, 'AI ready');
 
-      if (success) {
-        onProgress?.call(1.0, 'AI ready');
-        if (kDebugMode) {
-          debugPrint('[LocalLlmService] Model loaded successfully');
-        }
-      } else {
-        if (kDebugMode) {
-          debugPrint('[LocalLlmService] Failed to load model');
-        }
+      if (kDebugMode) {
+        debugPrint('[LocalLlmService] Model ready (flutter_gemma)');
       }
 
-      return success;
-    } catch (e) {
+      return true;
+    } catch (e, st) {
       _isLoading = false;
+      _isModelLoaded = false;
+      _lastInitError = e.toString();
       if (kDebugMode) {
         debugPrint('[LocalLlmService] Error initializing: $e');
+        debugPrint('$st');
       }
-      return false;
-    }
-  }
-
-  /// Get the path where the model should be stored
-  Future<String> _getModelPath() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final modelsDir = Directory(path.join(appDir.path, 'models'));
-    if (!await modelsDir.exists()) {
-      await modelsDir.create(recursive: true);
-    }
-    return path.join(modelsDir.path, _modelFileName);
-  }
-
-  /// Download the model from HuggingFace
-  Future<bool> _downloadModel(
-      Function(double progress, String status)? onProgress) async {
-    try {
-      final modelFile = File(_modelPath!);
-
-      // Create a client for the download
-      final client = http.Client();
-      final request = http.Request('GET', Uri.parse(_modelDownloadUrl));
-      final response = await client.send(request);
-
-      if (response.statusCode != 200) {
-        if (kDebugMode) {
-          debugPrint(
-              '[LocalLlmService] Download failed: ${response.statusCode}');
-        }
-        return false;
-      }
-
-      final contentLength = response.contentLength ?? 0;
-      int received = 0;
-
-      final sink = modelFile.openWrite();
-
-      await for (final chunk in response.stream) {
-        sink.add(chunk);
-        received += chunk.length;
-        if (contentLength > 0) {
-          final progress = received / contentLength;
-          onProgress?.call(progress * 0.85,
-              'Downloading AI model (${(progress * 100).toInt()}%)...');
-        }
-      }
-
-      await sink.close();
-      client.close();
-
-      if (kDebugMode) {
-        debugPrint('[LocalLlmService] Model downloaded successfully');
-      }
-      return true;
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[LocalLlmService] Download error: $e');
-      }
+      onProgress?.call(0.0, 'AI init error: ${_lastInitError!}');
       return false;
     }
   }
@@ -158,52 +142,63 @@ class LocalLlmService {
     double topP = 0.95,
     int topK = 40,
   }) async {
-    if (!_isModelLoaded) {
-      final initialized = await initialize();
-      if (!initialized) {
-        throw Exception('Failed to initialize local LLM');
-      }
-    }
-
-    try {
-      // Format prompt using Zephyr/TinyLlama chat template
-      final formattedPrompt = _formatPrompt(prompt, systemInstruction);
-
-      final params = GenerationParams(
-        prompt: formattedPrompt,
-        temperature: temperature,
-        topP: topP,
-        topK: topK,
-        maxTokens: maxTokens,
-        repeatPenalty: 1.1,
-      );
-
-      final response = await _llama.generate(params);
-
-      // Clean up the response
-      String text = response.text.trim();
-
-      // Remove any trailing special tokens
-      text = text.replaceAll('</s>', '').trim();
-      text = text.replaceAll('<|user|>', '').trim();
-      text = text.replaceAll('<|assistant|>', '').trim();
-      text = text.replaceAll('<|system|>', '').trim();
-
-      // Extract JSON if the response contains it
-      text = _extractJson(text);
-
-      if (kDebugMode) {
-        debugPrint(
-            '[LocalLlmService] Generated ${response.tokensGenerated} tokens at ${response.tokensPerSecond.toStringAsFixed(1)} tok/s');
+    return _enqueueInference(() async {
+      if (!_isModelLoaded) {
+        final initialized = await initialize();
+        if (!initialized) {
+          throw Exception(
+              'Failed to initialize local LLM${_lastInitError == null ? '' : ': $_lastInitError'}');
+        }
       }
 
-      return text;
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[LocalLlmService] Generation error: $e');
+      InferenceChat? chat;
+      try {
+        final model = _model;
+        if (model == null) {
+          throw Exception('Local model instance not available');
+        }
+
+        // Ensure the request fits within the model context.
+        final preparedPrompt = _preparePromptForContext(
+          userPrompt: prompt,
+          systemInstruction: systemInstruction,
+          desiredOutputTokens: maxTokens,
+        );
+
+        chat = await model.createChat(
+          temperature: temperature,
+          topP: topP,
+          topK: topK,
+          tokenBuffer: _clampDesiredOutputTokens(maxTokens),
+          modelType: ModelType.llama,
+        );
+
+        if (systemInstruction != null && systemInstruction.isNotEmpty) {
+          await chat.addQueryChunk(Message.systemInfo(text: systemInstruction));
+        }
+        await chat.addQueryChunk(
+          Message.text(text: preparedPrompt, isUser: true),
+        );
+
+        final response = await chat.generateChatResponse();
+
+        final rawText =
+            response is TextResponse ? response.token : response.toString();
+        final text = _extractJson(rawText.trim());
+        return text;
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('[LocalLlmService] Generation error: $e');
+        }
+        throw Exception('Failed to generate response: $e');
+      } finally {
+        try {
+          await chat?.session.close();
+        } catch (_) {
+          // Best-effort close; ignore.
+        }
       }
-      throw Exception('Failed to generate response: $e');
-    }
+    });
   }
 
   /// Generate text with streaming support
@@ -215,88 +210,247 @@ class LocalLlmService {
     double topP = 0.95,
     int topK = 40,
   }) async* {
-    if (!_isModelLoaded) {
-      final initialized = await initialize();
-      if (!initialized) {
-        throw Exception('Failed to initialize local LLM');
-      }
-    }
+    final controller = StreamController<String>();
 
-    try {
-      final formattedPrompt = _formatPrompt(prompt, systemInstruction);
-
-      final params = GenerationParams(
-        prompt: formattedPrompt,
-        temperature: temperature,
-        topP: topP,
-        topK: topK,
-        maxTokens: maxTokens,
-        repeatPenalty: 1.1,
-      );
-
-      await for (final token in _llama.generateStream(params)) {
-        // Filter out special tokens
-        if (!token.contains('</s>') &&
-            !token.contains('<|user|>') &&
-            !token.contains('<|assistant|>') &&
-            !token.contains('<|system|>')) {
-          yield token;
+    // Run streaming inference in the same single-flight queue.
+    unawaited(_enqueueInference(() async {
+      if (!_isModelLoaded) {
+        final initialized = await initialize();
+        if (!initialized) {
+          throw Exception(
+              'Failed to initialize local LLM${_lastInitError == null ? '' : ': $_lastInitError'}');
         }
       }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[LocalLlmService] Stream generation error: $e');
+
+      final model = _model;
+      if (model == null) {
+        throw Exception('Local model instance not available');
       }
-      throw Exception('Failed to generate response: $e');
-    }
-  }
 
-  /// Format the prompt using Zephyr/TinyLlama chat template
-  String _formatPrompt(String userPrompt, String? systemInstruction) {
-    final buffer = StringBuffer();
+      // Ensure the request fits within the model context.
+      final preparedPrompt = _preparePromptForContext(
+        userPrompt: prompt,
+        systemInstruction: systemInstruction,
+        desiredOutputTokens: maxTokens,
+      );
 
-    // Add system instruction if provided
-    if (systemInstruction != null && systemInstruction.isNotEmpty) {
-      buffer.writeln('<|system|>');
-      buffer.writeln(systemInstruction);
-      buffer.writeln('</s>');
-    }
+      InferenceChat? chat;
+      StreamSubscription? sub;
+      try {
+        chat = await model.createChat(
+          temperature: temperature,
+          topP: topP,
+          topK: topK,
+          tokenBuffer: _clampDesiredOutputTokens(maxTokens),
+          modelType: ModelType.llama,
+        );
 
-    // Add user prompt
-    buffer.writeln('<|user|>');
-    buffer.writeln(userPrompt);
-    buffer.writeln('</s>');
-    buffer.writeln('<|assistant|>');
+        if (systemInstruction != null && systemInstruction.isNotEmpty) {
+          await chat.addQueryChunk(Message.systemInfo(text: systemInstruction));
+        }
+        await chat.addQueryChunk(
+          Message.text(text: preparedPrompt, isUser: true),
+        );
 
-    return buffer.toString();
+        sub = chat.generateChatResponseAsync().listen(
+          (response) {
+            if (response is TextResponse) {
+              controller.add(response.token);
+            }
+          },
+          onError: (e, st) async {
+            controller.addError(e, st);
+            await sub?.cancel();
+            try {
+              await chat?.session.close();
+            } catch (_) {}
+            await controller.close();
+          },
+          onDone: () async {
+            try {
+              await chat?.session.close();
+            } catch (_) {}
+            await controller.close();
+          },
+          cancelOnError: true,
+        );
+
+        // Hold the inference lock until the stream is fully finished.
+        await controller.done;
+      } finally {
+        try {
+          await sub?.cancel();
+        } catch (_) {}
+        try {
+          await chat?.session.close();
+        } catch (_) {}
+        if (!controller.isClosed) {
+          await controller.close();
+        }
+      }
+      return true;
+    }).catchError((e, st) async {
+      if (!controller.isClosed) {
+        controller.addError(e, st);
+        await controller.close();
+      }
+      return false;
+    }));
+
+    yield* controller.stream;
   }
 
   /// Extract JSON from text that may contain preamble or other content
   String _extractJson(String text) {
-    // Try to find JSON object
-    final jsonStart = text.indexOf('{');
-    final jsonEnd = text.lastIndexOf('}');
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return trimmed;
 
-    if (jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart) {
-      return text.substring(jsonStart, jsonEnd + 1);
+    // If it's already valid JSON, keep it.
+    try {
+      jsonDecode(trimmed);
+      return trimmed;
+    } catch (_) {
+      // continue
     }
 
-    // Try to find JSON array
-    final arrayStart = text.indexOf('[');
-    final arrayEnd = text.lastIndexOf(']');
+    // Prefer a JSON object that looks like our discharge structure.
+    const requiredKeys = <String>{
+      'medications',
+      'follow_ups',
+      'instructions',
+      'tasks',
+      'warnings',
+      'contacts',
+    };
 
-    if (arrayStart != -1 && arrayEnd != -1 && arrayEnd > arrayStart) {
-      return text.substring(arrayStart, arrayEnd + 1);
+    String? best;
+    int bestScore = -1;
+
+    for (int i = 0; i < trimmed.length; i++) {
+      if (trimmed.codeUnitAt(i) != 0x7B /* { */) continue;
+
+      final end = _findMatchingJsonBrace(trimmed, i);
+      if (end == -1) continue;
+
+      final candidate = trimmed.substring(i, end + 1);
+      Object? decoded;
+      try {
+        decoded = jsonDecode(candidate);
+      } catch (_) {
+        continue;
+      }
+
+      if (decoded is Map) {
+        final keys = decoded.keys.map((k) => k.toString()).toSet();
+        final score = keys.intersection(requiredKeys).length;
+
+        // Prefer candidates that match our expected schema; tie-breaker is size.
+        final isBetter = score > bestScore ||
+            (score == bestScore &&
+                best != null &&
+                candidate.length > best!.length) ||
+            (score == bestScore && best == null);
+
+        if (isBetter) {
+          bestScore = score;
+          best = candidate;
+          if (bestScore == requiredKeys.length) break;
+        }
+      }
     }
 
-    // Return original if no JSON found
-    return text;
+    if (best != null) return best!;
+
+    // No JSON object found; return original so callers can still inspect/log it.
+    return trimmed;
+  }
+
+  int _findMatchingJsonBrace(String s, int startIndex) {
+    int depth = 0;
+    bool inString = false;
+    bool escaped = false;
+
+    for (int i = startIndex; i < s.length; i++) {
+      final int c = s.codeUnitAt(i);
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (c == 0x5C /* \\ */) {
+          escaped = true;
+          continue;
+        }
+        if (c == 0x22 /* " */) {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (c == 0x22 /* " */) {
+        inString = true;
+        continue;
+      }
+
+      if (c == 0x7B /* { */) depth++;
+      if (c == 0x7D /* } */) {
+        depth--;
+        if (depth == 0) return i;
+        if (depth < 0) return -1;
+      }
+    }
+    return -1;
+  }
+
+  int _clampDesiredOutputTokens(int desired) {
+    // Keep output headroom reasonable for small-context models.
+    if (desired <= 0) return 128;
+    if (desired < 64) return desired;
+    if (desired > 256) return 256;
+    return desired;
+  }
+
+  String _preparePromptForContext({
+    required String userPrompt,
+    required String? systemInstruction,
+    required int desiredOutputTokens,
+  }) {
+    final reservedOutput = _clampDesiredOutputTokens(desiredOutputTokens);
+
+    // Available budget for (system + user) text.
+    final maxInputTokens =
+        _modelMaxContextTokens - reservedOutput - _contextOverheadTokens;
+    if (maxInputTokens <= 0) {
+      // Worst-case: still return something minimal.
+      return userPrompt;
+    }
+
+    final maxCombinedChars = maxInputTokens * _charsPerTokenEstimate;
+    final systemChars = (systemInstruction?.length ?? 0);
+
+    // If system message already consumes the budget, heavily trim user prompt.
+    final maxUserChars =
+        (maxCombinedChars - systemChars).clamp(0, maxCombinedChars);
+    if (userPrompt.length <= maxUserChars) return userPrompt;
+
+    // Preserve a small prefix (often contains instructions) and a tail (often
+    // contains the latest/most relevant extracted text), with a clear marker.
+    final head = maxUserChars >= 2400 ? 2000 : (maxUserChars ~/ 3);
+    final tail = (maxUserChars - head).clamp(0, maxUserChars);
+
+    final headText = head > 0 ? userPrompt.substring(0, head) : '';
+    final tailText =
+        tail > 0 ? userPrompt.substring(userPrompt.length - tail) : '';
+
+    return '$headText\n\n[TRUNCATED to fit on-device model context]\n\n$tailText';
   }
 
   /// Unload the model to free memory
   Future<void> unload() async {
     if (_isModelLoaded) {
-      await _llama.unloadModel();
+      await _model?.close();
+      _model = null;
       _isModelLoaded = false;
       if (kDebugMode) {
         debugPrint('[LocalLlmService] Model unloaded');
@@ -307,25 +461,23 @@ class LocalLlmService {
   /// Get model info
   Future<Map<String, dynamic>?> getModelInfo() async {
     if (!_isModelLoaded) return null;
-    return await _llama.getModelInfo();
+    return <String, dynamic>{
+      'engine': 'flutter_gemma',
+      'modelFile': _modelFileName,
+    };
   }
 
   /// Check if the model file exists
   Future<bool> isModelDownloaded() async {
-    final modelPath = await _getModelPath();
-    return File(modelPath).existsSync();
+    return FlutterGemma.isModelInstalled(_modelFileName);
   }
 
   /// Delete the model file
   Future<void> deleteModel() async {
     await unload();
-    final modelPath = await _getModelPath();
-    final modelFile = File(modelPath);
-    if (await modelFile.exists()) {
-      await modelFile.delete();
-      if (kDebugMode) {
-        debugPrint('[LocalLlmService] Model file deleted');
-      }
+    if (kDebugMode) {
+      debugPrint(
+          '[LocalLlmService] deleteModel: not implemented for flutter_gemma');
     }
   }
 }

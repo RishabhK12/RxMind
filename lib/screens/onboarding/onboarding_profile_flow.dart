@@ -134,13 +134,20 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                 const SizedBox(height: 32),
                 TextField(
                   onChanged: (val) => setState(() => firstName = val),
+                  style: const TextStyle(color: Colors.black),
+                  cursorColor: Colors.black,
                   decoration: InputDecoration(
                     labelText: 'First Name',
                     hintText: 'Enter your first name',
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelStyle: const TextStyle(color: Colors.black54),
+                    floatingLabelStyle: const TextStyle(color: Colors.black54),
+                    hintStyle: const TextStyle(color: Colors.black38),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: const Icon(Icons.person, color: Colors.black54),
                   ),
                   textCapitalization: TextCapitalization.words,
                   autofocus: true,
@@ -148,13 +155,21 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                 const SizedBox(height: 16),
                 TextField(
                   onChanged: (val) => setState(() => lastName = val),
+                  style: const TextStyle(color: Colors.black),
+                  cursorColor: Colors.black,
                   decoration: InputDecoration(
                     labelText: 'Last Name',
                     hintText: 'Enter your last name',
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelStyle: const TextStyle(color: Colors.black54),
+                    floatingLabelStyle: const TextStyle(color: Colors.black54),
+                    hintStyle: const TextStyle(color: Colors.black38),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: Icon(Icons.person_outline),
+                    prefixIcon:
+                        const Icon(Icons.person_outline, color: Colors.black54),
                   ),
                   textCapitalization: TextCapitalization.words,
                 ),

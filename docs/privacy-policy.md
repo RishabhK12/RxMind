@@ -5,14 +5,14 @@ description: Privacy Policy for RxMind
 
 # Privacy Policy
 
-Last Updated: 11/26/2025
+Last Updated: 12/24/2025
 
-RxMind ("we," "us," "our," or "the App") is committed to protecting your privacy and giving you control over your health information. This Privacy Policy explains how we handle your data when you use our mobile application. By using RxMind, you agree to the practices described in this Policy.
+RxMind ("we," "us," "our," or "the App") is committed to protecting your privacy and giving you control over your information. This Privacy Policy explains how we handle your data when you use our mobile application. By using RxMind, you agree to the practices described in this Policy.
 
 ## What Information We Collect
 
 ### A. Information You Provide
-You may provide photos or PDFs of discharge papers, manually entered medications, schedules, tasks, follow-up appointments, notes, reminders, and questions typed into the app. This information may include health-related data.
+You may provide photos or PDFs of discharge papers, manually entered medications, schedules, tasks, follow-up appointments, notes, reminders, and questions typed into the app.
 
 ### B. No Account Required
 You may use RxMind without creating an account. We do not require your name, email, phone number, or any identifying information.
@@ -41,9 +41,7 @@ RxMind may use on-device logic or automated processing to organize and display y
 
 RxMind does not provide medical advice, diagnose conditions, or recommend treatments. The app is intended for organizational and informational purposes only.
 
-## HIPAA Considerations
-
-RxMind follows HIPAA-aligned principles such as data minimization, local-only storage, and secure handling of sensitive information. However, RxMind is a prototype, is not a HIPAA-certified platform, and is not a covered entity or a medical provider.
+RxMind is intended as a personal organization and reminder tool and should not be used as a substitute for professional medical care.
 
 ## User Controls
 

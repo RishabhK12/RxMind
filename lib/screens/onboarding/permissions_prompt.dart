@@ -131,7 +131,7 @@ class _PermissionsPromptScreenState extends State<PermissionsPromptScreen>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'We need access to your camera and files to scan your discharge documents—all processing stays on this device.',
+                      'We need access to your camera and files to scan your documents—all processing stays on this device.',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: const Color(0xFF616161),
                         fontSize: 16,

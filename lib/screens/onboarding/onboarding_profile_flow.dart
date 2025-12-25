@@ -263,7 +263,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
           child: _NumberPickerCard(
             title: 'What is your age?',
             unit1: 'years',
-            min: 10,
+            min: 13,
             max: 120,
             value: age,
             onChanged: (v) => setState(() => age = v),

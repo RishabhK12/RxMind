@@ -956,7 +956,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discharge Summary'),
+        title: const Text('Document Summary'),
         actions: [
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.robot),

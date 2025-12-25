@@ -276,13 +276,13 @@ STYLE:
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Upload a Discharge Paper First',
+                          'Upload a Document First',
                           style: theme.textTheme.titleLarge,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'The health assistant needs your discharge information to provide personalized help. Please scan or upload your discharge paper first.',
+                          'The assistant can be more helpful with your uploaded documents. Please scan or upload a document first.',
                           style: theme.textTheme.bodyMedium,
                           textAlign: TextAlign.center,
                         ),

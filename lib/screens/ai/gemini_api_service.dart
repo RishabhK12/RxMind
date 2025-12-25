@@ -1,5 +1,4 @@
 import 'package:rxmind_app/services/ai/local_llm_service.dart';
-import 'package:rxmind_app/core/ai/rate_limiter.dart';
 
 /// AI service that uses a local on-device LLM for complete privacy.
 /// All inference runs locally - no data is sent to external servers.
@@ -18,9 +17,6 @@ class GeminiApiService {
     double topP = 0.95,
     int maxTokens = 1024,
   }) async {
-    if (!await RateLimiter.canMakeRequest()) {
-      throw Exception('Rate limit exceeded. Please try again later.');
-    }
     try {
       final text = await _localLlm.generateText(
         message,

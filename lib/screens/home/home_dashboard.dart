@@ -94,7 +94,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       setState(() {
         tasks = [
           {
-            'title': 'Upload Discharge Paper',
+            'title': 'Upload Documents',
             'progress': 0.0,
             'uploadTask': true
           },
@@ -454,11 +454,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               sliver: SliverGrid(
                 delegate: SliverChildListDelegate([
                   Semantics(
-                    label: 'Upload Discharge',
+                    label: 'Upload Document',
                     button: true,
                     child: _ActionTile(
                       icon: Icons.upload_file,
-                      label: 'Upload Discharge',
+                      label: 'Upload Document',
                       color: theme.colorScheme.primary,
                       onTap: () =>
                           Navigator.pushNamed(context, '/uploadOptions'),

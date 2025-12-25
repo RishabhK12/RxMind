@@ -17,19 +17,19 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
       illustration: 'assets/illus/onboard1.svg',
       title: 'Welcome to RxMind',
       description:
-          'Your on-device guide to safe hospital discharge. All your instructions, meds, and reminders in one secure place.',
+          'Your on-device assistant for staying organized. Keep your documents, notes, tasks, and reminders in one secure place.',
     ),
     _CarouselPage(
       illustration: 'assets/illus/onboard2.svg',
       title: 'Offline & Private',
       description:
-          'Everything stays on your device. No cloud, no tracking. Your health data is always encrypted.',
+          'Everything stays on your device. No cloud, no tracking. Your data is always encrypted.',
     ),
     _CarouselPage(
       illustration: 'assets/illus/onboard3.svg',
-      title: 'Smarter Recovery',
+      title: 'Smarter Organization',
       description:
-          'Scan, organize, and act on your discharge instructions with reminders, glossary, and more.',
+          'Scan, organize, and act on your documents with reminders, summaries, and more.',
     ),
   ];
 

@@ -12,7 +12,7 @@ RxMind ("we," "us," "our," or "the App") is committed to protecting your privacy
 ## What Information We Collect
 
 ### A. Information You Provide
-You may provide photos or PDFs of discharge papers, manually entered medications, schedules, tasks, follow-up appointments, notes, reminders, and questions typed into the app.
+You may provide photos or PDFs of documents you choose to upload, manually entered medications, schedules, tasks, follow-up appointments, notes, reminders, and questions typed into the app.
 
 ### B. No Account Required
 You may use RxMind without creating an account. We do not require your name, email, phone number, or any identifying information.
@@ -28,7 +28,7 @@ RxMind does not transmit your data to third-party services, cloud servers, or ex
 ## How Your Data Is Used
 
 We use your information solely to:
-- Extract and organize information from discharge papers  
+- Extract and organize information from documents  
 - Create and manage tasks, medications, and reminders  
 - Display summaries, checklists, and recovery progress  
 - Support core app functionality and performance  

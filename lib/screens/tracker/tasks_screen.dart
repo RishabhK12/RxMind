@@ -478,7 +478,7 @@ class _TasksScreenState extends State<TasksScreen> {
                         ),
                       if (_safeTasksList.isEmpty && !dischargeUploaded)
                         Semantics(
-                          label: 'Upload Discharge Paper',
+                          label: 'Upload Documents',
                           button: true,
                           child: GestureDetector(
                             onTap: () =>
@@ -507,7 +507,7 @@ class _TasksScreenState extends State<TasksScreen> {
                                       size: 28),
                                   const SizedBox(width: 12),
                                   Text(
-                                    'Upload Discharge Paper',
+                                    'Upload Documents',
                                     style: theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16,

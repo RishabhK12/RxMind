@@ -473,7 +473,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         actions: [
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.robot),
-            tooltip: 'Chat with Health Assistant',
+            tooltip: 'Chat with Wellness Guide',
             onPressed: () {
               Navigator.pushNamed(context, '/chat',
                   arguments: {'initial_context': _rawOcrText});

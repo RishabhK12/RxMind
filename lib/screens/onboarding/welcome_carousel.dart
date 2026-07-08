@@ -23,13 +23,13 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
       illustration: 'assets/illus/onboard2.svg',
       title: 'Offline & Private',
       description:
-          'Everything stays on your device. No cloud, no tracking. Your health data is always encrypted.',
+          'Everything stays on your device. No cloud, no tracking. Your health data is stored locally on your device.',
     ),
     _CarouselPage(
       illustration: 'assets/illus/onboard3.svg',
-      title: 'Smarter Recovery',
+      title: 'Organized Recovery',
       description:
-          'Scan, organize, and act on your discharge instructions with reminders, glossary, and more.',
+          'Log, organize, and remind yourself about discharge instructions with tasks, glossary, and more.',
     ),
   ];
 

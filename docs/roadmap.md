@@ -10,11 +10,11 @@
 
 | Field | Value |
 | --- | --- |
-| **Phase** | 1 |
-| **Task ID** | 1.2 |
-| **Branch pattern** | `feature/phase1-task1.2` |
+| **Phase** | 2 |
+| **Task ID** | 2.1 |
+| **Branch pattern** | `feature/phase2-task2.1` |
 | **Status** | Not started |
-| **Prerequisites** | Task 1.1 complete |
+| **Prerequisites** | Phase 1 complete |
 
 ---
 
@@ -88,7 +88,7 @@
 
 ---
 
-### 1.2 — Purge diagnostic AI system prompts and clinical decision language
+### 1.2 — Purge diagnostic AI system prompts and clinical decision language ✅
 
 **Acceptance Criteria:**
 - Grep across `lib/` for `(?i)(hipaa-compliant|diagnos|dosage|prescri|clinical decision|medical advice|treatment plan|medical assistant)` returns zero matches in AI prompt strings.
@@ -104,7 +104,7 @@
 
 ---
 
-### 1.3 — Add mandatory non-medical-device disclaimer (first-use, non-dismissible until acknowledged)
+### 1.3 — Add mandatory non-medical-device disclaimer (first-use, non-dismissible until acknowledged) ✅
 
 **Acceptance Criteria:**
 - On cold start, before any health data entry, a full-screen modal displays verbatim first paragraph: *"This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Consult a licensed healthcare professional for medical advice."*
@@ -120,7 +120,7 @@
 
 ---
 
-### 1.4 — Replace bundled Privacy/Terms acceptance with standalone CHD consent panel
+### 1.4 — Replace bundled Privacy/Terms acceptance with standalone CHD consent panel ✅
 
 **Acceptance Criteria:**
 - Separate standalone screen (not combined with Terms checkbox) explains Consumer Health Data categories collected, local-only storage, and withdrawal via Settings → Erase All Data.
@@ -136,7 +136,7 @@
 
 ---
 
-### 1.5 — ASO and in-app copy purge (diagnostic verbs & absolute claims)
+### 1.5 — ASO and in-app copy purge (diagnostic verbs & absolute claims) ✅
 
 **Acceptance Criteria:**
 - Grep repo (excluding this roadmap and compliance doc) for `(?i)(smart document|automatically extract|detect|diagnose|HIPAA-certified|medical device)` returns zero user-facing strings.
@@ -155,7 +155,7 @@
 
 ---
 
-### 1.6 — Consolidate duplicate chat and notification entry points
+### 1.6 — Consolidate duplicate chat and notification entry points ✅
 
 **Acceptance Criteria:**
 - Only one chat screen remains in navigation (`ai_chat_screen.dart`); `chat_screen.dart` deleted or redirected.
@@ -171,7 +171,7 @@
 
 ---
 
-### 1.7 — Android platform declarations (manifest hardening)
+### 1.7 — Android platform declarations (manifest hardening) ✅
 
 **Acceptance Criteria:**
 - `AndroidManifest.xml` sets `android:allowBackup="false"` and `android:fullBackupContent="false"` on `<application>`.
@@ -187,7 +187,7 @@
 
 ---
 
-### 1.8 — iOS platform declarations (Info.plist & entitlements)
+### 1.8 — iOS platform declarations (Info.plist & entitlements) ✅
 
 **Acceptance Criteria:**
 - `Info.plist` includes `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`, and `NSUserNotificationsUsageDescription` with user-benefit strings (no diagnostic language).
@@ -203,7 +203,7 @@
 
 ---
 
-### 1.9 — Rename application ID from example namespace
+### 1.9 — Rename application ID from example namespace ✅
 
 **Acceptance Criteria:**
 - `applicationId` / `PRODUCT_BUNDLE_IDENTIFIER` changed from `com.example.rxmind_app` to organization-owned ID (default: `org.rxmind.app` unless overridden in task branch).

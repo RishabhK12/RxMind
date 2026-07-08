@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rxmind_app/core/ai/local_ai_stub.dart';
+import 'package:rxmind_app/core/ai/wellness_prompts.dart';
 
 class ParsingProgressScreen extends StatefulWidget {
   const ParsingProgressScreen({super.key});
@@ -26,7 +27,10 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
     }
     try {
       final stub = LocalAiStub();
-      await stub.sendMessage(reviewedText);
+      await stub.sendMessage(
+        reviewedText,
+        systemInstruction: WellnessPrompts.parsingOrganizerInstruction,
+      );
 
       const emptyJson =
           '{"medications":[],"tasks":[],"follow_ups":[],"instructions":[],"warnings":[]}';
@@ -99,7 +103,7 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _error ?? 'Parsing Your Discharge Text...',
+                    _error ?? 'Organizing Your Document...',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.onSurface,
                       fontWeight: FontWeight.w600,

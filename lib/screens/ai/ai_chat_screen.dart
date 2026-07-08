@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'local_ai_service.dart';
 import '../../core/ai/chat_manager.dart';
+import '../../core/ai/wellness_prompts.dart';
 import '../../core/widgets/markdown_text.dart';
 import '../../services/discharge_data_manager.dart';
 
@@ -52,7 +53,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
       _isTyping = true;
     });
     try {
-      final aiResponse = await _localAi.sendMessage(text);
+      final aiResponse = await _localAi.sendMessage(
+        text,
+        systemInstruction: WellnessPrompts.chatSystemInstruction,
+      );
       setState(() {
         _chatManager.addMessage('assistant', aiResponse);
         _isTyping = false;
@@ -114,9 +118,9 @@ class _AiChatScreenState extends State<AiChatScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('About the Assistant'),
+        title: const Text('About the Wellness Guide'),
         content: const Text(
-            'This health assistant helps you understand your discharge summary and recovery plan. All data is stored securely on your device.'),
+            'This wellness guide helps you organize and clarify recovery information from documents you provide. All data stays on your device. This app is not a medical device.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -153,12 +157,12 @@ class _AiChatScreenState extends State<AiChatScreen> {
         ),
         actions: [
           Semantics(
-            label: 'About the Assistant',
+            label: 'About the Wellness Guide',
             button: true,
             child: IconButton(
               icon: const Icon(Icons.info_outline),
               onPressed: _showInfoDialog,
-              tooltip: 'About the Assistant',
+              tooltip: 'About the Wellness Guide',
             ),
           ),
         ],
@@ -186,7 +190,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'The health assistant needs your discharge information to provide personalized help. Please scan or upload your discharge paper first.',
+                          'The wellness guide works best after you upload a discharge document. Please scan or upload your discharge paper first.',
                           style: theme.textTheme.bodyMedium,
                           textAlign: TextAlign.center,
                         ),

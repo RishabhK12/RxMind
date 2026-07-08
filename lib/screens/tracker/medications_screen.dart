@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/screens/tracker/glossary_detail_screen.dart';
-import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
+import 'package:rxmind_app/screens/ai/local_ai_service.dart';
+import 'package:rxmind_app/core/ai/local_ai_stub.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
-import 'dart:convert';
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
@@ -28,60 +28,16 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
   Future<void> _fetchMedInfo(String name, int index) async {
     if (medGlossary.containsKey(name)) return;
-  final GeminiApiService geminiService = GeminiApiService();
-    String prompt = '''
-You are a medical assistant. Please provide ONLY the following JSON object for the medication "$name":
-{
-  "name": "<medication name>",
-  "description": "<one-sentence plain-language summary>",
-  "instructions": "<concise instructions for use>",
-  "side_effects": "<common side effects, comma separated>"
-}
-Do NOT include any extra text, preamble, or confirmation. Only output the JSON object. If you cannot find information, return:
-{
-  "name": "$name",
-  "description": "No information found.",
-  "instructions": "",
-  "side_effects": ""
-}
-''';
-    int attempts = 0;
-    String info = '';
-    String errorMsg = '';
-    while (attempts < 2) {
-      try {
-        final response = await geminiService.sendMessage(prompt);
-        final jsonStart = response.indexOf('{');
-        final jsonEnd = response.lastIndexOf('}');
-        if (jsonStart != -1 && jsonEnd != -1) {
-          final jsonStr = response.substring(jsonStart, jsonEnd + 1);
-          final data = json.decode(jsonStr);
-          info =
-              'Name: ${data['name']}\nDescription: ${data['description']}\nInstructions: ${data['instructions']}\nSide Effects: ${data['side_effects']}';
-          break;
-        } else {
-          errorMsg = 'Malformed response from Gemini API.';
-          attempts++;
-        }
-      } catch (e) {
-        errorMsg = 'Error: ${e.toString()}';
-        break;
-      }
-    }
-    if (info.isEmpty) {
-      info = errorMsg.isNotEmpty ? errorMsg : 'Unable to fetch information.';
+    final localAi = LocalAiService();
+    String info = LocalAiStub.unavailableMessage;
+    try {
+      info = await localAi.sendMessage(name);
+    } catch (_) {
+      info = LocalAiStub.unavailableMessage;
     }
     setState(() {
       medGlossary[name] = info;
     });
-    if (errorMsg.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg, style: const TextStyle(color: Colors.red)),
-          backgroundColor: Colors.white,
-        ),
-      );
-    }
   }
 
   List<Map<String, dynamic>> medicationsList = [];

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
+import 'package:rxmind_app/screens/ai/local_ai_service.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -14,7 +14,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<Message> _messages = [];
   bool _loading = false;
-  late final GeminiApiService _model;
+  late final LocalAiService _model;
   String? _initialContext;
   bool _didRun = false;
 
@@ -22,7 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     // Instead of using GoogleGemini directly, use our wrapper service
-    _model = GeminiApiService();
+    _model = LocalAiService();
   }
 
   @override

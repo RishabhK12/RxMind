@@ -2,15 +2,15 @@
 
 **Your Personal Health Recovery Assistant**
 
-RxMind is a mobile app designed to help patients manage their post-discharge care more effectively. We built this because navigating medical discharge papers can be overwhelming - they're full of complicated instructions, medication schedules, and follow-up appointments that are easy to miss. RxMind simplifies this by scanning your discharge papers and organizing everything into an easy-to-follow plan.
+RxMind is a mobile app designed to help patients manage their post-discharge care more effectively. We built this because navigating medical discharge papers can be overwhelming - they're full of complicated instructions, medication schedules, and follow-up appointments that are easy to miss. RxMind helps you log and organize discharge information into an easy-to-follow plan.
 
 ## What Does It Do?
 
-- **Smart Document Scanning**: Take a photo of your discharge papers and RxMind extracts all the important information automatically
-- **Medication Tracking**: Never forget a dose again with automatic reminders and a simple check-off system
+- **Document Upload**: Take a photo or select a PDF of your discharge papers for on-device text extraction
+- **Medication Tracking**: Never forget a dose again with reminders and a simple check-off system
 - **Task Management**: All your recovery instructions in one place - wound care, physical therapy exercises, dietary restrictions, you name it
 - **Follow-up Appointments**: Keep track of when and where you need to go for checkups
-- **Health Assistant**: Ask questions about your medications or discharge instructions and get helpful answers
+- **Wellness Assistant**: On-device AI chat (Phase 3) — currently shows a placeholder while local inference is integrated
 - **Compliance Tracking**: See how well you're sticking to your recovery plan with visual charts
 - **PDF Reports**: Generate shareable reports for your doctor or family members
 
@@ -23,8 +23,6 @@ You'll need:
 - Flutter SDK (version 3.0 or higher)
 - Dart SDK
 - Android Studio or VS Code
-- (Optional) Access to the RxMind Cloudflare Worker URL if you plan to use a
-  custom backend environment
 
 ### Installation
 
@@ -32,7 +30,7 @@ You'll need:
 
 ```bash
 git clone https://github.com/RishabhK12/RxMind.git
-cd RxMind/rxmind_app
+cd RxMind
 ```
 
 2. Install dependencies:
@@ -41,76 +39,50 @@ cd RxMind/rxmind_app
 flutter pub get
 ```
 
-3. Deploy the Cloudflare Worker (Required for AI features):
-
-   RxMind proxies all Gemini API requests through a Cloudflare Worker to keep the API key secure.
-   **The bundled worker URL will not work until you deploy it.**
-
-   Quick setup:
-
-   ```bash
-   cd cloudflare-worker
-   npm install
-   npx wrangler login
-   npx wrangler secret put GEMINI_API_KEY
-   # Paste your Gemini API key from https://aistudio.google.com/apikey
-   npx wrangler deploy
-   ```
-
-   After deploying, either:
-
-   - Update `lib/config/backend_config.dart` line 17 with your live `*.workers.dev` URL, **OR**
-   - Create `.env` (copy `.env.example`) and set `BACKEND_BASE_URL=https://your-worker.workers.dev`
-
-   See [`BACKEND_SETUP.md`](./BACKEND_SETUP.md) for detailed instructions and troubleshooting.
-
-4. Run the app:
+3. Run the app:
 
 ```bash
 flutter run
 ```
 
-That's it! The app should launch on your connected device or emulator.
+That's it! The app should launch on your connected device or emulator. No backend URL, API keys, or `.env` file are required.
 
-### Important: AI Features Require Backend Deployment
+### AI Features (Local-Only)
 
-The app defaults to `https://rxmind-gemini-proxy.rishabhk12.workers.dev`, but this URL **is not deployed by default**.
-You must deploy the Cloudflare Worker (step 3 above) before AI features work. See [`BACKEND_SETUP.md`](./BACKEND_SETUP.md) for help.
+RxMind does **not** use cloud AI inference. Structured document parsing and chat responses will be powered by an on-device quantized model in **Phase 3** of the engineering roadmap. Until then, AI surfaces display a local-only placeholder message.
 
 ## Privacy & Security
 
 We take your health data seriously:
 
-- **All data stays on your device** - medications, tasks, and personal info are stored locally using Flutter's secure storage
-- **No account required** - you don't need to sign up or give us any personal information
-- **Gemini API** is only used for parsing discharge papers and answering health questions - your raw data isn't stored on Google's servers
-- **HIPAA Considerations** - while we've designed the app with privacy in mind, this is a prototype and hasn't undergone formal HIPAA compliance certification
+- **All data stays on your device** — medications, tasks, and personal info are stored locally
+- **No account required** — you don't need to sign up or give us any personal information
+- **No cloud AI transmission** — health data is never sent to remote inference endpoints
+- **Local-only architecture** — see `docs/roadmap.md` for the compliance engineering plan
 
 ## How to Use
 
 1. **First Launch**: Set up your profile (optional but helpful for personalized reminders)
-2. **Scan Discharge Papers**: Tap the upload button and either take a photo or select a PDF of your discharge instructions
-3. **Review Extracted Data**: The app will parse your document and show you medications, tasks, appointments, and warnings
+2. **Upload Discharge Papers**: Tap the upload button and either take a photo or select a PDF of your discharge instructions
+3. **Review Extracted Data**: Review and manually edit medications, tasks, appointments, and warnings on the summary screen
 4. **Track Daily**: Check off medications and tasks as you complete them
-5. **Ask Questions**: Use the chat feature if you're confused about any instructions
+5. **Ask Questions**: Use the chat feature when on-device AI becomes available (Phase 3)
 6. **Export Report**: Generate a PDF summary to share with family or bring to follow-up appointments
 
 ## Tech Stack
 
 Built with Flutter and Dart, using:
 
-- Google's Gemini API for smart text extraction and health Q&A
-- Tesseract OCR for document scanning
-- SharedPreferences for local data storage
+- Tesseract OCR for on-device document text extraction
+- Local secure storage (SQLCipher planned — see roadmap)
 - Syncfusion Charts for compliance visualization
 - Flutter Local Notifications for medication reminders
 
 ## Known Issues
 
 - OCR works best with clear, well-lit photos of printed text
-- Some medical abbreviations might not be recognized perfectly
+- Automatic structured parsing is unavailable until Phase 3 on-device AI ships
 - Recurring tasks currently support daily/weekly/monthly patterns only
-- The app hasn't been tested with extremely complex medication regimens (10+ different medications)
 
 ## Contributing
 
@@ -130,4 +102,4 @@ Have questions? Reach out to us through the GitHub issues page or contact the ma
 
 ---
 
-**Disclaimer**: RxMind is meant to help you manage your recovery, not replace professional medical advice. Always consult your healthcare provider if you have concerns about your treatment plan.
+**Disclaimer**: This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Consult a licensed healthcare professional for medical advice.

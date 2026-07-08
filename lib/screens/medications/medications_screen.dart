@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:rxmind_app/screens/ai/gemini_api_service.dart';
+import 'package:rxmind_app/screens/ai/local_ai_service.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class MedicationsScreen extends StatefulWidget {
@@ -35,11 +35,8 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
     );
 
     try {
-      final geminiService = GeminiApiService();
-      final prompt =
-          'Provide a brief, easy-to-understand summary for the medication "$medicationName". Include what it is used for, common side effects, and important precautions. Format the response in Markdown with clear headings.';
-
-      final response = await geminiService.sendMessage(prompt);
+      final localAi = LocalAiService();
+      final response = await localAi.sendMessage(medicationName);
       final responseText =
           response.isNotEmpty ? response : 'No information available.';
 

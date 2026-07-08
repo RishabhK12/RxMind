@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
@@ -22,19 +20,8 @@ import 'screens/settings/privacy_terms_screen.dart';
 import 'services/notification_service.dart';
 import 'services/discharge_data_manager.dart';
 
-Future<void> _safeLoadDotEnv() async {
-  try {
-    await dotenv.load();
-  } catch (err) {
-    if (kDebugMode) {
-      debugPrint('[dotenv] skipped (.env missing): $err');
-    }
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await _safeLoadDotEnv();
 
   // Initialize timezone database for notifications
   tz.initializeTimeZones();

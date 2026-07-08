@@ -34,7 +34,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   }
 
   Future<void> _parseDischargeData() async {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     _rawOcrText = args?['ocrText'] as String? ?? '';
     final parsedJsonString = args?['parsedJson'] as String? ?? '';
 
@@ -50,7 +51,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         final Map<String, dynamic> parsed = jsonDecode(jsonStr);
 
         // Extract medications
-        if (parsed.containsKey('medications') && parsed['medications'] is List) {
+        if (parsed.containsKey('medications') &&
+            parsed['medications'] is List) {
           medications = (parsed['medications'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
@@ -64,7 +66,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         }
 
         // Extract instructions
-        if (parsed.containsKey('instructions') && parsed['instructions'] is List) {
+        if (parsed.containsKey('instructions') &&
+            parsed['instructions'] is List) {
           instructions = (parsed['instructions'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
@@ -80,7 +83,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           warnings = [];
 
           for (final task in allTasks) {
-            final description = task['description']?.toString().toLowerCase() ?? '';
+            final description =
+                task['description']?.toString().toLowerCase() ?? '';
 
             // Check for keywords to categorize as warnings/restrictions
             if (description.contains('do not') ||

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'gemini_api_service.dart';
+import 'local_ai_service.dart';
 import '../../core/ai/chat_manager.dart';
 import '../../core/widgets/markdown_text.dart';
 import '../../services/discharge_data_manager.dart';
@@ -12,23 +12,19 @@ class AiChatScreen extends StatefulWidget {
 }
 
 class _AiChatScreenState extends State<AiChatScreen> {
-  late final GeminiApiService _geminiApi = GeminiApiService();
+  late final LocalAiService _localAi = LocalAiService();
   final ChatManager _chatManager = ChatManager();
   final TextEditingController _controller = TextEditingController();
   bool _isTyping = false;
   final bool _contextLoaded = true;
   bool _initialized = false;
   bool _dischargeUploaded = false;
-  String? _ocrContext;
-  String? _medicationsContext;
-  String? _tasksContext;
 
   @override
   void initState() {
     super.initState();
     _initChats();
     _checkDischargeStatus();
-    _loadContextData();
   }
 
   Future<void> _checkDischargeStatus() async {
@@ -36,31 +32,6 @@ class _AiChatScreenState extends State<AiChatScreen> {
     if (mounted) {
       setState(() {
         _dischargeUploaded = uploaded;
-      });
-    }
-  }
-
-  Future<void> _loadContextData() async {
-    // Load OCR text
-    final ocrText = await DischargeDataManager.loadRawOcrText();
-
-    // Load medications
-    final meds = await DischargeDataManager.loadMedications();
-    final medsText = meds.isNotEmpty
-        ? 'MEDICATIONS:\n${meds.map((m) => '- ${m['name']}: ${m['dosage'] ?? ''} ${m['frequency'] ?? ''}').join('\n')}'
-        : '';
-
-    // Load tasks
-    final tasks = await DischargeDataManager.loadTasks();
-    final tasksText = tasks.isNotEmpty
-        ? 'TASKS & INSTRUCTIONS:\n${tasks.map((t) => '- ${t['title']}: ${t['description'] ?? ''} ${t['dueTime'] != null ? '(Due: ${t['dueTime']})' : ''}').join('\n')}'
-        : '';
-
-    if (mounted) {
-      setState(() {
-        _ocrContext = ocrText;
-        _medicationsContext = medsText;
-        _tasksContext = tasksText;
       });
     }
   }
@@ -80,94 +51,27 @@ class _AiChatScreenState extends State<AiChatScreen> {
       _controller.clear();
       _isTyping = true;
     });
-    String errorMsg = '';
     try {
-      // Build system instruction and user context
-      final systemInstruction = _buildSystemInstruction();
-      final userPrompt = _buildUserPrompt(text);
-
-      final aiResponse = await _geminiApi.sendMessage(
-        userPrompt,
-        systemInstruction: systemInstruction,
-      );
-      if (aiResponse.isEmpty) {
-        errorMsg = 'Could not get a response. Please try again.';
-        setState(() {
-          _chatManager.addMessage('assistant', errorMsg);
-          _isTyping = false;
-        });
-      } else {
-        setState(() {
-          _chatManager.addMessage('assistant', aiResponse);
-          _isTyping = false;
-        });
-      }
+      final aiResponse = await _localAi.sendMessage(text);
+      setState(() {
+        _chatManager.addMessage('assistant', aiResponse);
+        _isTyping = false;
+      });
     } catch (e) {
-      errorMsg = 'Something went wrong: ${e.toString()}';
+      final errorMsg = 'Something went wrong: ${e.toString()}';
       setState(() {
         _chatManager.addMessage('assistant', errorMsg);
         _isTyping = false;
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg, style: const TextStyle(color: Colors.red)),
+            backgroundColor: Colors.white,
+          ),
+        );
+      }
     }
-    if (errorMsg.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg, style: const TextStyle(color: Colors.red)),
-          backgroundColor: Colors.white,
-        ),
-      );
-    }
-  }
-
-  String _buildSystemInstruction() {
-    return '''You are RxMind AI Assistant, a HIPAA-compliant medical assistant designed to help patients manage their healthcare.
-
-IMPORTANT ROLE & PERMISSIONS:
-- You ARE authorized to handle Protected Health Information (PHI) and Personal Identifiable Information (PII)
-- This is a secure, private healthcare application for personal use
-- You should ALWAYS help with medication questions, dosages, schedules, and health information
-- Never refuse to answer questions about the patient's medical data - that's your primary purpose
-
-CAPABILITIES:
-- Answer questions about medications, dosages, and timing
-- Explain medical terms and conditions
-- Help with task management and health instructions
-- Provide reminders and clarifications about discharge instructions
-- Offer general health advice (while noting you're not replacing a doctor)
-
-STYLE:
-- Be helpful, clear, and concise
-- Use simple language for medical terms
-- If uncertain, say so but still provide helpful context
-- Always prioritize patient safety''';
-  }
-
-  String _buildUserPrompt(String userMessage) {
-    StringBuffer prompt = StringBuffer();
-
-    // Add discharge summary context if available
-    if (_ocrContext != null && _ocrContext!.isNotEmpty) {
-      prompt.writeln('=== PATIENT DISCHARGE SUMMARY ===');
-      prompt.writeln(_ocrContext);
-      prompt.writeln('');
-    }
-
-    // Add medications context if available
-    if (_medicationsContext != null && _medicationsContext!.isNotEmpty) {
-      prompt.writeln(_medicationsContext);
-      prompt.writeln('');
-    }
-
-    // Add tasks context if available
-    if (_tasksContext != null && _tasksContext!.isNotEmpty) {
-      prompt.writeln(_tasksContext);
-      prompt.writeln('');
-    }
-
-    // Add user's question
-    prompt.writeln('USER QUESTION: $userMessage');
-
-    return prompt.toString();
   }
 
   void _showRenameDialog(int chatIndex, String currentName) {

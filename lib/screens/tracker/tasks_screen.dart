@@ -37,10 +37,15 @@ class _TasksScreenState extends State<TasksScreen> {
         return Duration(hours: hours);
       }
     }
-    if (lower.contains('once') || lower.contains('daily') || lower.contains('day')) {
-      if (lower.contains('twice') || lower.contains('2')) return const Duration(hours: 12);
-      if (lower.contains('three') || lower.contains('3')) return const Duration(hours: 8);
-      if (lower.contains('four') || lower.contains('4')) return const Duration(hours: 6);
+    if (lower.contains('once') ||
+        lower.contains('daily') ||
+        lower.contains('day')) {
+      if (lower.contains('twice') || lower.contains('2'))
+        return const Duration(hours: 12);
+      if (lower.contains('three') || lower.contains('3'))
+        return const Duration(hours: 8);
+      if (lower.contains('four') || lower.contains('4'))
+        return const Duration(hours: 6);
       return const Duration(hours: 24);
     }
     if (lower.contains('week')) return const Duration(days: 7);
@@ -431,8 +436,8 @@ class _TasksScreenState extends State<TasksScreen> {
         }
       }
 
-  // Sync to related medication (e.g., Take [med])
-  await _updateRelatedMedication(updatedTaskInfo, true);
+      // Sync to related medication (e.g., Take [med])
+      await _updateRelatedMedication(updatedTaskInfo, true);
 
       // Refresh stats screen immediately
       widget.complianceStatsKey?.currentState?.refreshStats();

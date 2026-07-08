@@ -23,16 +23,30 @@ class ChatManager {
 
   int get activeChatIndex => _activeChatIndex;
   int get chatCount => _chats.length;
+  String get activeSessionId => _chats.isNotEmpty
+      ? _chats[_activeChatIndex]['session_id'] as String? ?? 'session_0'
+      : 'session_0';
+
   String get activeChatName => _chats.isNotEmpty
       ? _chats[_activeChatIndex]['name'] ?? 'Chat ${_activeChatIndex + 1}'
       : 'New Chat';
+
+  bool get activeDisclosureAcknowledged {
+    if (_chats.isEmpty) return false;
+    return _chats[_activeChatIndex]['ai_disclosure_ack'] == true;
+  }
 
   Future<void> loadChats() async {
     final repo = await _repository();
     final sessions = await repo.getSessions();
     if (sessions.isEmpty) {
       _chats = [
-        {'session_id': 'session_0', 'name': 'Chat 1', 'messages': <Map<String, dynamic>>[]}
+        {
+          'session_id': 'session_0',
+          'name': 'Chat 1',
+          'ai_disclosure_ack': false,
+          'messages': <Map<String, dynamic>>[],
+        }
       ];
       return;
     }
@@ -44,6 +58,7 @@ class ChatManager {
       _chats.add({
         'session_id': sessionId,
         'name': session['name'],
+        'ai_disclosure_ack': session['ai_disclosure_ack'] == true,
         'messages': messages,
       });
     }
@@ -65,7 +80,18 @@ class ChatManager {
         chat['name'] as String? ?? 'Chat',
         messages,
       );
+      if (chat['ai_disclosure_ack'] == true) {
+        await repo.setDisclosureAck(sessionId, true);
+      }
     }
+  }
+
+  Future<void> acknowledgeDisclosure() async {
+    if (_chats.isEmpty) return;
+    final sessionId = activeSessionId;
+    _chats[_activeChatIndex]['ai_disclosure_ack'] = true;
+    final repo = await _repository();
+    await repo.setDisclosureAck(sessionId, true);
   }
 
   void addMessage(String role, String content) {
@@ -73,7 +99,8 @@ class ChatManager {
       _chats.add({
         'session_id': 'session_0',
         'name': 'Chat 1',
-        'messages': <Map<String, dynamic>>[]
+        'ai_disclosure_ack': false,
+        'messages': <Map<String, dynamic>>[],
       });
     }
 
@@ -90,10 +117,15 @@ class ChatManager {
       messages = <Map<String, dynamic>>[];
     }
 
+    final sessionId = activeSessionId;
+    final msgId =
+        '${sessionId}_${DateTime.now().microsecondsSinceEpoch}_${messages.length}';
+
     messages.add({
+      'id': msgId,
       'role': role,
       'content': content,
-      'timestamp': DateTime.now().toIso8601String()
+      'timestamp': DateTime.now().toIso8601String(),
     });
 
     _chats[_activeChatIndex]['messages'] = messages;
@@ -115,7 +147,8 @@ class ChatManager {
     _chats.add({
       'session_id': id,
       'name': 'Chat ${_chats.length + 1}',
-      'messages': <Map<String, dynamic>>[]
+      'ai_disclosure_ack': false,
+      'messages': <Map<String, dynamic>>[],
     });
     _activeChatIndex = _chats.length - 1;
     saveChats();
@@ -150,7 +183,12 @@ class ChatManager {
     final repo = await _repository();
     await repo.deleteAll();
     _chats = [
-      {'session_id': 'session_0', 'name': 'Chat 1', 'messages': <Map<String, dynamic>>[]}
+      {
+        'session_id': 'session_0',
+        'name': 'Chat 1',
+        'ai_disclosure_ack': false,
+        'messages': <Map<String, dynamic>>[],
+      }
     ];
     _activeChatIndex = 0;
   }

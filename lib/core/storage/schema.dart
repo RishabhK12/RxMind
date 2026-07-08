@@ -4,7 +4,7 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 class Schema {
   Schema._();
 
-  static const int version = 1;
+  static const int version = 2;
 
   static const String medications = '''
     CREATE TABLE IF NOT EXISTS medications (
@@ -106,6 +106,26 @@ class Schema {
     )
   ''';
 
+  static const String chatSessions = '''
+    CREATE TABLE IF NOT EXISTS chat_sessions (
+      session_id TEXT PRIMARY KEY,
+      session_name TEXT,
+      ai_disclosure_ack INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL
+    )
+  ''';
+
+  static const String aiReports = '''
+    CREATE TABLE IF NOT EXISTS ai_reports (
+      id TEXT PRIMARY KEY,
+      message_id TEXT NOT NULL,
+      message_hash TEXT NOT NULL,
+      reason_code TEXT NOT NULL,
+      note TEXT,
+      created_at INTEGER NOT NULL
+    )
+  ''';
+
   static Future<void> createAll(Database db, int version) async {
     await db.execute(medications);
     await db.execute(tasks);
@@ -117,8 +137,13 @@ class Schema {
     await db.execute(ocrText);
     await db.execute(chatMessages);
     await db.execute(appMetadata);
+    await db.execute(chatSessions);
+    await db.execute(aiReports);
     await db.execute(
       'CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_messages(session_id)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_ai_reports_message ON ai_reports(message_id)',
     );
   }
 }

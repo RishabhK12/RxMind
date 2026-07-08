@@ -5,6 +5,7 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 
 import 'master_key_service.dart';
 import 'migration_v1.dart';
+import 'migration_v2.dart';
 import 'schema.dart';
 
 /// Opens and holds the encrypted SQLCipher database singleton.
@@ -40,9 +41,11 @@ class SecureDatabase {
       path,
       version: Schema.version,
       onCreate: Schema.createAll,
+      onUpgrade: MigrationV2.onUpgrade,
     );
 
     await MigrationV1.runIfNeeded(_instance!);
+    await MigrationV2.runIfNeeded(_instance!);
     return _instance!;
   }
 

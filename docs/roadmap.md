@@ -10,9 +10,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Phase** | 3 |
-| **Task ID** | 3.1 |
-| **Branch pattern** | `feature/phase3-task3.1` |
+| **Phase** | 4 |
+| **Task ID** | 4.1 |
+| **Branch pattern** | `feature/phase4-task4.1` |
 | **Status** | Not started |
 | **Prerequisites** | Phase 2 complete |
 
@@ -376,7 +376,7 @@
 
 ---
 
-### 3.1 — Integrate on-device quantized LLM runtime
+### 3.1 — Integrate on-device quantized LLM runtime ✅
 
 **Acceptance Criteria:**
 - Add approved local inference package (e.g., `flutter_gemma` / `llama_cpp_dart` — exact package gated by orchestrator approval in `pubspec.yaml`).
@@ -393,7 +393,7 @@
 
 ---
 
-### 3.2 — Pre-inference regex emergency trigger gate
+### 3.2 — Pre-inference regex emergency trigger gate ✅
 
 **Acceptance Criteria:**
 - `SafetyInputFilter.evaluate(query)` blocks inference when query matches configured acute patterns (minimum: suicide/self-harm, overdose, heart attack/chest pain, stroke keywords).
@@ -409,7 +409,7 @@
 
 ---
 
-### 3.3 — Post-inference prescription and dosing strip parser
+### 3.3 — Post-inference prescription and dosing strip parser ✅
 
 **Acceptance Criteria:**
 - `SafetyOutputFilter.sanitize(text)` removes lines matching: Rx header patterns, `mg/` dosage directives, "take X tablets", brand-name + numeric dose combos.
@@ -424,7 +424,7 @@
 
 ---
 
-### 3.4 — AI transparency gate (pre-first-message)
+### 3.4 — AI transparency gate (pre-first-message) ✅
 
 **Acceptance Criteria:**
 - Before first user message in any chat session, blocking banner requires acknowledgment: *"You are interacting with an automated on-device AI system, not a human clinician."*
@@ -438,7 +438,7 @@
 
 ---
 
-### 3.5 — "Report Output" flag on every assistant bubble
+### 3.5 — "Report Output" flag on every assistant bubble ✅
 
 **Acceptance Criteria:**
 - Each assistant message bubble includes accessible **Report Output** control (min 48×48 dp tap target).
@@ -454,7 +454,7 @@
 
 ---
 
-### 3.6 — Neutral wellness-only parsing prompts for local model
+### 3.6 — Neutral wellness-only parsing prompts for local model ✅
 
 **Acceptance Criteria:**
 - `parsing_progress.dart` uses local model with JSON schema validation via `AiParser.validateJson`.
@@ -468,7 +468,7 @@
 
 ---
 
-### 3.7 — Bias testing dataset stub (audit documentation)
+### 3.7 — Bias testing dataset stub (audit documentation) ✅
 
 **Acceptance Criteria:**
 - `test/fixtures/ai_bias_validation_set.json` contains ≥30 anonymized synthetic discharge snippets spanning age/sex/ethnicity labels for offline evaluation harness.

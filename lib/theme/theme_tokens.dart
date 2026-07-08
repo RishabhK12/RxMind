@@ -76,7 +76,9 @@ class ThemeTokens {
   static double relativeLuminance(Color color) {
     double channel(int c) {
       final v = c / 255.0;
-      return v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+      return v <= 0.03928
+          ? v / 12.92
+          : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
     }
 
     final r = channel(color.red);
@@ -96,7 +98,7 @@ class ThemeTokens {
   static TextTheme textTheme({required bool bold, Brightness? brightness}) {
     final weight = bold ? FontWeight.w700 : FontWeight.w400;
     final titleWeight = bold ? FontWeight.w700 : FontWeight.w600;
-  final labelWeight = bold ? FontWeight.w700 : FontWeight.w500;
+    final labelWeight = bold ? FontWeight.w700 : FontWeight.w500;
 
     return TextTheme(
       displayLarge: TextStyle(

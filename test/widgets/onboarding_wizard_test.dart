@@ -5,7 +5,8 @@ import 'package:rxmind_app/screens/onboarding/disclaimer_gate_screen.dart';
 import 'package:rxmind_app/screens/onboarding/onboarding_wizard_screen.dart';
 
 void main() {
-  testWidgets('onboarding wizard shows disclaimer text on step 2', (tester) async {
+  testWidgets('onboarding wizard shows disclaimer text on step 2',
+      (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: RxMindSettings(

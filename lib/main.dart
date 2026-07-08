@@ -130,7 +130,8 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
                   },
                   onComplete: () {
                     if (!context.mounted) return;
-                    Navigator.pushReplacementNamed(context, '/onboardingProfile');
+                    Navigator.pushReplacementNamed(
+                        context, '/onboardingProfile');
                   },
                 ),
             '/chdConsent': (context) => OnboardingWizardScreen(
@@ -142,7 +143,8 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
                   },
                   onComplete: () {
                     if (!context.mounted) return;
-                    Navigator.pushReplacementNamed(context, '/onboardingProfile');
+                    Navigator.pushReplacementNamed(
+                        context, '/onboardingProfile');
                   },
                 ),
             '/onboarding': (context) {
@@ -158,8 +160,7 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
                 },
                 onComplete: () {
                   if (!context.mounted) return;
-                  Navigator.pushReplacementNamed(
-                      context, '/onboardingProfile');
+                  Navigator.pushReplacementNamed(context, '/onboardingProfile');
                 },
               );
             },

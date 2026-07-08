@@ -18,7 +18,8 @@ void main() {
       ),
     );
 
-    final semantics = tester.getSemantics(find.byType(CircularProgressIndicator));
+    final semantics =
+        tester.getSemantics(find.byType(CircularProgressIndicator));
     expect(semantics.label, status);
     expect(semantics.hasFlag(SemanticsFlag.isLiveRegion), isTrue);
   });

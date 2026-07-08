@@ -35,7 +35,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
   @override
   void initState() {
     super.initState();
-    _currentStep = widget.initialStep.clamp(0, OnboardingWizardScreen.totalSteps - 1);
+    _currentStep =
+        widget.initialStep.clamp(0, OnboardingWizardScreen.totalSteps - 1);
     _pageController = PageController(initialPage: _currentStep);
     _carouselController = PageController();
   }
@@ -72,7 +73,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     }
   }
 
-  double get _progress => (_currentStep + 1) / OnboardingWizardScreen.totalSteps;
+  double get _progress =>
+      (_currentStep + 1) / OnboardingWizardScreen.totalSteps;
 
   Future<void> _nextStep() async {
     if (_currentStep == 1) {
@@ -209,7 +211,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
           const SizedBox(height: 24),
           Text(
             'Important Notice',
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -233,7 +236,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
         children: [
           Text(
             'Consumer Health Data',
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -247,7 +251,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
                   ),
                   SizedBox(height: 12),
                   _Bullet('Discharge documents you scan or import'),
-                  _Bullet('Medications, tasks, and follow-up reminders you enter'),
+                  _Bullet(
+                      'Medications, tasks, and follow-up reminders you enter'),
                   _Bullet('Recovery instructions and wellness notes'),
                   _Bullet('Optional profile and scheduling preferences'),
                   SizedBox(height: 16),
@@ -334,7 +339,9 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
         Padding(
           padding: const EdgeInsets.all(24),
           child: _primaryButton(
-            _carouselIndex < _carouselSlides.length - 1 ? 'Next Slide' : 'Continue',
+            _carouselIndex < _carouselSlides.length - 1
+                ? 'Next Slide'
+                : 'Continue',
             () {
               if (_carouselIndex < _carouselSlides.length - 1) {
                 _carouselController.nextPage(
@@ -359,7 +366,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.person_outline, size: 72, color: theme.colorScheme.primary),
+          Icon(Icons.person_outline,
+              size: 72, color: theme.colorScheme.primary),
           const SizedBox(height: 24),
           Text(
             'Set Up Your Profile',

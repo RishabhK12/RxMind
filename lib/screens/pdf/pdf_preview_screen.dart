@@ -125,88 +125,89 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 ? 'Error loading PDF: $_error'
                 : 'PDF preview ready',
         child: _isLoading
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading PDF...'),
-                ],
-              ),
-            )
-          : _error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            size: 64, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Error loading PDF',
-                          style: theme.textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _error!,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : Column(
+            ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading PDF...'),
+                  ],
+                ),
+              )
+            : _error != null
+                ? Center(
+                    child: Padding(
                       padding: const EdgeInsets.all(16),
-                      color: theme.colorScheme.primaryContainer,
-                      child: Row(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.picture_as_pdf, size: 32),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Report Generated Successfully',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  fileName,
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
+                          const Icon(Icons.error_outline,
+                              size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error loading PDF',
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _error!,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium,
                           ),
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: PdfView(
-                        controller: _pdfController,
-                        scrollDirection: Axis.vertical,
-                        builders: PdfViewBuilders<DefaultBuilderOptions>(
-                          options: const DefaultBuilderOptions(),
-                          documentLoaderBuilder: (_) =>
-                              const Center(child: CircularProgressIndicator()),
-                          pageLoaderBuilder: (_) =>
-                              const Center(child: CircularProgressIndicator()),
-                          errorBuilder: (_, error) => Center(
-                            child: Text('Error: $error'),
+                  )
+                : Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        color: theme.colorScheme.primaryContainer,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.picture_as_pdf, size: 32),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Report Generated Successfully',
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    fileName,
+                                    style: theme.textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: PdfView(
+                          controller: _pdfController,
+                          scrollDirection: Axis.vertical,
+                          builders: PdfViewBuilders<DefaultBuilderOptions>(
+                            options: const DefaultBuilderOptions(),
+                            documentLoaderBuilder: (_) => const Center(
+                                child: CircularProgressIndicator()),
+                            pageLoaderBuilder: (_) => const Center(
+                                child: CircularProgressIndicator()),
+                            errorBuilder: (_, error) => Center(
+                              child: Text('Error: $error'),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
       ),
       bottomNavigationBar: !_isLoading && _error == null
           ? Container(

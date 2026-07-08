@@ -823,7 +823,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showDeleteConfirmation(BuildContext context) {
     final controller = TextEditingController();
-  String? liveMessage;
+    String? liveMessage;
 
     showDialog(
       context: context,
@@ -874,7 +874,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: canDelete
                       ? () async {
                           setDialogState(
-                            () => liveMessage = 'Erasing all data, please wait.',
+                            () =>
+                                liveMessage = 'Erasing all data, please wait.',
                           );
                           await SecureWipeService.wipeAll();
                           if (!mounted) return;

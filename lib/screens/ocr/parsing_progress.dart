@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:rxmind_app/core/ai/local_ai_stub.dart';
-import 'package:rxmind_app/core/ai/wellness_prompts.dart';
+import 'package:rxmind_app/core/ai/ai_parser.dart';
+import 'package:rxmind_app/core/ai/safety_pipeline.dart';
 
 class ParsingProgressScreen extends StatefulWidget {
   const ParsingProgressScreen({super.key});
@@ -12,6 +14,7 @@ class ParsingProgressScreen extends StatefulWidget {
 
 class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
   String? _error;
+  final SafetyPipeline _pipeline = SafetyPipeline();
 
   @override
   void didChangeDependencies() {
@@ -26,31 +29,41 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
       return;
     }
     try {
-      final stub = LocalAiStub();
-      await stub.sendMessage(
-        reviewedText,
-        systemInstruction: WellnessPrompts.parsingOrganizerInstruction,
+      final result = await _pipeline.runParse(reviewedText);
+      final parsed = result.parseJson ?? AiParser.emptySchema();
+      final jsonStr = jsonEncode(parsed);
+      final hasData = _hasStructuredData(parsed);
+
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        '/parsedSummary',
+        arguments: {'parsedJson': jsonStr},
       );
 
-      const emptyJson =
-          '{"medications":[],"tasks":[],"follow_ups":[],"instructions":[],"warnings":[]}';
-
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/parsedSummary',
-          arguments: {'parsedJson': emptyJson});
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Automatic parsing unavailable — review and edit manually',
+      if (!hasData || result.rateLimited) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Automatic parsing unavailable — review and edit manually',
+            ),
           ),
-        ),
-      );
+        );
+      }
     } catch (e) {
       setState(() => _error = 'Parsing failed: $e');
       await Future.delayed(const Duration(seconds: 2));
       if (mounted) Navigator.pop(context);
     }
+  }
+
+  bool _hasStructuredData(Map<String, dynamic> json) {
+    for (final key in ['medications', 'tasks', 'follow_ups', 'instructions']) {
+      final list = json[key];
+      if (list is List && list.isNotEmpty) return true;
+    }
+    return false;
   }
 
   @override
@@ -81,45 +94,31 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Semantics(
-                    label: 'RxMind logo',
-                    child: SvgPicture.asset(
-                      'assets/illus/logo.svg',
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Semantics(
-                    label: 'Progress indicator',
-                    child: CircularProgressIndicator(
-                      strokeWidth: 4,
-                      valueColor:
-                          AlwaysStoppedAnimation(theme.colorScheme.secondary),
-                    ),
+                  SvgPicture.asset(
+                    'assets/illus/logo.svg',
+                    width: 48,
+                    height: 48,
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    _error ?? 'Organizing Your Document...',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
+                  if (_error == null) ...[
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Organizing your document...',
+                      style: theme.textTheme.titleMedium,
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'This may take a few seconds. Please wait...',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
-                      fontSize: 15,
+                  ] else ...[
+                    Icon(Icons.error_outline,
+                        color: theme.colorScheme.error, size: 40),
+                    const SizedBox(height: 12),
+                    Text(
+                      _error!,
+                      style: theme.textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ],
               ),
             ),

@@ -26,7 +26,9 @@ dependencies:
   flutter_local_notifications: ^17.0.0
   flutter_slidable:
   flutter_tesseract_ocr: ^0.4.30
-  # AI inference: local-only (Phase 3). No cloud packages permitted.
+  # AI inference: local-only (Phase 3). flutter_gemma engine linked when SDK >=3.12.
+  # ModelLoader + LocalAiService use FallbackAiBackend until native runtime available.
+  flutter_gemma: ^0.10.1
   image_picker: ^1.2.0
   permission_handler: ^11.3.0
   flutter_markdown: ^0.7.4+1

@@ -1,17 +1,19 @@
-import 'package:rxmind_app/core/ai/local_ai_stub.dart';
-import 'rate_limiter.dart';
+import 'package:rxmind_app/core/ai/ai_parser.dart';
+import 'package:rxmind_app/core/ai/local_ai_service.dart';
+import 'package:rxmind_app/core/ai/rate_limiter.dart';
 
-/// Legacy AI service refactored to local-only stub (Phase 3 will add real inference).
+/// Structured discharge parsing via on-device AI.
 class AiService {
-  AiService() : _stub = LocalAiStub();
+  AiService({LocalAiService? localAi}) : _localAi = localAi ?? LocalAiService();
 
-  final LocalAiStub _stub;
+  final LocalAiService _localAi;
 
-  /// Attempts structured parse via on-device AI; returns null until Phase 3.
   Future<Map<String, dynamic>?> parseDischargeText(String text) async {
     if (!await RateLimiter.canMakeRequest()) {
       throw Exception('Rate limit exceeded. Please try again later.');
     }
-    return _stub.parseDischargeText(text);
+    final result = await _localAi.parseDischargeJson(text);
+    if (result == null) return null;
+    return AiParser.validateJson(result);
   }
 }

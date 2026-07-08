@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
-import 'dart:convert';
 
 // Extension to capitalize first letter of string
 extension StringExtension on String {
@@ -54,40 +52,22 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Future<void> _loadWarnings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? warningsJson = prefs.getString('warnings');
-
-    if (warningsJson != null && warningsJson.isNotEmpty) {
-      try {
-        final List<dynamic> parsedWarnings = jsonDecode(warningsJson);
-        setState(() {
-          warnings = List<Map<String, dynamic>>.from(parsedWarnings);
-        });
-      } catch (e) {
-        // Error parsing warnings data
-      }
-    }
+    final loaded = await DischargeDataManager.loadWarnings();
+    setState(() {
+      warnings = loaded;
+    });
   }
 
   Future<void> _loadContacts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? contactsJson = prefs.getString('contacts');
-
-    if (contactsJson != null && contactsJson.isNotEmpty) {
-      try {
-        final List<dynamic> parsedContacts = jsonDecode(contactsJson);
-        setState(() {
-          contacts = List<Map<String, dynamic>>.from(parsedContacts);
-        });
-      } catch (e) {
-        // Error parsing contacts data
-      }
-    }
+    final loaded = await DischargeDataManager.loadContacts();
+    setState(() {
+      contacts = loaded;
+    });
   }
 
   Future<void> _loadUserProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    userName = prefs.getString('userName');
+    final profile = await DischargeDataManager.loadProfileData();
+    userName = profile['name'] as String?;
     dischargeUploaded = await DischargeDataManager.isDischargeUploaded();
 
     if (!dischargeUploaded) {

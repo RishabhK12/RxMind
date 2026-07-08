@@ -16,7 +16,8 @@ dependencies:
   provider:
   font_awesome_flutter:
   flutter_secure_storage:
-  sqflite:
+  sqflite_sqlcipher: ^3.1.0
+  crypto: ^3.0.3
   archive:
   file_picker:
   device_info_plus: ^9.1.2
@@ -40,6 +41,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints:
+  sqflite_common_ffi: ^2.3.6
 
 flutter:
   uses-material-design: true

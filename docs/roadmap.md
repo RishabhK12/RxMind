@@ -10,11 +10,11 @@
 
 | Field | Value |
 | --- | --- |
-| **Phase** | 2 |
-| **Task ID** | 2.1 |
-| **Branch pattern** | `feature/phase2-task2.1` |
+| **Phase** | 3 |
+| **Task ID** | 3.1 |
+| **Branch pattern** | `feature/phase3-task3.1` |
 | **Status** | Not started |
-| **Prerequisites** | Phase 1 complete |
+| **Prerequisites** | Phase 2 complete |
 
 ---
 
@@ -226,7 +226,7 @@
 
 ---
 
-### 2.1 — Android StrongBox-backed master key (Kotlin platform channel)
+### 2.1 — Android StrongBox-backed master key (Kotlin platform channel) ✅
 
 **Acceptance Criteria:**
 - Platform channel `rxmind/crypto` exposes `generateMasterKey()` returning 256-bit AES key handle stored in Android Keystore with `setIsStrongBoxBacked(true)` when `PackageManager.FEATURE_STRONGBOX_KEYSTORE` is true; falls back to TEE with logged warning.
@@ -242,7 +242,7 @@
 
 ---
 
-### 2.2 — iOS Secure Enclave master key (Swift platform channel)
+### 2.2 — iOS Secure Enclave master key (Swift platform channel) ✅
 
 **Acceptance Criteria:**
 - Platform channel generates P-256 key with `kSecAttrTokenIDSecureEnclave` and accessibility `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`.
@@ -258,7 +258,7 @@
 
 ---
 
-### 2.3 — SQLCipher integration with PBKDF2 100k derivation
+### 2.3 — SQLCipher integration with PBKDF2 100k derivation ✅
 
 **Acceptance Criteria:**
 - Replace plain `sqflite` with `sqflite_sqlcipher` (or approved SQLCipher FFI wrapper).
@@ -275,7 +275,7 @@
 
 ---
 
-### 2.4 — Migrate DischargeDataManager from SharedPreferences to encrypted SQLCipher tables
+### 2.4 — Migrate DischargeDataManager from SharedPreferences to encrypted SQLCipher tables ✅
 
 **Acceptance Criteria:**
 - Schema tables: `medications`, `tasks`, `follow_ups`, `instructions`, `contacts`, `warnings`, `profile`, `ocr_text` (structured fields only).
@@ -292,7 +292,7 @@
 
 ---
 
-### 2.5 — Secure chat history storage (encrypted, not JSON in secure storage)
+### 2.5 — Secure chat history storage (encrypted, not JSON in secure storage) ✅
 
 **Acceptance Criteria:**
 - `ChatManager` persists messages to SQLCipher table `chat_messages` instead of `LocalStorage.writeSecure('ai_chats', ...)`.
@@ -306,7 +306,7 @@
 
 ---
 
-### 2.6 — Multi-pass cryptographic "Erase All My Data"
+### 2.6 — Multi-pass cryptographic "Erase All My Data" ✅
 
 **Acceptance Criteria:**
 - Settings **Delete All Data** invokes `SecureWipeService.wipeAll()`: cancels notifications, deletes SQLCipher DB file, overwrites with random bytes (3 passes) before unlink, clears secure storage, clears temp directories.
@@ -322,7 +322,7 @@
 
 ---
 
-### 2.7 — Ephemeral OCR pipeline (RAM-only frames, no flash writes)
+### 2.7 — Ephemeral OCR pipeline (RAM-only frames, no flash writes) ✅
 
 **Acceptance Criteria:**
 - Refactor `TextExtractionService` to accept in-memory `Uint8List` frames; prohibit `writeAsBytes` for OCR intermediates.
@@ -340,7 +340,7 @@
 
 ---
 
-### 2.8 — Raw OCR text minimization (store structured fields, not full discharge blob)
+### 2.8 — Raw OCR text minimization (store structured fields, not full discharge blob) ✅
 
 **Acceptance Criteria:**
 - After parsing, full raw OCR text purged from DB unless user explicitly pins it; default saves structured extractions only.
@@ -355,7 +355,7 @@
 
 ---
 
-### 2.9 — Rate limiter migration off SharedPreferences
+### 2.9 — Rate limiter migration off SharedPreferences ✅
 
 **Acceptance Criteria:**
 - `RateLimiter` stores counters in SQLCipher settings table or secure storage — not SharedPreferences.

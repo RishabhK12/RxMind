@@ -27,16 +27,19 @@ void main() async {
 
   tz.initializeTimeZones();
 
+  await LocalStorage.initDb();
+
   final notificationService = NotificationService();
   await notificationService.initialize();
 
-  final tasks = await DischargeDataManager.loadTasks();
-  await notificationService.scheduleNotificationsForTasks(tasks);
+  try {
+    final tasks = await DischargeDataManager.loadTasks();
+    await notificationService.scheduleNotificationsForTasks(tasks);
+  } catch (e) {
+    debugPrint('Task notification scheduling deferred: $e');
+  }
 
   runApp(const RxMindApp());
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    await LocalStorage.initDb();
-  });
 }
 
 class RxMindApp extends StatefulWidget {

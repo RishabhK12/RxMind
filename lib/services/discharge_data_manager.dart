@@ -1,46 +1,52 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import '../core/storage/local_storage.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart';
 
-/// Manages discharge data persistence across the app
+import '../core/chd/repositories/app_metadata_repository.dart';
+import '../core/chd/repositories/contact_repository.dart';
+import '../core/chd/repositories/follow_up_repository.dart';
+import '../core/chd/repositories/instruction_repository.dart';
+import '../core/chd/repositories/medication_repository.dart';
+import '../core/chd/repositories/ocr_text_repository.dart';
+import '../core/chd/repositories/profile_repository.dart';
+import '../core/chd/repositories/task_repository.dart';
+import '../core/chd/repositories/warning_repository.dart';
+import '../core/storage/local_storage.dart';
+import '../core/storage/sqlcipher_database.dart';
+
+/// Manages discharge data persistence via encrypted SQLCipher.
 class DischargeDataManager {
-  // Task update listener functions
   static final List<Function()> _taskUpdateListeners = [];
 
-  // Register a listener that will be called when tasks are updated
+  static const retainRawOcrKey = 'retain_raw_ocr';
+
   static void addTaskUpdateListener(Function() listener) {
     _taskUpdateListeners.add(listener);
   }
 
-  // Remove a previously registered listener
   static void removeTaskUpdateListener(Function() listener) {
     _taskUpdateListeners.remove(listener);
   }
 
-  // Notify all listeners that tasks have been updated
   static void _notifyTaskUpdateListeners() {
-    for (var listener in _taskUpdateListeners) {
+    for (final listener in _taskUpdateListeners) {
       listener();
     }
   }
 
-  static const String _keyDischargeUploaded = 'dischargeUploaded';
-  static const String _keyMedications = 'medications';
-  static const String _keyTasks = 'tasks';
-  static const String _keyFollowUps = 'followUps';
-  static const String _keyInstructions = 'instructions';
-  static const String _keyUserName = 'userName';
-  static const String _keyUserHeight = 'userHeight';
-  static const String _keyUserWeight = 'userWeight';
-  static const String _keyUserAge = 'userAge';
-  static const String _keyUserSex = 'userSex';
-  static const String _keyUserBedtime = 'userBedtime';
-  static const String _keyUserWakeTime = 'userWakeTime';
-  static const String _keyRawOcrText = 'rawOcrText';
-  static const String _keyContacts = 'contacts';
-  static const String _keyWarnings = 'warnings';
+  static Future<Database> _db() => SecureDatabase.instance();
 
-  /// Save discharge data to persistent storage
+  static Future<AppMetadataRepository> _meta() async =>
+      AppMetadataRepository(await _db());
+
+  static Future<bool> shouldRetainRawOcr() async {
+    final meta = await _meta();
+    return await meta.get(retainRawOcrKey) == 'true';
+  }
+
+  static Future<void> setRetainRawOcr(bool retain) async {
+    final meta = await _meta();
+    await meta.set(retainRawOcrKey, retain.toString());
+  }
+
   static Future<void> saveDischargeData({
     required List<Map<String, dynamic>> medications,
     required List<Map<String, dynamic>> tasks,
@@ -48,30 +54,24 @@ class DischargeDataManager {
     required List<Map<String, dynamic>> instructions,
     String? rawOcrText,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
+    final db = await _db();
+    final meta = AppMetadataRepository(db);
 
-    // Mark discharge as uploaded
-    await prefs.setBool(_keyDischargeUploaded, true);
+    await meta.set('discharge_uploaded', 'true');
+    await MedicationRepository(db).replaceAll(medications);
+    await TaskRepository(db).replaceAll(tasks);
+    await FollowUpRepository(db).replaceAll(followUps);
+    await InstructionRepository(db).replaceAll(instructions);
 
-    // Save medications
-    await prefs.setString(_keyMedications, jsonEncode(medications));
-
-    // Save tasks
-    await prefs.setString(_keyTasks, jsonEncode(tasks));
-
-    // Save follow-ups
-    await prefs.setString(_keyFollowUps, jsonEncode(followUps));
-
-    // Save instructions
-    await prefs.setString(_keyInstructions, jsonEncode(instructions));
-
-    // Save raw OCR text
-    if (rawOcrText != null) {
-      await prefs.setString(_keyRawOcrText, rawOcrText);
+    if (rawOcrText != null && await shouldRetainRawOcr()) {
+      await OcrTextRepository(db).save(rawOcrText);
+    } else {
+      await OcrTextRepository(db).delete();
     }
+
+    _notifyTaskUpdateListeners();
   }
 
-  /// Save profile data
   static Future<void> saveProfileData({
     String? name,
     int? height,
@@ -81,180 +81,109 @@ class DischargeDataManager {
     String? bedtime,
     String? wakeTime,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (name != null) await prefs.setString(_keyUserName, name);
-    if (height != null) await prefs.setInt(_keyUserHeight, height);
-    if (weight != null) await prefs.setInt(_keyUserWeight, weight);
-    if (age != null) await prefs.setInt(_keyUserAge, age);
-    if (sex != null) await prefs.setString(_keyUserSex, sex);
-    if (bedtime != null) await prefs.setString(_keyUserBedtime, bedtime);
-    if (wakeTime != null) await prefs.setString(_keyUserWakeTime, wakeTime);
+    final db = await _db();
+    final repo = ProfileRepository(db);
+    final existing = await repo.get();
+    await repo.upsert({
+      'name': name ?? existing['name'],
+      'height': height ?? existing['height'],
+      'weight': weight ?? existing['weight'],
+      'age': age ?? existing['age'],
+      'sex': sex ?? existing['sex'],
+      'bedtime': bedtime ?? existing['bedtime'],
+      'wakeTime': wakeTime ?? existing['wakeTime'],
+    });
   }
 
-  /// Load profile data
   static Future<Map<String, dynamic>> loadProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    return {
-      'name': prefs.getString(_keyUserName),
-      'height': prefs.getInt(_keyUserHeight),
-      'weight': prefs.getInt(_keyUserWeight),
-      'age': prefs.getInt(_keyUserAge),
-      'sex': prefs.getString(_keyUserSex),
-      'bedtime': prefs.getString(_keyUserBedtime),
-      'wakeTime': prefs.getString(_keyUserWakeTime),
-    };
+    final db = await _db();
+    return ProfileRepository(db).get();
   }
 
-  /// Load raw OCR text
   static Future<String?> loadRawOcrText() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_keyRawOcrText);
+    if (!await shouldRetainRawOcr()) return null;
+    final db = await _db();
+    return OcrTextRepository(db).get();
   }
 
-  /// Check if discharge data has been uploaded
   static Future<bool> isDischargeUploaded() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_keyDischargeUploaded) ?? false;
+    final meta = await _meta();
+    return await meta.get('discharge_uploaded') == 'true';
   }
 
-  /// Load medications from storage
   static Future<List<Map<String, dynamic>>> loadMedications() async {
-    final prefs = await SharedPreferences.getInstance();
-    final medicationsJson = prefs.getString(_keyMedications);
-    if (medicationsJson == null) return [];
-
-    final List<dynamic> decoded = jsonDecode(medicationsJson);
-    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+    final db = await _db();
+    return MedicationRepository(db).getAll();
   }
 
-  /// Save medications to storage
   static Future<void> saveMedications(
       List<Map<String, dynamic>> medications) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyMedications, jsonEncode(medications));
-
-    // Notify all listeners that medications have been updated
+    final db = await _db();
+    await MedicationRepository(db).replaceAll(medications);
     _notifyTaskUpdateListeners();
   }
 
-  /// Load tasks from storage
   static Future<List<Map<String, dynamic>>> loadTasks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final tasksJson = prefs.getString(_keyTasks);
-    if (tasksJson == null) return [];
-
-    final List<dynamic> decoded = jsonDecode(tasksJson);
-    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+    final db = await _db();
+    return TaskRepository(db).getAll();
   }
 
-  /// Save tasks to storage
   static Future<void> saveTasks(List<Map<String, dynamic>> tasks) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Ensure all DateTime objects are converted to strings before saving
-    final serializableTasks = tasks.map((task) {
-      final serializedTask = Map<String, dynamic>.from(task);
-
-      // Convert DateTime fields to ISO 8601 strings
-      if (serializedTask['dueTime'] is DateTime) {
-        serializedTask['dueTime'] =
-            (serializedTask['dueTime'] as DateTime).toIso8601String();
-      }
-      if (serializedTask['startDate'] is DateTime) {
-        serializedTask['startDate'] =
-            (serializedTask['startDate'] as DateTime).toIso8601String();
-      }
-      if (serializedTask['dueDate'] is DateTime) {
-        serializedTask['dueDate'] =
-            (serializedTask['dueDate'] as DateTime).toIso8601String();
-      }
-
-      return serializedTask;
-    }).toList();
-
-    await prefs.setString(_keyTasks, jsonEncode(serializableTasks));
-
-    // Notify all listeners that tasks have been updated
+    final db = await _db();
+    await TaskRepository(db).replaceAll(tasks);
     _notifyTaskUpdateListeners();
   }
 
-  /// Get the most recent task update listeners count - useful for debugging
-  static int getTaskUpdateListenersCount() {
-    return _taskUpdateListeners.length;
-  }
+  static int getTaskUpdateListenersCount() => _taskUpdateListeners.length;
 
-  /// Load follow-ups from storage
   static Future<List<Map<String, dynamic>>> loadFollowUps() async {
-    final prefs = await SharedPreferences.getInstance();
-    final followUpsJson = prefs.getString(_keyFollowUps);
-    if (followUpsJson == null) return [];
-
-    final List<dynamic> decoded = jsonDecode(followUpsJson);
-    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+    final db = await _db();
+    return FollowUpRepository(db).getAll();
   }
 
-  /// Load instructions from storage
   static Future<List<Map<String, dynamic>>> loadInstructions() async {
-    final prefs = await SharedPreferences.getInstance();
-    final instructionsJson = prefs.getString(_keyInstructions);
-    if (instructionsJson == null) return [];
-
-    final List<dynamic> decoded = jsonDecode(instructionsJson);
-    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+    final db = await _db();
+    return InstructionRepository(db).getAll();
   }
 
-  /// Save contacts information
   static Future<void> saveContacts(List<Map<String, dynamic>> contacts) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyContacts, jsonEncode(contacts));
+    final db = await _db();
+    await ContactRepository(db).replaceAll(contacts);
   }
 
-  /// Load contacts information
   static Future<List<Map<String, dynamic>>> loadContacts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final contactsJson = prefs.getString(_keyContacts);
-    if (contactsJson == null) return [];
-
-    final List<dynamic> decoded = jsonDecode(contactsJson);
-    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+    final db = await _db();
+    return ContactRepository(db).getAll();
   }
 
-  /// Save warnings information
   static Future<void> saveWarnings(List<Map<String, dynamic>> warnings) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyWarnings, jsonEncode(warnings));
+    final db = await _db();
+    await WarningRepository(db).replaceAll(warnings);
   }
 
-  /// Load warnings information
   static Future<List<Map<String, dynamic>>> loadWarnings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final warningsJson = prefs.getString(_keyWarnings);
-    if (warningsJson == null) return [];
-
-    final List<dynamic> decoded = jsonDecode(warningsJson);
-    return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+    final db = await _db();
+    return WarningRepository(db).getAll();
   }
 
-  /// Clear all discharge data
-  static Future<void> clearDischargeData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_keyDischargeUploaded);
-    await prefs.remove(_keyMedications);
-    await prefs.remove(_keyTasks);
-    await prefs.remove(_keyFollowUps);
-    await prefs.remove(_keyInstructions);
-    await prefs.remove(_keyUserName);
-    await prefs.remove(_keyUserHeight);
-    await prefs.remove(_keyUserWeight);
-    await prefs.remove(_keyUserAge);
-    await prefs.remove(_keyUserSex);
-    await prefs.remove(_keyUserBedtime);
-    await prefs.remove(_keyUserWakeTime);
-    await prefs.remove(_keyRawOcrText);
-    await prefs.remove(_keyContacts);
-    await prefs.remove(_keyWarnings);
+  static Future<void> purgeRawOcrText() async {
+    final db = await _db();
+    await OcrTextRepository(db).delete();
+  }
 
-    // Clear AI chat history
+  /// Clears CHD tables (used during partial reset flows).
+  static Future<void> clearDischargeData() async {
+    final db = await _db();
+    await MedicationRepository(db).deleteAll();
+    await TaskRepository(db).deleteAll();
+    await FollowUpRepository(db).deleteAll();
+    await InstructionRepository(db).deleteAll();
+    await ContactRepository(db).deleteAll();
+    await WarningRepository(db).deleteAll();
+    await ProfileRepository(db).deleteAll();
+    await OcrTextRepository(db).delete();
+    final meta = AppMetadataRepository(db);
+    await meta.delete('discharge_uploaded');
     await LocalStorage.deleteSecure('ai_chats');
   }
 }

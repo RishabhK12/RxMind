@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxmind_app/main.dart'; // Use RxMindSettings from main
 import 'package:rxmind_app/screens/settings/contacts_screen.dart';
+import 'package:rxmind_app/core/storage/secure_wipe_service.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
@@ -803,10 +804,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Delete',
                   style: TextStyle(color: Theme.of(context).colorScheme.error)),
               onPressed: () async {
-                await DischargeDataManager.clearDischargeData();
+                await SecureWipeService.wipeAll();
                 if (!mounted) return;
-                Navigator.of(ctx).pop(); // Close the dialog
-                // Navigate to a fresh start, e.g., the splash screen
+                Navigator.of(ctx).pop();
                 Navigator.of(context).pushNamedAndRemoveUntil(
                     '/splash', (Route<dynamic> route) => false);
               },

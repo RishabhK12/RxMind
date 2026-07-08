@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ParsedSummaryScreen extends StatefulWidget {
   final Map<String, dynamic>? parsedJson;
@@ -21,7 +20,6 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   List<Map<String, dynamic>> tasks = [];
   bool _loading = true;
   bool _didRun = false;
-  String _rawOcrText = '';
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -36,7 +34,6 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   Future<void> _parseDischargeData() async {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    _rawOcrText = args?['ocrText'] as String? ?? '';
     final parsedJsonString = args?['parsedJson'] as String? ?? '';
 
     if (parsedJsonString.isNotEmpty) {
@@ -322,9 +319,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
 
               // Save warnings using the same mechanism as other data
               if (warningsForStorage.isNotEmpty) {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setString(
-                    'warnings', jsonEncode(warningsForStorage));
+                await DischargeDataManager.saveWarnings(warningsForStorage);
               }
             }
           }
@@ -420,8 +415,9 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         tasks: tasksForStorage,
         followUps: followUps,
         instructions: instructions,
-        rawOcrText: _rawOcrText,
       );
+
+      await DischargeDataManager.purgeRawOcrText();
 
       // Save contacts separately
       if (contacts.isNotEmpty) {
@@ -474,9 +470,16 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.robot),
             tooltip: 'Chat with Wellness Guide',
-            onPressed: () {
-              Navigator.pushNamed(context, '/chat',
-                  arguments: {'initial_context': _rawOcrText});
+            onPressed: () async {
+              final meds = await DischargeDataManager.loadMedications();
+              final tasks = await DischargeDataManager.loadTasks();
+              if (!context.mounted) return;
+              Navigator.pushNamed(context, '/chat', arguments: {
+                'structured_context': {
+                  'medications': meds,
+                  'tasks': tasks,
+                },
+              });
             },
           ),
         ],

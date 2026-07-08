@@ -6,11 +6,10 @@ import '../ai/chat_manager.dart';
 class AppReset {
   static Future<void> resetAll(
       TaskManager tm, MedManager mm, ChatManager cm) async {
-    // Clear all models
     tm.tasks.clear();
     tm.taskLogs.clear();
     mm.meds.clear();
-    cm.clearHistory();
+    await cm.deleteAllChats();
     await StorageManager.resetApp();
   }
 }

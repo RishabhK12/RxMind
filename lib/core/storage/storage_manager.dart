@@ -1,27 +1,26 @@
+import 'dart:convert';
+
 import 'local_storage.dart';
 import 'models/user_profile.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'secure_wipe_service.dart';
 
 class StorageManager {
   static Future<void> storeUserProfile(UserProfile profile) async {
-    await LocalStorage.writeSecure('user_profile', profile.toJson().toString());
+    await LocalStorage.writeSecure(
+      'user_profile',
+      jsonEncode(profile.toJson()),
+    );
   }
 
   static Future<UserProfile?> getUserProfile() async {
     final jsonStr = await LocalStorage.readSecure('user_profile');
     if (jsonStr == null) return null;
-    return UserProfile.fromJson(jsonStr as Map<String, dynamic>);
+    return UserProfile.fromJson(
+      jsonDecode(jsonStr) as Map<String, dynamic>,
+    );
   }
 
   static Future<void> resetApp() async {
-    // Wipe all secure storage
-    await LocalStorage.secureStorage.deleteAll();
-    // Wipe DB
-    if (LocalStorage.db != null) {
-      await LocalStorage.db!.close();
-      await LocalStorage.initDb();
-    }
-    final notifications = FlutterLocalNotificationsPlugin();
-    await notifications.cancelAll();
+    await SecureWipeService.wipeAll();
   }
 }

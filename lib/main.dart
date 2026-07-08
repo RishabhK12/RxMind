@@ -5,6 +5,8 @@ import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'screens/onboarding/welcome_carousel.dart';
 import 'screens/onboarding/onboarding_profile_flow.dart';
+import 'screens/onboarding/disclaimer_gate_screen.dart';
+import 'screens/onboarding/chd_consent_screen.dart';
 import 'screens/profile/profile_setup_screen.dart';
 import 'screens/home/home_dashboard.dart';
 import 'screens/home/main_navigation_shell.dart';
@@ -23,19 +25,15 @@ import 'services/discharge_data_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize timezone database for notifications
   tz.initializeTimeZones();
 
-  // Initialize notification service
   final notificationService = NotificationService();
   await notificationService.initialize();
 
-  // Schedule notifications for existing tasks
   final tasks = await DischargeDataManager.loadTasks();
   await notificationService.scheduleNotificationsForTasks(tasks);
 
   runApp(const RxMindApp());
-  // Initialize DB after first frame
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     await LocalStorage.initDb();
   });
@@ -53,44 +51,6 @@ class _RxMindAppState extends State<RxMindApp> {
   bool _highContrast = false;
   double _textScale = 1.0;
   bool _reducedMotion = false;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, _showPrivacyTermsDialog);
-  }
-
-  void _showPrivacyTermsDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Accept Privacy Policy & Terms'),
-        content: const Text(
-          'Please review and accept our Privacy Policy and Terms of Service to continue using the app.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PrivacyTermsScreen(),
-                ),
-              );
-            },
-            child: const Text('View Documents'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Accept'),
-          ),
-        ],
-      ),
-    );
-  }
 
   void updateTheme(ThemeMode mode) => setState(() => _themeMode = mode);
   void updateHighContrast(bool v) => setState(() => _highContrast = v);
@@ -126,8 +86,29 @@ class _RxMindAppState extends State<RxMindApp> {
           initialRoute: '/splash',
           routes: {
             '/splash': (context) => const SplashScreen(),
+            '/disclaimerGate': (context) => DisclaimerGateScreen(
+                  onAcknowledged: () async {
+                    await LocalStorage.setDisclaimerAcknowledged();
+                    if (!context.mounted) return;
+                    Navigator.pushReplacementNamed(context, '/splash');
+                  },
+                ),
+            '/chdConsent': (context) => ChdConsentScreen(
+                  onConsentGranted: () async {
+                    await LocalStorage.setChdConsent();
+                    if (!context.mounted) return;
+                    final profileData =
+                        await DischargeDataManager.loadProfileData();
+                    final name = profileData['name'];
+                    if (name != null && (name as String).isNotEmpty) {
+                      Navigator.pushReplacementNamed(context, '/mainNav');
+                    } else {
+                      Navigator.pushReplacementNamed(
+                          context, '/welcomeCarousel');
+                    }
+                  },
+                ),
             '/welcomeCarousel': (context) => const WelcomeCarousel(),
-            // Removed permissions prompt since app has permissions by default
             '/permissionsPrompt': (context) => OnboardingProfileFlow(
                   onComplete: () =>
                       Navigator.pushReplacementNamed(context, '/mainNav'),
@@ -147,6 +128,7 @@ class _RxMindAppState extends State<RxMindApp> {
             '/medications': (context) => const MedicationsScreen(),
             '/stats': (context) => ComplianceStatsScreen(),
             '/settings': (context) => const SettingsScreen(),
+            '/privacyTerms': (context) => const PrivacyTermsScreen(),
           },
         ),
       ),

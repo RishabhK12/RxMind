@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rxmind_app/core/storage/local_storage.dart';
 import 'package:rxmind_app/services/ocr/text_extraction_service.dart';
 import 'package:path/path.dart' as path;
 
@@ -21,6 +22,17 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
   @override
   void initState() {
     super.initState();
+    _checkChdConsent();
+  }
+
+  Future<void> _checkChdConsent() async {
+    final hasConsent = await LocalStorage.hasChdConsent();
+    if (!hasConsent && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/chdConsent');
+      });
+    }
   }
 
   Future<void> _simulateUpload() async {

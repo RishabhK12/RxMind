@@ -34,14 +34,20 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     final disclaimerAcked = await LocalStorage.isDisclaimerAcknowledged();
-    if (!disclaimerAcked) {
-      Navigator.pushReplacementNamed(context, '/disclaimerGate');
-      return;
-    }
-
     final chdConsent = await LocalStorage.hasChdConsent();
-    if (!chdConsent) {
-      Navigator.pushReplacementNamed(context, '/chdConsent');
+
+    if (!disclaimerAcked || !chdConsent) {
+      final initialStep = !disclaimerAcked
+          ? 0
+          : !chdConsent
+              ? 2
+              : 0;
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        '/onboarding',
+        arguments: initialStep,
+      );
       return;
     }
 

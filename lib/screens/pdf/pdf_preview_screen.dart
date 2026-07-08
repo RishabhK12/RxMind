@@ -1,13 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:path/path.dart' as path;
 
 class PdfPreviewScreen extends StatefulWidget {
   final File pdfFile;
+  final String? exportAnnouncement;
 
-  const PdfPreviewScreen({super.key, required this.pdfFile});
+  const PdfPreviewScreen({
+    super.key,
+    required this.pdfFile,
+    this.exportAnnouncement,
+  });
 
   @override
   State<PdfPreviewScreen> createState() => _PdfPreviewScreenState();
@@ -21,6 +27,12 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.exportAnnouncement != null) {
+      SemanticsService.announce(
+        widget.exportAnnouncement!,
+        TextDirection.ltr,
+      );
+    }
     _initializePdf();
   }
 
@@ -105,7 +117,14 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
           ),
         ],
       ),
-      body: _isLoading
+      body: Semantics(
+        liveRegion: true,
+        label: _isLoading
+            ? 'Loading PDF preview'
+            : _error != null
+                ? 'Error loading PDF: $_error'
+                : 'PDF preview ready',
+        child: _isLoading
           ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -188,6 +207,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     ),
                   ],
                 ),
+      ),
       bottomNavigationBar: !_isLoading && _error == null
           ? Container(
               padding: const EdgeInsets.all(16),

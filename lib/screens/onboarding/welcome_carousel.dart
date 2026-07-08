@@ -110,7 +110,10 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                                       .textTheme
                                       .bodyLarge
                                       ?.copyWith(
-                                          color: const Color(0xFF616161)),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.7)),
                                   textAlign: TextAlign.center,
                                 ),
                               ),

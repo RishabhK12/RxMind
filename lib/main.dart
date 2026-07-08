@@ -6,8 +6,7 @@ import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'screens/onboarding/welcome_carousel.dart';
 import 'screens/onboarding/onboarding_profile_flow.dart';
-import 'screens/onboarding/disclaimer_gate_screen.dart';
-import 'screens/onboarding/chd_consent_screen.dart';
+import 'screens/onboarding/onboarding_wizard_screen.dart';
 import 'screens/profile/profile_setup_screen.dart';
 import 'screens/home/home_dashboard.dart';
 import 'screens/home/main_navigation_shell.dart';
@@ -103,9 +102,14 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
         builder: (context) => MaterialApp(
           title: 'RxMind',
           debugShowCheckedModeBanner: false,
-          theme:
-              _highContrast ? AppTheme.highContrastTheme : AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          theme: AppTheme.resolve(
+            mode: _themeMode,
+            highContrast: _highContrast,
+            platformBrightness: MediaQuery.platformBrightnessOf(context),
+          ),
+          darkTheme: _highContrast
+              ? AppTheme.highContrastDarkTheme
+              : AppTheme.darkTheme,
           themeMode: _themeMode,
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context).copyWith(
@@ -117,28 +121,48 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
           initialRoute: '/splash',
           routes: {
             '/splash': (context) => const SplashScreen(),
-            '/disclaimerGate': (context) => DisclaimerGateScreen(
-                  onAcknowledged: () async {
+            '/disclaimerGate': (context) => OnboardingWizardScreen(
+                  onDisclaimerAcknowledged: () async {
                     await LocalStorage.setDisclaimerAcknowledged();
-                    if (!context.mounted) return;
-                    Navigator.pushReplacementNamed(context, '/splash');
                   },
-                ),
-            '/chdConsent': (context) => ChdConsentScreen(
                   onConsentGranted: () async {
                     await LocalStorage.setChdConsent();
+                  },
+                  onComplete: () {
                     if (!context.mounted) return;
-                    final profileData =
-                        await DischargeDataManager.loadProfileData();
-                    final name = profileData['name'];
-                    if (name != null && (name as String).isNotEmpty) {
-                      Navigator.pushReplacementNamed(context, '/mainNav');
-                    } else {
-                      Navigator.pushReplacementNamed(
-                          context, '/welcomeCarousel');
-                    }
+                    Navigator.pushReplacementNamed(context, '/onboardingProfile');
                   },
                 ),
+            '/chdConsent': (context) => OnboardingWizardScreen(
+                  onDisclaimerAcknowledged: () async {
+                    await LocalStorage.setDisclaimerAcknowledged();
+                  },
+                  onConsentGranted: () async {
+                    await LocalStorage.setChdConsent();
+                  },
+                  onComplete: () {
+                    if (!context.mounted) return;
+                    Navigator.pushReplacementNamed(context, '/onboardingProfile');
+                  },
+                ),
+            '/onboarding': (context) {
+              final initialStep =
+                  ModalRoute.of(context)?.settings.arguments as int? ?? 0;
+              return OnboardingWizardScreen(
+                initialStep: initialStep,
+                onDisclaimerAcknowledged: () async {
+                  await LocalStorage.setDisclaimerAcknowledged();
+                },
+                onConsentGranted: () async {
+                  await LocalStorage.setChdConsent();
+                },
+                onComplete: () {
+                  if (!context.mounted) return;
+                  Navigator.pushReplacementNamed(
+                      context, '/onboardingProfile');
+                },
+              );
+            },
             '/welcomeCarousel': (context) => const WelcomeCarousel(),
             '/permissionsPrompt': (context) => OnboardingProfileFlow(
                   onComplete: () =>

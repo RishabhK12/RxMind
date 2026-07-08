@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:rxmind_app/main.dart'; // Use RxMindSettings from main
+import 'package:rxmind_app/theme/app_theme.dart';
 import 'package:rxmind_app/screens/settings/contacts_screen.dart';
 import 'package:rxmind_app/core/storage/secure_wipe_service.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
@@ -356,8 +360,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             value: settings.highContrast,
-            onChanged: (v) {
-              settings.updateHighContrast(v);
+            onChanged: (v) async {
+              if (v) {
+                final confirmed = await _showHighContrastPreview(context);
+                if (confirmed == true && mounted) {
+                  settings.updateHighContrast(true);
+                }
+              } else {
+                settings.updateHighContrast(false);
+              }
             },
             title: Text('High-Contrast', style: theme.textTheme.bodyMedium),
             secondary: Semantics(
@@ -454,15 +465,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-          SwitchListTile(
-            value: settings.textScale > 1.1,
-            onChanged: (v) {
-              settings.updateTextScale(v ? 1.3 : 1.0);
-            },
-            title: Text('Large Text', style: theme.textTheme.bodyMedium),
-            secondary: Semantics(
-              label: 'Toggle large text for better readability',
+          ListTile(
+            leading: Semantics(
+              label: 'Text size slider',
               child: const Icon(Icons.format_size),
+            ),
+            title: Text('Text Size', style: theme.textTheme.bodyMedium),
+            subtitle: Text(
+              '${(settings.textScale * 100).round()}%',
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Slider(
+              value: settings.textScale.clamp(1.0, 2.0),
+              min: 1.0,
+              max: 2.0,
+              divisions: 10,
+              label: '${(settings.textScale * 100).round()}%',
+              onChanged: (v) => settings.updateTextScale(v),
             ),
           ),
           // Screen reader mode is a placeholder; real support is via OS accessibility
@@ -800,35 +822,148 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showDeleteConfirmation(BuildContext context) {
+    final controller = TextEditingController();
+  String? liveMessage;
+
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final canDelete = controller.text == 'DELETE';
+            return AlertDialog(
+              title: const Text('Confirm Deletion'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Semantics(
+                    liveRegion: true,
+                    child: Text(liveMessage ?? ''),
+                  ),
+                  const Text(
+                    'This permanently erases all medications, tasks, documents, '
+                    'and profile data from this device. Type DELETE to confirm.',
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Type DELETE',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => setDialogState(() {}),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+                TextButton(
+                  child: Text(
+                    'Delete All Data',
+                    style: TextStyle(
+                      color: canDelete
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).disabledColor,
+                    ),
+                  ),
+                  onPressed: canDelete
+                      ? () async {
+                          setDialogState(
+                            () => liveMessage = 'Erasing all data, please wait.',
+                          );
+                          await SecureWipeService.wipeAll();
+                          if (!mounted) return;
+                          setDialogState(
+                            () => liveMessage = 'All data erased successfully.',
+                          );
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/splash',
+                            (Route<dynamic> route) => false,
+                          );
+                        }
+                      : null,
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<bool?> _showHighContrastPreview(BuildContext context) async {
+    final completer = Completer<bool?>();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if (ctx.mounted && !completer.isCompleted) {
+            Navigator.of(ctx).pop(true);
+            completer.complete(true);
+          }
+        });
         return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: const Text(
-              'Are you sure you want to delete all your data? This action cannot be undone.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(ctx).pop();
+          title: const Text('High-Contrast Preview'),
+          content: Theme(
+            data: AppTheme.highContrastTheme,
+            child: Builder(
+              builder: (previewContext) {
+                final previewTheme = Theme.of(previewContext);
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Sample card',
+                          style: previewTheme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Body text preview with high contrast colors.',
+                          style: previewTheme.textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: () {},
+                          child: const Text('Sample button'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               },
             ),
+          ),
+          actions: [
             TextButton(
-              child: Text('Delete',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
-              onPressed: () async {
-                await SecureWipeService.wipeAll();
-                if (!mounted) return;
+              onPressed: () {
+                if (!completer.isCompleted) completer.complete(false);
                 Navigator.of(ctx).pop();
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/splash', (Route<dynamic> route) => false);
               },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (!completer.isCompleted) completer.complete(true);
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Apply'),
             ),
           ],
         );
       },
     );
+    return completer.future;
   }
 
   Future<int?> _showNumberPicker(BuildContext context, String title,
@@ -893,36 +1028,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _exportData() async {
+    String exportStatus = 'Starting PDF export';
     try {
-      // Show loading indicator
       if (!mounted) return;
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
+        builder: (context) => Semantics(
+          liveRegion: true,
+          label: exportStatus,
+          child: const Center(child: CircularProgressIndicator()),
         ),
       );
 
-      // Generate PDF
+      exportStatus = 'Generating health report PDF';
       final pdfFile = await PdfExportService.generateHealthReport();
 
-      // Close loading dialog
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      // Navigate to preview screen
+      exportStatus = 'PDF export complete';
       if (!mounted) return;
+      SemanticsService.announce(exportStatus, TextDirection.ltr);
+
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => PdfPreviewScreen(pdfFile: pdfFile),
+          builder: (context) => PdfPreviewScreen(
+            pdfFile: pdfFile,
+            exportAnnouncement: exportStatus,
+          ),
         ),
       );
     } catch (e) {
-      // Close loading dialog if still open
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
+
+      exportStatus = 'PDF export failed';
+      SemanticsService.announce('$exportStatus: $e', TextDirection.ltr);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

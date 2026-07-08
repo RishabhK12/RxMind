@@ -1,5 +1,7 @@
 # RxMind
 
+**Public site:** https://<org>.github.io/RxMind/
+
 This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Consult a licensed healthcare professional for medical advice.
 
 RxMind is a mobile app designed to help patients manage their post-discharge care more effectively. We built this because navigating medical discharge papers can be overwhelming - they're full of complicated instructions, medication schedules, and follow-up appointments that are easy to miss. RxMind helps you log and organize discharge information into an easy-to-follow plan.

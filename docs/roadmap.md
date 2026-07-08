@@ -10,11 +10,11 @@
 
 | Field | Value |
 | --- | --- |
-| **Phase** | 5 |
-| **Task ID** | 5.1 |
-| **Branch pattern** | `feature/phase5-task5.1` |
-| **Status** | Not started |
-| **Prerequisites** | Phases 1–3 complete |
+| **Phase** | — |
+| **Task ID** | — |
+| **Branch pattern** | — |
+| **Status** | Phase 5 complete |
+| **Prerequisites** | Phases 1–4 complete |
 
 ---
 
@@ -606,7 +606,7 @@
 
 ---
 
-### 5.1 — AI Studio high-contrast theme cascade
+### 5.1 — AI Studio high-contrast theme cascade ✅
 
 **Acceptance Criteria:**
 - `AppTheme` refactored to token file `lib/theme/theme_tokens.dart` with WCAG 2.2 AA contrast ratios ≥4.5:1 for all body text combinations.
@@ -622,7 +622,7 @@
 
 ---
 
-### 5.2 — Accessible navigation shell refactor
+### 5.2 — Accessible navigation shell refactor ✅
 
 **Acceptance Criteria:**
 - Bottom nav bar height ≥56 dp; each item has `Semantics` label, hint, and selected state.
@@ -638,7 +638,7 @@
 
 ---
 
-### 5.3 — Onboarding visual redesign (illustrations + disclaimer flow)
+### 5.3 — Onboarding visual redesign (illustrations + disclaimer flow) ✅
 
 **Acceptance Criteria:**
 - Onboarding integrates disclaimer gate (1.3) and CHD consent (1.4) into cohesive 5-step flow with progress indicator.
@@ -653,7 +653,7 @@
 
 ---
 
-### 5.4 — Settings accessibility and erase-data UX polish
+### 5.4 — Settings accessibility and erase-data UX polish ✅
 
 **Acceptance Criteria:**
 - **Erase All My Data** uses type-to-confirm pattern (`DELETE`) before wipe.
@@ -667,7 +667,7 @@
 
 ---
 
-### 5.5 — GitHub Pages landing site (public privacy policy URL)
+### 5.5 — GitHub Pages landing site (public privacy policy URL) ✅
 
 **Acceptance Criteria:**
 - Static site published to `docs/site/` (or `gh-pages` branch) with pages: Home, Privacy Policy, Terms, Data Safety summary.
@@ -685,7 +685,7 @@
 
 ---
 
-### 5.6 — Google Play Data Safety Form documentation
+### 5.6 — Google Play Data Safety Form documentation ✅
 
 **Acceptance Criteria:**
 - `docs/store/google_data_safety_form.md` lists every data type collected, encrypted in transit/at rest, user deletion method, and confirms **No data shared with third parties**.
@@ -698,7 +698,7 @@
 
 ---
 
-### 5.7 — App Store Privacy Nutrition Labels documentation
+### 5.7 — App Store Privacy Nutrition Labels documentation ✅
 
 **Acceptance Criteria:**
 - `docs/store/apple_privacy_labels.md` maps RxMind data practices to App Store Connect questionnaire answers.
@@ -709,7 +709,7 @@
 
 ---
 
-### 5.8 — Store screenshot and metadata asset pack (neutral ASO)
+### 5.8 — Store screenshot and metadata asset pack (neutral ASO) ✅
 
 **Acceptance Criteria:**
 - `docs/store/screenshots/` contains template brief: no diagnostic claims, show disclaimer overlay on screenshot 1.

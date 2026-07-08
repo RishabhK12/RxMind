@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:workmanager/workmanager.dart';
 import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
@@ -21,11 +22,17 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/settings/privacy_terms_screen.dart';
 import 'services/notification_service.dart';
 import 'services/discharge_data_manager.dart';
+import 'services/background/reminder_sync_scheduler.dart';
+import 'services/background/reminder_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   tz.initializeTimeZones();
+
+  if (ReminderSyncScheduler.isSupported) {
+    await Workmanager().initialize(reminderSyncCallbackDispatcher);
+  }
 
   await LocalStorage.initDb();
 
@@ -35,6 +42,7 @@ void main() async {
   try {
     final tasks = await DischargeDataManager.loadTasks();
     await notificationService.scheduleNotificationsForTasks(tasks);
+    await ReminderSyncScheduler.registerPeriodicSync();
   } catch (e) {
     debugPrint('Task notification scheduling deferred: $e');
   }
@@ -49,11 +57,31 @@ class RxMindApp extends StatefulWidget {
   State<RxMindApp> createState() => _RxMindAppState();
 }
 
-class _RxMindAppState extends State<RxMindApp> {
+class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
   ThemeMode _themeMode = ThemeMode.light;
   bool _highContrast = false;
   double _textScale = 1.0;
   bool _reducedMotion = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ReminderSyncService.flushLockSafeBuffer();
+      ReminderSyncService.rescheduleAllFromDatabase();
+    }
+  }
 
   void updateTheme(ThemeMode mode) => setState(() => _themeMode = mode);
   void updateHighContrast(bool v) => setState(() => _highContrast = v);

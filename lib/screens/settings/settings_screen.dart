@@ -7,6 +7,8 @@ import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
 import 'package:rxmind_app/services/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rxmind_app/core/permissions/permission_disclosure_store.dart';
+import 'package:rxmind_app/screens/permissions/permission_disclosure_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -384,6 +386,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if (v) {
                 final status = await Permission.notification.status;
                 if (!status.isGranted) {
+                  final acked = await PermissionDisclosureStore.isAcknowledged(
+                      'notification');
+                  if (!acked) {
+                    if (!mounted) return;
+                    final disclosed = await showPermissionDisclosure(
+                      context,
+                      PermissionType.notification,
+                    );
+                    if (!disclosed) return;
+                    await PermissionDisclosureStore.setAcknowledged(
+                        'notification');
+                  }
                   final requested =
                       await _notificationService.checkAndRequestPermissions();
                   if (!requested) {

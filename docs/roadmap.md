@@ -10,11 +10,11 @@
 
 | Field | Value |
 | --- | --- |
-| **Phase** | 4 |
-| **Task ID** | 4.1 |
-| **Branch pattern** | `feature/phase4-task4.1` |
+| **Phase** | 5 |
+| **Task ID** | 5.1 |
+| **Branch pattern** | `feature/phase5-task5.1` |
 | **Status** | Not started |
-| **Prerequisites** | Phase 2 complete |
+| **Prerequisites** | Phases 1–3 complete |
 
 ---
 
@@ -489,7 +489,7 @@
 
 ---
 
-### 4.1 — Native contact picker integration (no READ_CONTACTS)
+### 4.1 — Native contact picker integration (no READ_CONTACTS) ✅
 
 **Acceptance Criteria:**
 - Adding a medical contact opens OS-native picker (`flutter_native_contact_picker` or platform channel using `Intent.ACTION_PICK` / `CNContactPickerViewController`).
@@ -507,7 +507,7 @@
 
 ---
 
-### 4.2 — Clinical facility geofence exclusion module
+### 4.2 — Clinical facility geofence exclusion module ✅
 
 **Acceptance Criteria:**
 - If any location feature is added, `GeofenceGuard` checks coordinates against bundled static facility index (OpenStreetMap-derived, ≥500 US hospital/clinic points minimum viable; expandable).
@@ -523,7 +523,7 @@
 
 ---
 
-### 4.3 — Neutral notification copy (no clinical strings on lock screen)
+### 4.3 — Neutral notification copy (no clinical strings on lock screen) ✅
 
 **Acceptance Criteria:**
 - All scheduled notifications use static title `"Recovery reminder"` and body `"You have a scheduled wellness entry"` — never include medication names, dosages, or diagnosis-related task titles.
@@ -537,7 +537,7 @@
 
 ---
 
-### 4.4 — Lock-safe RAM cache buffer for background notification rescheduling
+### 4.4 — Lock-safe RAM cache buffer for background notification rescheduling ✅
 
 **Acceptance Criteria:**
 - When device locked (secure storage inaccessible), background reschedule writes pending task IDs to in-memory `LockSafeWriteBuffer` singleton (max 256 entries, volatile).
@@ -553,7 +553,7 @@
 
 ---
 
-### 4.5 — Android WorkManager background maintenance worker
+### 4.5 — Android WorkManager background maintenance worker ✅
 
 **Acceptance Criteria:**
 - `ReminderSyncWorker` registered via WorkManager; runs only when app notifications enabled and device unlocked.
@@ -568,7 +568,7 @@
 
 ---
 
-### 4.6 — iOS BGTaskScheduler registration for reminder sync
+### 4.6 — iOS BGTaskScheduler registration for reminder sync ✅
 
 **Acceptance Criteria:**
 - `BGAppRefreshTask` identifier `org.rxmind.app.reminder-sync` registered in `Info.plist` `BGTaskSchedulerPermittedIdentifiers`.
@@ -583,7 +583,7 @@
 
 ---
 
-### 4.7 — In-context permission disclosure modals
+### 4.7 — In-context permission disclosure modals ✅
 
 **Acceptance Criteria:**
 - Before camera, photo library, or notification permission requests, show RxMind disclosure modal explaining data type, local storage, and user benefit (per Play / App Store 2026 guidance).

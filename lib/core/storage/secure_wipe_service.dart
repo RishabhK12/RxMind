@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/notification_service.dart';
 import '../chd/repositories/app_metadata_repository.dart';
+import 'lock_safe_write_buffer.dart';
 import 'sqlcipher_database.dart';
 
 /// Multi-pass cryptographic wipe for Erase All My Data.
@@ -34,6 +35,7 @@ class SecureWipeService {
     await prefs.clear();
 
     await _wipeTempDirectories();
+    LockSafeWriteBuffer.instance.clear();
   }
 
   static Future<void> _wipeDatabaseFilesFallback() async {

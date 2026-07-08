@@ -37,6 +37,7 @@ dependencies:
   timezone: ^0.9.2
   url_launcher: ^6.2.5
   intl: ^0.18.0
+  workmanager: ^0.5.2
   # Add other dependencies as needed
 
 dev_dependencies:
@@ -55,6 +56,7 @@ flutter:
     - assets/tessdata/
     - assets/tessdata/README.md
     - assets/tessdata_config.json
+    - assets/data/clinical_facilities_us.geojson
     # Add other assets as needed
   fonts:
     - family: Poppins

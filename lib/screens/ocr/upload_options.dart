@@ -3,6 +3,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rxmind_app/core/storage/local_storage.dart';
 import 'package:rxmind_app/services/ocr/text_extraction_service.dart';
+import 'package:rxmind_app/core/permissions/permission_disclosure_store.dart';
+import 'package:rxmind_app/screens/permissions/permission_disclosure_dialog.dart';
 import 'package:path/path.dart' as path;
 
 class UploadOptionsScreen extends StatefulWidget {
@@ -32,6 +34,64 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
         if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/chdConsent');
       });
+    }
+  }
+
+  Future<bool> _ensurePermissionDisclosure(PermissionType type) async {
+    final key = type.name;
+    if (await PermissionDisclosureStore.isAcknowledged(key)) return true;
+    if (!mounted) return false;
+    final disclosed = await showPermissionDisclosure(context, type);
+    if (disclosed) {
+      await PermissionDisclosureStore.setAcknowledged(key);
+    }
+    return disclosed;
+  }
+
+  Future<void> _captureFromCamera() async {
+    if (!await _ensurePermissionDisclosure(PermissionType.camera)) return;
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+      if (photo != null) {
+        setState(() {
+          _selectedFilePaths.add(photo.path);
+          _hasUsedCamera = true;
+        });
+        await _simulateUpload();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Camera not available or permission denied.')),
+      );
+    }
+  }
+
+  Future<void> _pickFromLibrary() async {
+    if (!await _ensurePermissionDisclosure(PermissionType.photoLibrary)) {
+      return;
+    }
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+        allowMultiple: true,
+      );
+      if (result != null && result.paths.isNotEmpty) {
+        setState(() {
+          _selectedFilePaths
+              .addAll(result.paths.where((p) => p != null).cast<String>());
+          _hasUsedFilePicker = true;
+        });
+        await _simulateUpload();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error selecting file: $e')),
+      );
     }
   }
 
@@ -236,30 +296,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                     ),
                     elevation: 4,
                   ),
-                  onPressed: _uploading
-                      ? null
-                      : () async {
-                          // Use image_picker to capture photo from camera
-                          try {
-                            final ImagePicker picker = ImagePicker();
-                            final XFile? photo = await picker.pickImage(
-                                source: ImageSource.camera);
-                            if (photo != null) {
-                              setState(() {
-                                _selectedFilePaths.add(photo.path);
-                                _hasUsedCamera = true;
-                              });
-                              await _simulateUpload();
-                            }
-                          } catch (e) {
-                            if (!mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Camera not available or permission denied.')),
-                            );
-                          }
-                        },
+                  onPressed: _uploading ? null : _captureFromCamera,
                 ),
               ),
               const SizedBox(height: 24),
@@ -289,32 +326,7 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
                     ),
                     elevation: 4,
                   ),
-                  onPressed: _uploading
-                      ? null
-                      : () async {
-                          try {
-                            final result = await FilePicker.platform.pickFiles(
-                              type: FileType.custom,
-                              allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
-                              allowMultiple: true,
-                            );
-                            if (result != null && result.paths.isNotEmpty) {
-                              setState(() {
-                                _selectedFilePaths.addAll(result.paths
-                                    .where((p) => p != null)
-                                    .cast<String>());
-                                _hasUsedFilePicker = true;
-                              });
-                              await _simulateUpload();
-                            }
-                          } catch (e) {
-                            if (!mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text('Error selecting file: $e')),
-                            );
-                          }
-                        },
+                  onPressed: _uploading ? null : _pickFromLibrary,
                 ),
               ),
               if (_selectedFilePaths.isNotEmpty) ...[

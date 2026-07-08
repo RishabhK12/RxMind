@@ -1,13 +1,29 @@
 package com.rxmind.app
 
+import android.content.Intent
+import com.rxmind.app.contacts.ContactPickerModule
 import com.rxmind.app.crypto.MasterKeyModule
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private lateinit var contactPickerModule: ContactPickerModule
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
+        contactPickerModule = ContactPickerModule(this)
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            ContactPickerModule.CHANNEL
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "pickSingleContact" -> contactPickerModule.pickSingleContact(result)
+                else -> result.notImplemented()
+            }
+        }
+
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             MasterKeyModule.CHANNEL
@@ -47,6 +63,14 @@ class MainActivity : FlutterActivity() {
                 }
                 else -> result.notImplemented()
             }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (::contactPickerModule.isInitialized) {
+            contactPickerModule.onActivityResult(requestCode, resultCode, data)
         }
     }
 }

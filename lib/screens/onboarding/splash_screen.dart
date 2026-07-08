@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:rxmind_app/core/storage/local_storage.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -26,16 +27,31 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
     _controller.forward();
-    Future.delayed(const Duration(milliseconds: 1200), () async {
-      if (!mounted) return;
-      final profileData = await DischargeDataManager.loadProfileData();
-      final name = profileData['name'];
-      if (name != null && name.isNotEmpty) {
-        Navigator.pushReplacementNamed(context, '/mainNav');
-      } else {
-        Navigator.pushReplacementNamed(context, '/welcomeCarousel');
-      }
-    });
+    Future.delayed(const Duration(milliseconds: 1200), _navigateNext);
+  }
+
+  Future<void> _navigateNext() async {
+    if (!mounted) return;
+
+    final disclaimerAcked = await LocalStorage.isDisclaimerAcknowledged();
+    if (!disclaimerAcked) {
+      Navigator.pushReplacementNamed(context, '/disclaimerGate');
+      return;
+    }
+
+    final chdConsent = await LocalStorage.hasChdConsent();
+    if (!chdConsent) {
+      Navigator.pushReplacementNamed(context, '/chdConsent');
+      return;
+    }
+
+    final profileData = await DischargeDataManager.loadProfileData();
+    final name = profileData['name'];
+    if (name != null && (name as String).isNotEmpty) {
+      Navigator.pushReplacementNamed(context, '/mainNav');
+    } else {
+      Navigator.pushReplacementNamed(context, '/welcomeCarousel');
+    }
   }
 
   @override
@@ -61,7 +77,6 @@ class _SplashScreenState extends State<SplashScreen>
                 'assets/illus/logo.svg',
                 width: MediaQuery.of(context).size.width * 0.7,
                 errorBuilder: (context, error, stackTrace) {
-                  // Fallback if SVG not found
                   return Icon(
                     Icons.medical_services_rounded,
                     size: 80,

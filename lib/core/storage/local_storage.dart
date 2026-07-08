@@ -5,6 +5,23 @@ class LocalStorage {
   static final secureStorage = FlutterSecureStorage();
   static Database? _db;
 
+  static const disclaimerAckKey = 'disclaimer_ack_v1';
+  static const chdConsentKey = 'chd_consent_v1';
+
+  static Future<bool> isDisclaimerAcknowledged() async =>
+      (await readSecure(disclaimerAckKey)) == 'true';
+
+  static Future<void> setDisclaimerAcknowledged() async =>
+      writeSecure(disclaimerAckKey, 'true');
+
+  static Future<bool> hasChdConsent() async =>
+      (await readSecure(chdConsentKey)) != null;
+
+  static Future<void> setChdConsent() async => writeSecure(
+        chdConsentKey,
+        DateTime.now().toUtc().toIso8601String(),
+      );
+
   static Future<void> initDb() async {
     _db = await openDatabase(
       'rxmind.db',

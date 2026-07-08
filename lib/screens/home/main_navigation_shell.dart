@@ -11,6 +11,8 @@ import 'package:rxmind_app/theme/theme_tokens.dart';
 class MainNavigationShell extends StatefulWidget {
   const MainNavigationShell({super.key});
 
+  static const double navBarHeight = 56;
+
   @override
   State<MainNavigationShell> createState() => _MainNavigationShellState();
 }
@@ -21,8 +23,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
 
   late final List<Widget> _tabs;
-
-  static const double navBarHeight = 56;
 
   @override
   void initState() {
@@ -63,7 +63,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           bottom: true,
           minimum: EdgeInsets.zero,
           child: Container(
-            height: navBarHeight,
+            height: MainNavigationShell.navBarHeight,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
               color: colorScheme.surface,

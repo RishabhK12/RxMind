@@ -7,12 +7,12 @@ void main() {
     const status = 'Generating health report PDF';
 
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         home: Scaffold(
           body: Semantics(
             liveRegion: true,
             label: status,
-            child: Center(child: CircularProgressIndicator()),
+            child: const Center(child: CircularProgressIndicator()),
           ),
         ),
       ),

@@ -1,6 +1,6 @@
 # RxMind
 
-**Public site:** https://<org>.github.io/RxMind/
+**Public site:** GitHub Pages from [`website/`](website/) (see [`website/README.md`](website/README.md) for `NEXT_PUBLIC_PLAY_STORE_URL` and `NEXT_PUBLIC_BASE_PATH`).
 
 This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Consult a licensed healthcare professional for medical advice.
 

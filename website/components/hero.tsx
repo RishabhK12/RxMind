@@ -474,7 +474,7 @@ export function Hero() {
         <div className="flex flex-col items-center text-center">
           <h1 className="sr-only">master your recovery</h1>
           <p className="mb-10 max-w-3xl px-4 text-lg font-medium leading-relaxed text-slate-600 md:text-xl">
-            RxMind helps you organize post-hospital recovery on your phone —
+            rxmind helps you organize post-hospital recovery on your phone —
             private recovery plans, medication schedules, and progress tracking
             that stay on-device.
           </p>

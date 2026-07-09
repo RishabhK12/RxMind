@@ -20,7 +20,7 @@ export function DownloadSection() {
           Download
         </span>
         <h2 className="text-4xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-5xl">
-          Get RxMind
+          Get rxmind
         </h2>
         <p className="text-lg font-medium leading-relaxed text-slate-600">
           Download on Google Play. App Store coming soon. Your recovery data

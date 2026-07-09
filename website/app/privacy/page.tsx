@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { SiteChrome } from "@/components/site-chrome";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — RxMind",
+  title: "Privacy Policy — rxmind",
   description:
-    "RxMind privacy policy: on-device storage, no cloud sync of Consumer Health Data.",
+    "rxmind privacy policy: on-device storage, no cloud sync of Consumer Health Data.",
 };
 
 export default function PrivacyPage() {
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
 
         <h2>Plain-Language Summary</h2>
         <p>
-          RxMind is a personal recovery organizer that runs on your phone. The
+          rxmind is a personal recovery organizer that runs on your phone. The
           health information you enter or scan is stored <strong>on your device
           only</strong>. We do not operate cloud servers that receive, store, or
           process your health data. You can export a copy and permanently erase
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
 
         <h2>Data Categories</h2>
         <p>
-          Depending on how you use RxMind, locally processed information may
+          Depending on how you use rxmind, locally processed information may
           include recovery documents, medications, tasks, follow-up contacts,
           profile preferences, and on-device AI interactions.
         </p>

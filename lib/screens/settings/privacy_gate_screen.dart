@@ -34,7 +34,7 @@ class _PrivacyGateScreenState extends State<PrivacyGateScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome to RxMind! Before you continue, please review and accept our Privacy Policy and Terms of Service.',
+                'Welcome to rxmind! Before you continue, please review and accept our Privacy Policy and Terms of Service.',
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),

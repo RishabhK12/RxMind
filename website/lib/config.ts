@@ -6,7 +6,7 @@ export const PLAY_STORE_URL =
   process.env.NEXT_PUBLIC_PLAY_STORE_URL ??
   "https://play.google.com/store/apps/details?id=PLACEHOLDER";
 
-export const SITE_NAME = "RxMind";
+export const SITE_NAME = "rxmind";
 
 /** GitHub project Pages base path, e.g. `/RxMind` (no trailing slash). */
 export const BASE_PATH =

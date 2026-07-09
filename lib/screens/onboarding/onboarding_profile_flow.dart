@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
 
 class OnboardingProfileFlow extends StatefulWidget {
   final VoidCallback onComplete;
@@ -94,8 +96,6 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   }
 
   Widget buildProgressBar() {
-    // ...existing code...
-    // ...existing code...
     final theme = Theme.of(context);
     return Semantics(
       label: 'Progress: Step ${currentStep + 1} of $totalSteps',
@@ -103,13 +103,12 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
           child: LinearProgressIndicator(
             value: (currentStep + 1) / totalSteps,
             minHeight: 8,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            valueColor:
-                AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+            backgroundColor: ThemeTokens.brandMuted,
+            color: theme.colorScheme.primary,
           ),
         ),
       ),
@@ -127,10 +126,13 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('What\'s your name?',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF212121))),
+                Text(
+                  'What\'s your name?',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
                 const SizedBox(height: 32),
                 TextField(
                   onChanged: (val) => setState(() => firstName = val),
@@ -138,9 +140,9 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                     labelText: 'First Name',
                     hintText: 'Enter your first name',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
                     ),
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: const Icon(Icons.person),
                   ),
                   textCapitalization: TextCapitalization.words,
                   autofocus: true,
@@ -152,9 +154,9 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                     labelText: 'Last Name',
                     hintText: 'Enter your last name',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
                     ),
-                    prefixIcon: Icon(Icons.person_outline),
+                    prefixIcon: const Icon(Icons.person_outline),
                   ),
                   textCapitalization: TextCapitalization.words,
                 ),
@@ -287,7 +289,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
           children: [
             _ChipSelectCard(
               title: 'Any dietary restrictions?',
-              options: [
+              options: const [
                 'Vegetarian',
                 'Vegan',
                 'Gluten-Free',
@@ -304,7 +306,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 child: TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Please specify',
                     border: OutlineInputBorder(),
                   ),
@@ -319,7 +321,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
           children: [
             _ChipSelectCard(
               title: 'Any chronic conditions?',
-              options: [
+              options: const [
                 'Diabetes',
                 'Hypertension',
                 'Asthma',
@@ -336,7 +338,7 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 child: TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Please specify',
                     border: OutlineInputBorder(),
                   ),
@@ -349,7 +351,13 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
       case 9:
         return _ChipSelectCard(
           title: 'Any allergies?',
-          options: ['Penicillin', 'Peanuts', 'Latex', 'Shellfish', 'Other'],
+          options: const [
+            'Penicillin',
+            'Peanuts',
+            'Latex',
+            'Shellfish',
+            'Other'
+          ],
           selected: allergies,
           onChanged: (v) => setState(() => allergies = v),
           optional: true,
@@ -362,8 +370,11 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFB),
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: LayoutBuilder(
@@ -382,17 +393,20 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                       const SizedBox(height: 16),
                       buildProgressBar(),
                       Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 350),
-                          transitionBuilder: (child, anim) => SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(1, 0),
-                              end: Offset.zero,
-                            ).animate(anim),
-                            child: child,
-                          ),
-                          child: buildQuestion(),
-                        ),
+                        child: reduceMotion
+                            ? buildQuestion()
+                            : AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 350),
+                                transitionBuilder: (child, anim) =>
+                                    SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(1, 0),
+                                    end: Offset.zero,
+                                  ).animate(anim),
+                                  child: child,
+                                ),
+                                child: buildQuestion(),
+                              ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -405,29 +419,25 @@ class _OnboardingProfileFlowState extends State<OnboardingProfileFlow> {
                                 child: Semantics(
                                   label: 'Back',
                                   button: true,
-                                  child: Text('Back',
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(color: Colors.grey)),
+                                  child: Text(
+                                    'Back',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: ext.navInactive,
+                                    ),
+                                  ),
                                 ),
                               ),
                             const Spacer(),
-                            ElevatedButton(
-                              onPressed: canContinue ? next : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.colorScheme.primary,
-                                foregroundColor: Colors.white,
-                                shape: StadiumBorder(),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 32, vertical: 14),
-                                elevation: 0,
-                              ),
-                              child: Semantics(
-                                label: canContinue
-                                    ? 'Continue'
-                                    : 'Continue (disabled)',
-                                button: true,
-                                enabled: canContinue,
-                                child: const Text('Continue'),
+                            Semantics(
+                              label: canContinue
+                                  ? 'Continue'
+                                  : 'Continue (disabled)',
+                              button: true,
+                              enabled: canContinue,
+                              child: RxPrimaryButton(
+                                label: 'Continue',
+                                onPressed: canContinue ? next : null,
+                                expand: false,
                               ),
                             ),
                           ],
@@ -465,14 +475,19 @@ class _NumberPickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700, color: const Color(0xFF212121))),
+          Text(
+            title,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           const SizedBox(height: 32),
           Row(
             children: [
@@ -492,7 +507,7 @@ class _NumberPickerCard extends StatelessWidget {
                           style: theme.textTheme.displaySmall!.copyWith(
                             color: (value == min + i)
                                 ? theme.colorScheme.primary
-                                : Colors.grey,
+                                : ext.navInactive,
                             fontWeight: FontWeight.w600,
                           ),
                           child: Text('${min + i} $unit1'),
@@ -518,6 +533,7 @@ class _SexPickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     final options = [
       {'label': 'Male', 'icon': Icons.male},
       {'label': 'Female', 'icon': Icons.female},
@@ -528,9 +544,13 @@ class _SexPickerCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('What is your biological sex?',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700, color: const Color(0xFF212121))),
+          Text(
+            'What is your biological sex?',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -543,32 +563,35 @@ class _SexPickerCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                   decoration: BoxDecoration(
-                    color: selected ? theme.colorScheme.primary : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    color: selected
+                        ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                        : theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
                     border: Border.all(
-                        color: selected
-                            ? theme.colorScheme.primary
-                            : Colors.grey.shade300,
-                        width: 2),
-                    boxShadow: selected
-                        ? [
-                            BoxShadow(
-                                color:
-                                    theme.colorScheme.primary.withOpacity(0.08),
-                                blurRadius: 8)
-                          ]
-                        : [],
+                      color: selected ? theme.colorScheme.primary : ext.border,
+                      width: 2,
+                    ),
+                    boxShadow: selected ? ext.softShadow : null,
                   ),
                   child: Column(
                     children: [
-                      Icon(opt['icon'] as IconData,
-                          color: selected ? Colors.white : Colors.grey,
-                          size: 36),
+                      Icon(
+                        opt['icon'] as IconData,
+                        color: selected
+                            ? theme.colorScheme.primary
+                            : ext.navInactive,
+                        size: 36,
+                      ),
                       const SizedBox(height: 8),
-                      Text(opt['label'] as String,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                              color: selected ? Colors.white : Colors.grey,
-                              fontWeight: FontWeight.w600)),
+                      Text(
+                        opt['label'] as String,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: selected
+                              ? theme.colorScheme.primary
+                              : ext.navInactive,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -592,8 +615,8 @@ class _SleepScheduleCard extends StatelessWidget {
     final picked = await showTimePicker(
       context: context,
       initialTime: isBedtime
-          ? (bedtime ?? TimeOfDay(hour: 22, minute: 0))
-          : (wakeTime ?? TimeOfDay(hour: 7, minute: 0)),
+          ? (bedtime ?? const TimeOfDay(hour: 22, minute: 0))
+          : (wakeTime ?? const TimeOfDay(hour: 7, minute: 0)),
       builder: (ctx, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context)
@@ -620,9 +643,13 @@ class _SleepScheduleCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('What is your sleep schedule?',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700, color: const Color(0xFF212121))),
+          Text(
+            'What is your sleep schedule?',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -637,14 +664,18 @@ class _SleepScheduleCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 24, vertical: 16),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(12),
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.08),
+                        borderRadius:
+                            BorderRadius.circular(ThemeTokens.radiusMd),
                       ),
                       child: Text(
-                          bedtime != null ? bedtime!.format(context) : '--:--',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w600)),
+                        bedtime != null ? bedtime!.format(context) : '--:--',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -659,16 +690,18 @@ class _SleepScheduleCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 24, vertical: 16),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(12),
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.08),
+                        borderRadius:
+                            BorderRadius.circular(ThemeTokens.radiusMd),
                       ),
                       child: Text(
-                          wakeTime != null
-                              ? wakeTime!.format(context)
-                              : '--:--',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w600)),
+                        wakeTime != null ? wakeTime!.format(context) : '--:--',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -689,6 +722,7 @@ class _ActivityLevelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     final options = [
       {'label': 'Sedentary', 'icon': Icons.self_improvement},
       {'label': 'Light', 'icon': Icons.directions_walk},
@@ -700,9 +734,13 @@ class _ActivityLevelCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('How active are you?',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700, color: const Color(0xFF212121))),
+          Text(
+            'How active are you?',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           const SizedBox(height: 32),
           Column(
             children: options.map((opt) {
@@ -717,33 +755,36 @@ class _ActivityLevelCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 18),
                     decoration: BoxDecoration(
-                      color:
-                          selected ? theme.colorScheme.primary : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      color: selected
+                          ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                          : theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
                       border: Border.all(
-                          color: selected
-                              ? theme.colorScheme.primary
-                              : Colors.grey.shade300,
-                          width: 2),
-                      boxShadow: selected
-                          ? [
-                              BoxShadow(
-                                  color: theme.colorScheme.primary
-                                      .withOpacity(0.08),
-                                  blurRadius: 8)
-                            ]
-                          : [],
+                        color:
+                            selected ? theme.colorScheme.primary : ext.border,
+                        width: 2,
+                      ),
+                      boxShadow: selected ? ext.softShadow : null,
                     ),
                     child: Row(
                       children: [
-                        Icon(opt['icon'] as IconData,
-                            color: selected ? Colors.white : Colors.grey,
-                            size: 32),
+                        Icon(
+                          opt['icon'] as IconData,
+                          color: selected
+                              ? theme.colorScheme.primary
+                              : ext.navInactive,
+                          size: 32,
+                        ),
                         const SizedBox(width: 16),
-                        Text(opt['label'] as String,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                                color: selected ? Colors.white : Colors.grey,
-                                fontWeight: FontWeight.w600)),
+                        Text(
+                          opt['label'] as String,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: selected
+                                ? theme.colorScheme.primary
+                                : ext.navInactive,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -773,14 +814,19 @@ class _ChipSelectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700, color: const Color(0xFF212121))),
+          Text(
+            title,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           const SizedBox(height: 32),
           Wrap(
             spacing: 12,
@@ -788,16 +834,25 @@ class _ChipSelectCard extends StatelessWidget {
             children: options.map((opt) {
               final isSelected = selected.contains(opt);
               return ChoiceChip(
-                label: Text(opt,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                        color: isSelected
-                            ? Colors.white
-                            : theme.colorScheme.primary)),
+                label: Text(
+                  opt,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface,
+                  ),
+                ),
                 selected: isSelected,
-                selectedColor: theme.colorScheme.primary,
-                backgroundColor: Colors.white,
+                selectedColor:
+                    theme.colorScheme.primary.withValues(alpha: 0.12),
+                backgroundColor: theme.colorScheme.surface,
+                side: BorderSide(
+                  color: isSelected ? theme.colorScheme.primary : ext.border,
+                  width: isSelected ? 2 : 1,
+                ),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+                ),
                 onSelected: (sel) {
                   final newList = List<String>.from(selected);
                   if (sel) {

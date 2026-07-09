@@ -1,31 +1,19 @@
-import 'dart:convert';
-import 'package:rxmind_app/services/ai/gemini_backend_client.dart';
-import 'rate_limiter.dart';
+import 'package:rxmind_app/core/ai/ai_parser.dart';
+import 'package:rxmind_app/core/ai/local_ai_service.dart';
+import 'package:rxmind_app/core/ai/rate_limiter.dart';
 
-/// Legacy AI service refactored to use backend proxy instead of direct API key.
+/// Structured discharge parsing via on-device AI.
 class AiService {
-  AiService();
+  AiService({LocalAiService? localAi}) : _localAi = localAi ?? LocalAiService();
 
-  /// Sends raw text to Gemini via backend, attempting to decode JSON if returned.
+  final LocalAiService _localAi;
+
   Future<Map<String, dynamic>?> parseDischargeText(String text) async {
     if (!await RateLimiter.canMakeRequest()) {
       throw Exception('Rate limit exceeded. Please try again later.');
     }
-    try {
-      final responseText = await GeminiBackendClient.I.generateText(text);
-      // Attempt to parse as JSON if model happened to return structured data.
-      final trimmed = responseText.trim();
-      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-        try {
-          final decoded = jsonDecode(trimmed);
-          if (decoded is Map<String, dynamic>) return decoded;
-        } catch (_) {
-          // Not valid JSON; fall through
-        }
-      }
-      return null; // No structured JSON parsed
-    } catch (_) {
-      return null;
-    }
+    final result = await _localAi.parseDischargeJson(text);
+    if (result == null) return null;
+    return AiParser.validateJson(result);
   }
 }

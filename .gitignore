@@ -58,3 +58,4 @@ website/.next/
 website/out/
 website/tsconfig.tsbuildinfo
 *.tsbuildinfo
+aistudio-ui.zip

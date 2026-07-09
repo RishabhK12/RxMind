@@ -5,7 +5,11 @@ import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io' show Platform;
 
-/// Service to manage task notifications with customizable timing
+import 'package:rxmind_app/core/notifications/neutral_notification_copy.dart';
+import 'package:rxmind_app/core/storage/database_key_exception.dart';
+import 'package:rxmind_app/core/storage/lock_safe_write_buffer.dart';
+
+/// Service to manage task notifications with customizable timing.
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -14,20 +18,16 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
 
-  // Storage keys
   static const String _keyNotificationsEnabled = 'notificationsEnabled';
   static const String _keyNotificationTimes = 'notificationTimes';
 
-  // Default notification times (in minutes before task)
-  static const List<int> defaultNotificationTimes = [
-    120,
-    30,
-    5
-  ]; // 2hr, 30min, 5min
+  static const List<int> defaultNotificationTimes = [120, 30, 5];
 
   bool _initialized = false;
 
-  /// Initialize the notification service
+  /// Exposed for tests to inspect scheduled notification content.
+  FlutterLocalNotificationsPlugin get plugin => _notifications;
+
   Future<void> initialize() async {
     if (_initialized) return;
 
@@ -52,16 +52,13 @@ class NotificationService {
     _initialized = true;
   }
 
-  /// Handle notification tap
-  void _onNotificationTapped(NotificationResponse response) {
-    // Navigate to relevant screen based on notification payload
-  }
+  void _onNotificationTapped(NotificationResponse response) {}
 
-  /// Check and request notification permissions
-  Future<bool> checkAndRequestPermissions() async {
+  Future<bool> checkAndRequestPermissions({bool skipRequest = false}) async {
     final notificationStatus = await Permission.notification.status;
 
     if (!notificationStatus.isGranted) {
+      if (skipRequest) return false;
       if (notificationStatus.isDenied) {
         final result = await Permission.notification.request();
         if (!result.isGranted) {
@@ -77,7 +74,7 @@ class NotificationService {
         final scheduleExactAlarmStatus =
             await Permission.scheduleExactAlarm.status;
 
-        if (!scheduleExactAlarmStatus.isGranted) {
+        if (!scheduleExactAlarmStatus.isGranted && !skipRequest) {
           await Permission.scheduleExactAlarm.request();
         }
       } catch (e) {
@@ -88,7 +85,6 @@ class NotificationService {
     return true;
   }
 
-  /// Check if exact alarms are available (Android 12+)
   Future<bool> canScheduleExactAlarms() async {
     if (!Platform.isAndroid) return true;
 
@@ -100,30 +96,24 @@ class NotificationService {
     }
   }
 
-  /// Open app notification settings
   Future<void> openNotificationSettings() async {
     await openAppSettings();
   }
 
-  /// Check if notifications are enabled in app settings
   Future<bool> areNotificationsEnabled() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_keyNotificationsEnabled) ??
-        true; // Enabled by default
+    return prefs.getBool(_keyNotificationsEnabled) ?? true;
   }
 
-  /// Set notifications enabled/disabled
   Future<void> setNotificationsEnabled(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyNotificationsEnabled, enabled);
 
     if (!enabled) {
-      // Cancel all notifications if disabled
       await cancelAllNotifications();
     }
   }
 
-  /// Get notification times (in minutes before task)
   Future<List<int>> getNotificationTimes() async {
     final prefs = await SharedPreferences.getInstance();
     final timesJson = prefs.getString(_keyNotificationTimes);
@@ -140,44 +130,33 @@ class NotificationService {
     }
   }
 
-  /// Set notification times (in minutes before task)
   Future<void> setNotificationTimes(List<int> times) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyNotificationTimes, jsonEncode(times));
   }
 
-  /// Schedule notifications for a task
   Future<void> scheduleTaskNotifications({
     required String taskId,
     required String taskTitle,
     required DateTime dueTime,
   }) async {
-    // Check if notifications are enabled
     final enabled = await areNotificationsEnabled();
     if (!enabled) return;
 
-    // Check system permissions
-    final hasPermission = await checkAndRequestPermissions();
+    final hasPermission = await checkAndRequestPermissions(skipRequest: true);
     if (!hasPermission) return;
 
-    // Get notification times
     final notificationTimes = await getNotificationTimes();
-
-    // Cancel any existing notifications for this task
     await cancelTaskNotifications(taskId);
 
-    // Schedule a notification for each time offset
     for (int i = 0; i < notificationTimes.length; i++) {
       final minutesBefore = notificationTimes[i];
       final notificationTime =
           dueTime.subtract(Duration(minutes: minutesBefore));
 
-      // Only schedule if notification time is in the future
       if (notificationTime.isAfter(DateTime.now())) {
         await _scheduleNotification(
           id: _getNotificationId(taskId, i),
-          title: 'Task Reminder',
-          body: '$taskTitle is due in ${_formatDuration(minutesBefore)}',
           scheduledTime: notificationTime,
           payload: taskId,
         );
@@ -185,7 +164,6 @@ class NotificationService {
     }
   }
 
-  /// Cancel all notifications for a specific task
   Future<void> cancelTaskNotifications(String taskId) async {
     final notificationTimes = await getNotificationTimes();
 
@@ -194,16 +172,15 @@ class NotificationService {
     }
   }
 
-  /// Cancel all notifications
   Future<void> cancelAllNotifications() async {
     await _notifications.cancelAll();
   }
 
-  /// Schedule all notifications for a list of tasks
   Future<void> scheduleNotificationsForTasks(
-      List<Map<String, dynamic>> tasks) async {
+    List<Map<String, dynamic>> tasks,
+  ) async {
     for (final task in tasks) {
-      if (task['completed'] == true) continue; // Skip completed tasks
+      if (task['completed'] == true) continue;
 
       final taskId = task['id']?.toString();
       final taskTitle = task['title']?.toString() ?? 'Task';
@@ -218,34 +195,39 @@ class NotificationService {
           try {
             parsedDueTime = DateTime.parse(dueTime);
           } catch (e) {
-            // Invalid date format, skip
             continue;
           }
         }
 
         if (parsedDueTime != null && parsedDueTime.isAfter(DateTime.now())) {
-          await scheduleTaskNotifications(
-            taskId: taskId,
-            taskTitle: taskTitle,
-            dueTime: parsedDueTime,
-          );
+          try {
+            await scheduleTaskNotifications(
+              taskId: taskId,
+              taskTitle: taskTitle,
+              dueTime: parsedDueTime,
+            );
+          } on DatabaseKeyException {
+            LockSafeWriteBuffer.instance.enqueue(
+              PendingWrite(
+                operation: 'reschedule_task',
+                payload: {'taskId': taskId},
+              ),
+            );
+          }
         }
       }
     }
   }
 
-  /// Schedule a single notification
   Future<void> _scheduleNotification({
     required int id,
-    required String title,
-    required String body,
     required DateTime scheduledTime,
     String? payload,
   }) async {
     const androidDetails = AndroidNotificationDetails(
-      'task_reminders',
-      'Task Reminders',
-      channelDescription: 'Notifications for upcoming tasks',
+      NeutralNotificationCopy.channelId,
+      NeutralNotificationCopy.channelName,
+      channelDescription: NeutralNotificationCopy.channelDescription,
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
@@ -263,20 +245,15 @@ class NotificationService {
     );
 
     try {
-      // Check if we can use exact alarms
       final canUseExactAlarms = await canScheduleExactAlarms();
-
-      // Choose schedule mode based on permission
-      // exactAllowWhileIdle requires SCHEDULE_EXACT_ALARM permission
-      // inexactAllowWhileIdle doesn't require special permission
       final scheduleMode = canUseExactAlarms
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexactAllowWhileIdle;
 
       await _notifications.zonedSchedule(
         id,
-        title,
-        body,
+        NeutralNotificationCopy.title,
+        NeutralNotificationCopy.body,
         tz.TZDateTime.from(scheduledTime, tz.local),
         notificationDetails,
         androidScheduleMode: scheduleMode,
@@ -288,8 +265,8 @@ class NotificationService {
       try {
         await _notifications.zonedSchedule(
           id,
-          title,
-          body,
+          NeutralNotificationCopy.title,
+          NeutralNotificationCopy.body,
           tz.TZDateTime.from(scheduledTime, tz.local),
           notificationDetails,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -303,28 +280,8 @@ class NotificationService {
     }
   }
 
-  /// Get unique notification ID for a task and time offset index
   int _getNotificationId(String taskId, int timeIndex) {
-    // Create a unique int ID from taskId hash and index
     final hash = taskId.hashCode;
-    // Ensure positive int and combine with index
     return (hash.abs() % 100000) * 10 + timeIndex;
-  }
-
-  /// Format duration in minutes to human-readable string
-  String _formatDuration(int minutes) {
-    if (minutes < 60) {
-      return '$minutes minute${minutes == 1 ? '' : 's'}';
-    } else if (minutes < 1440) {
-      final hours = minutes ~/ 60;
-      final mins = minutes % 60;
-      if (mins == 0) {
-        return '$hours hour${hours == 1 ? '' : 's'}';
-      }
-      return '$hours hour${hours == 1 ? '' : 's'} $mins minute${mins == 1 ? '' : 's'}';
-    } else {
-      final days = minutes ~/ 1440;
-      return '$days day${days == 1 ? '' : 's'}';
-    }
   }
 }

@@ -1,12 +1,23 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:rxmind_app/main.dart'; // Use RxMindSettings from main
+import 'package:rxmind_app/theme/app_theme.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
 import 'package:rxmind_app/screens/settings/contacts_screen.dart';
+import 'package:rxmind_app/core/storage/secure_wipe_service.dart';
 import 'package:rxmind_app/screens/settings/privacy_terms_screen.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
 import 'package:rxmind_app/services/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rxmind_app/core/permissions/permission_disclosure_store.dart';
+import 'package:rxmind_app/screens/permissions/permission_disclosure_dialog.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
+import 'package:rxmind_app/widgets/rx_section_header.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -90,427 +101,459 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget _sectionLabel(BuildContext context, String title,
+      {String? semanticsLabel}) {
+    final label = Padding(
+      padding: const EdgeInsets.fromLTRB(
+        ThemeTokens.spacingMd,
+        ThemeTokens.spacingLg,
+        ThemeTokens.spacingMd,
+        ThemeTokens.spacingSm,
+      ),
+      child: RxSectionHeader(title: title),
+    );
+    if (semanticsLabel == null) return label;
+    return Semantics(label: semanticsLabel, child: label);
+  }
+
+  Widget _groupCard({required List<Widget> children}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: ThemeTokens.spacingMd),
+      child: RxCard(
+        radius: ThemeTokens.radiusMd,
+        padding: EdgeInsets.zero,
+        child: Column(children: children),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final settings = RxMindSettings.of(context);
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        elevation: 0,
         title: Text('Settings', style: theme.textTheme.titleLarge),
         // No leading/back button, navigation is via bottom nav bar
       ),
       body: ListView(
-        padding: EdgeInsets.zero,
+        padding: const EdgeInsets.only(bottom: ThemeTokens.spacingXl),
         physics: const BouncingScrollPhysics(),
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Semantics(
-              label: 'Profile section',
-              child: Text('Profile',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface
-                          .withAlpha((0.6 * 255).toInt()))),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Name'),
-            trailing: Text(_name ?? 'Not Set'),
-            onTap: () async {
-              final newName = await _showTextPicker(context, 'Name', _name);
-              if (newName != null) {
-                setState(() => _name = newName);
-                await _saveProfileData();
-              }
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.height),
-            title: const Text('Height'),
-            trailing: Text('${_height ?? '--'} cm'),
-            onTap: () async {
-              final val = await _showNumberPicker(
-                  context, 'Height (cm)', _height ?? 170, 100, 220);
-              if (val != null) {
-                setState(() => _height = val);
-                await _saveProfileData();
-              }
-            },
-            subtitle: Semantics(
-              label: 'Tap to set height in centimeters',
-              child: const SizedBox.shrink(),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.monitor_weight),
-            title: const Text('Weight'),
-            trailing: Text('${_weight ?? '--'} kg'),
-            onTap: () async {
-              final val = await _showNumberPicker(
-                  context, 'Weight (kg)', _weight ?? 70, 30, 200);
-              if (val != null) {
-                setState(() => _weight = val);
-                await _saveProfileData();
-              }
-            },
-            subtitle: Semantics(
-              label: 'Tap to set weight in kilograms',
-              child: const SizedBox.shrink(),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.cake),
-            title: const Text('Age'),
-            trailing: Text('${_age ?? '--'}'),
-            onTap: () async {
-              final val =
-                  await _showNumberPicker(context, 'Age', _age ?? 30, 10, 120);
-              if (val != null) {
-                setState(() => _age = val);
-                await _saveProfileData();
-              }
-            },
-            subtitle: Semantics(
-              label: 'Tap to set age in years',
-              child: const SizedBox.shrink(),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.transgender),
-            title: const Text('Biological Sex'),
-            trailing: Text(_sex ?? '--'),
-            onTap: () async {
-              final val = await showDialog<String>(
-                context: context,
-                builder: (ctx) => SimpleDialog(
-                  title: const Text('Select Sex'),
-                  children: [
-                    SimpleDialogOption(
-                        child: const Text('Male'),
-                        onPressed: () => Navigator.pop(ctx, 'Male')),
-                    SimpleDialogOption(
-                        child: const Text('Female'),
-                        onPressed: () => Navigator.pop(ctx, 'Female')),
-                    SimpleDialogOption(
-                        child: const Text('Other'),
-                        onPressed: () => Navigator.pop(ctx, 'Other')),
-                  ],
-                ),
-              );
-              if (val != null) {
-                setState(() => _sex = val);
-                await _saveProfileData();
-              }
-            },
-            subtitle: Semantics(
-              label: 'Tap to set biological sex',
-              child: const SizedBox.shrink(),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.bedtime),
-            title: const Text('Bedtime'),
-            trailing: Text(_bedtime?.format(context) ?? '--:--'),
-            onTap: () async {
-              final picked = await showTimePicker(
-                  context: context,
-                  initialTime:
-                      _bedtime ?? const TimeOfDay(hour: 22, minute: 0));
-              if (picked != null) {
-                setState(() => _bedtime = picked);
-                await _saveProfileData();
-              }
-            },
-            subtitle: Semantics(
-              label: 'Tap to set bedtime',
-              child: const SizedBox.shrink(),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.wb_sunny),
-            title: const Text('Wake Time'),
-            trailing: Text(_wakeTime?.format(context) ?? '--:--'),
-            onTap: () async {
-              final picked = await showTimePicker(
-                  context: context,
-                  initialTime:
-                      _wakeTime ?? const TimeOfDay(hour: 7, minute: 0));
-              if (picked != null) {
-                setState(() => _wakeTime = picked);
-                await _saveProfileData();
-              }
-            },
-            subtitle: Semantics(
-              label: 'Tap to set wake time',
-              child: const SizedBox.shrink(),
-            ),
-          ),
-          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
-          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('Data',
-                style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withAlpha(153))),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _exportData,
-                icon: Icon(Icons.download, color: theme.colorScheme.onPrimary),
-                label: Text(
-                  'Export Data',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onPrimary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
+          _sectionLabel(context, 'Profile', semanticsLabel: 'Profile section'),
+          _groupCard(
+            children: [
+              ListTile(
+                leading: Icon(Icons.person, color: theme.colorScheme.primary),
+                title: const Text('Name'),
+                trailing: Text(_name ?? 'Not Set'),
+                onTap: () async {
+                  final newName = await _showTextPicker(context, 'Name', _name);
+                  if (newName != null) {
+                    setState(() => _name = newName);
+                    await _saveProfileData();
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.height, color: theme.colorScheme.primary),
+                title: const Text('Height'),
+                trailing: Text('${_height ?? '--'} cm'),
+                onTap: () async {
+                  final val = await _showNumberPicker(
+                      context, 'Height (cm)', _height ?? 170, 100, 220);
+                  if (val != null) {
+                    setState(() => _height = val);
+                    await _saveProfileData();
+                  }
+                },
+                subtitle: Semantics(
+                  label: 'Tap to set height in centimeters',
+                  child: const SizedBox.shrink(),
                 ),
               ),
+              ListTile(
+                leading: Icon(Icons.monitor_weight,
+                    color: theme.colorScheme.primary),
+                title: const Text('Weight'),
+                trailing: Text('${_weight ?? '--'} kg'),
+                onTap: () async {
+                  final val = await _showNumberPicker(
+                      context, 'Weight (kg)', _weight ?? 70, 30, 200);
+                  if (val != null) {
+                    setState(() => _weight = val);
+                    await _saveProfileData();
+                  }
+                },
+                subtitle: Semantics(
+                  label: 'Tap to set weight in kilograms',
+                  child: const SizedBox.shrink(),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.cake, color: theme.colorScheme.secondary),
+                title: const Text('Age'),
+                trailing: Text('${_age ?? '--'}'),
+                onTap: () async {
+                  final val = await _showNumberPicker(
+                      context, 'Age', _age ?? 30, 10, 120);
+                  if (val != null) {
+                    setState(() => _age = val);
+                    await _saveProfileData();
+                  }
+                },
+                subtitle: Semantics(
+                  label: 'Tap to set age in years',
+                  child: const SizedBox.shrink(),
+                ),
+              ),
+              ListTile(
+                leading:
+                    Icon(Icons.transgender, color: theme.colorScheme.primary),
+                title: const Text('Biological Sex'),
+                trailing: Text(_sex ?? '--'),
+                onTap: () async {
+                  final val = await showDialog<String>(
+                    context: context,
+                    builder: (ctx) => SimpleDialog(
+                      title: const Text('Select Sex'),
+                      children: [
+                        SimpleDialogOption(
+                            child: const Text('Male'),
+                            onPressed: () => Navigator.pop(ctx, 'Male')),
+                        SimpleDialogOption(
+                            child: const Text('Female'),
+                            onPressed: () => Navigator.pop(ctx, 'Female')),
+                        SimpleDialogOption(
+                            child: const Text('Other'),
+                            onPressed: () => Navigator.pop(ctx, 'Other')),
+                      ],
+                    ),
+                  );
+                  if (val != null) {
+                    setState(() => _sex = val);
+                    await _saveProfileData();
+                  }
+                },
+                subtitle: Semantics(
+                  label: 'Tap to set biological sex',
+                  child: const SizedBox.shrink(),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.bedtime, color: theme.colorScheme.primary),
+                title: const Text('Bedtime'),
+                trailing: Text(_bedtime?.format(context) ?? '--:--'),
+                onTap: () async {
+                  final picked = await showTimePicker(
+                      context: context,
+                      initialTime:
+                          _bedtime ?? const TimeOfDay(hour: 22, minute: 0));
+                  if (picked != null) {
+                    setState(() => _bedtime = picked);
+                    await _saveProfileData();
+                  }
+                },
+                subtitle: Semantics(
+                  label: 'Tap to set bedtime',
+                  child: const SizedBox.shrink(),
+                ),
+              ),
+              ListTile(
+                leading:
+                    Icon(Icons.wb_sunny, color: theme.colorScheme.secondary),
+                title: const Text('Wake Time'),
+                trailing: Text(_wakeTime?.format(context) ?? '--:--'),
+                onTap: () async {
+                  final picked = await showTimePicker(
+                      context: context,
+                      initialTime:
+                          _wakeTime ?? const TimeOfDay(hour: 7, minute: 0));
+                  if (picked != null) {
+                    setState(() => _wakeTime = picked);
+                    await _saveProfileData();
+                  }
+                },
+                subtitle: Semantics(
+                  label: 'Tap to set wake time',
+                  child: const SizedBox.shrink(),
+                ),
+              ),
+            ],
+          ),
+          _sectionLabel(context, 'Data'),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: ThemeTokens.spacingMd,
+              vertical: ThemeTokens.spacingSm,
+            ),
+            child: RxPrimaryButton(
+              label: 'Export Data',
+              icon: Icons.download,
+              onPressed: _exportData,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: ThemeTokens.spacingMd,
+              vertical: ThemeTokens.spacingSm,
+            ),
             child: SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
+              child: FilledButton.icon(
                 onPressed: () {
                   _showDeleteConfirmation(context);
                 },
-                icon: Icon(Icons.delete_forever, color: Colors.white),
+                icon: Icon(Icons.delete_forever,
+                    color: theme.colorScheme.onError),
                 label: Text(
                   'Delete All Data',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onError,
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
+                style: FilledButton.styleFrom(
                   backgroundColor: theme.colorScheme.error,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  foregroundColor: theme.colorScheme.onError,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
                   ),
-                  elevation: 2,
                 ),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('Medical Contacts',
-                style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withAlpha(153))),
+          _sectionLabel(context, 'Medical Contacts'),
+          _groupCard(
+            children: [
+              ListTile(
+                leading: Icon(Icons.local_hospital,
+                    color: theme.colorScheme.secondary),
+                title: const Text('Doctor/Hospital Contacts'),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                ),
+                onTap: () {
+                  _showContactsScreen(context);
+                },
+                subtitle: const Text('Add and manage medical contacts'),
+              ),
+            ],
           ),
-          ListTile(
-            leading: const Icon(Icons.local_hospital),
-            title: const Text('Doctor/Hospital Contacts'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              _showContactsScreen(context);
-            },
-            subtitle: const Text('Add and manage medical contacts'),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('Theme',
-                style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withAlpha(153))),
-          ),
-          RadioListTile<ThemeMode>(
-            title: Text('Light Mode', style: theme.textTheme.bodyMedium),
-            value: ThemeMode.light,
-            groupValue: settings.themeMode,
-            onChanged: (v) => settings.updateTheme(v!),
-          ),
-          RadioListTile<ThemeMode>(
-            title: Text('Dark Mode', style: theme.textTheme.bodyMedium),
-            value: ThemeMode.dark,
-            groupValue: settings.themeMode,
-            onChanged: (v) => settings.updateTheme(v!),
-          ),
-          RadioListTile<ThemeMode>(
-            title: Text('System Default', style: theme.textTheme.bodyMedium),
-            value: ThemeMode.system,
-            groupValue: settings.themeMode,
-            onChanged: (v) => settings.updateTheme(v!),
-          ),
-          SwitchListTile(
-            value: settings.highContrast,
-            onChanged: (v) {
-              settings.updateHighContrast(v);
-            },
-            title: Text('High-Contrast', style: theme.textTheme.bodyMedium),
-            secondary: Semantics(
-              label: 'Toggle high-contrast mode',
-              child: const Icon(Icons.contrast),
-            ),
-          ),
-          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('Notifications',
-                style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withAlpha(153))),
-          ),
-          SwitchListTile(
-            value: _notificationsEnabled,
-            onChanged: (v) async {
-              if (!v) {
-                // Show warning before disabling
-                final confirm = await _showDisableNotificationsDialog(context);
-                if (confirm != true) return;
-              }
-
-              // Check system permissions when enabling
-              if (v) {
-                final status = await Permission.notification.status;
-                if (!status.isGranted) {
-                  final requested =
-                      await _notificationService.checkAndRequestPermissions();
-                  if (!requested) {
-                    // Show dialog to open settings
-                    if (!mounted) return;
-                    await _showPermissionDialog(context);
-                    return;
+          _sectionLabel(context, 'Theme'),
+          _groupCard(
+            children: [
+              RadioListTile<ThemeMode>(
+                title: Text('Light Mode', style: theme.textTheme.bodyMedium),
+                value: ThemeMode.light,
+                groupValue: settings.themeMode,
+                onChanged: (v) => settings.updateTheme(v!),
+              ),
+              RadioListTile<ThemeMode>(
+                title: Text('Dark Mode', style: theme.textTheme.bodyMedium),
+                value: ThemeMode.dark,
+                groupValue: settings.themeMode,
+                onChanged: (v) => settings.updateTheme(v!),
+              ),
+              RadioListTile<ThemeMode>(
+                title:
+                    Text('System Default', style: theme.textTheme.bodyMedium),
+                value: ThemeMode.system,
+                groupValue: settings.themeMode,
+                onChanged: (v) => settings.updateTheme(v!),
+              ),
+              SwitchListTile(
+                value: settings.highContrast,
+                onChanged: (v) async {
+                  if (v) {
+                    final confirmed = await _showHighContrastPreview(context);
+                    if (confirmed == true && mounted) {
+                      settings.updateHighContrast(true);
+                    }
+                  } else {
+                    settings.updateHighContrast(false);
                   }
-                }
-
-                // For Android, also check exact alarm permission
-                final canScheduleExact =
-                    await _notificationService.canScheduleExactAlarms();
-                if (!canScheduleExact) {
-                  if (!mounted) return;
-                  await _showExactAlarmPermissionDialog(context);
-                  // Continue anyway - inexact alarms will be used
-                }
-              }
-
-              setState(() => _notificationsEnabled = v);
-              await _notificationService.setNotificationsEnabled(v);
-
-              // Reschedule notifications if enabled
-              if (v) {
-                final tasks = await DischargeDataManager.loadTasks();
-                await _notificationService.scheduleNotificationsForTasks(tasks);
-              }
-            },
-            title:
-                Text('Enable Notifications', style: theme.textTheme.bodyMedium),
-            subtitle: const Text('Receive reminders for upcoming tasks'),
-            secondary: const Icon(Icons.notifications_active),
-          ),
-          if (_notificationsEnabled) ...[
-            ListTile(
-              leading: const Icon(Icons.access_time),
-              title: const Text('Notification Times'),
-              subtitle:
-                  Text(_formatNotificationTimes(_selectedNotificationTimes)),
-              trailing: const Icon(Icons.edit, size: 20),
-              onTap: () => _showNotificationTimesDialog(context),
-            ),
-          ],
-          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text(
-              'Accessibility',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color:
-                    theme.colorScheme.onSurface.withAlpha((0.6 * 255).toInt()),
-              ),
-            ),
-          ),
-          SwitchListTile(
-            value: settings.textScale > 1.1,
-            onChanged: (v) {
-              settings.updateTextScale(v ? 1.3 : 1.0);
-            },
-            title: Text('Large Text', style: theme.textTheme.bodyMedium),
-            secondary: Semantics(
-              label: 'Toggle large text for better readability',
-              child: const Icon(Icons.format_size),
-            ),
-          ),
-          // Screen reader mode is a placeholder; real support is via OS accessibility
-          SwitchListTile(
-            value: _screenReader,
-            onChanged: (v) => setState(() => _screenReader = v),
-            title:
-                Text('Screen Reader Mode', style: theme.textTheme.bodyMedium),
-            secondary: Semantics(
-              label: 'Toggle screen reader mode for accessibility',
-              child: const Icon(Icons.record_voice_over),
-            ),
-          ),
-          SwitchListTile(
-            value: settings.reducedMotion,
-            onChanged: (v) {
-              settings.updateReducedMotion(v);
-            },
-            title: Text('Reduced Motion', style: theme.textTheme.bodyMedium),
-            secondary: Semantics(
-              label: 'Toggle reduced motion for accessibility',
-              child: const Icon(Icons.motion_photos_off),
-            ),
-          ),
-          Divider(height: 32, color: theme.colorScheme.surfaceContainerHighest),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('About',
-                style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withAlpha(153))),
-          ),
-          ListTile(
-            leading: Icon(Icons.info_outline,
-                color:
-                    theme.colorScheme.onSurface.withAlpha((0.6 * 255).toInt())),
-            title: const Text('Version'),
-            subtitle: const Text('rxmind v1.0.0'),
-          ),
-          ListTile(
-            leading: Icon(Icons.privacy_tip, color: theme.colorScheme.primary),
-            title: const Text('Privacy'),
-            subtitle: const Text(
-                'All data is stored locally and never leaves your device.'),
-          ),
-          ListTile(
-            leading: Icon(Icons.people, color: theme.colorScheme.secondary),
-            title: const Text('Credits'),
-            subtitle: const Text('Created by the rxmind team.'),
-          ),
-          ListTile(
-            leading: Icon(Icons.privacy_tip_outlined, color: theme.colorScheme.primary),
-            title: const Text('Privacy Policy & Terms'),
-            subtitle: const Text('View our privacy policy and terms of service'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const PrivacyTermsScreen(),
+                },
+                title: Text('High-Contrast', style: theme.textTheme.bodyMedium),
+                secondary: Semantics(
+                  label: 'Toggle high-contrast mode',
+                  child: const Icon(Icons.contrast),
                 ),
-              );
-            },
+              ),
+            ],
+          ),
+          _sectionLabel(context, 'Notifications'),
+          _groupCard(
+            children: [
+              SwitchListTile(
+                value: _notificationsEnabled,
+                onChanged: (v) async {
+                  if (!v) {
+                    // Show warning before disabling
+                    final confirm =
+                        await _showDisableNotificationsDialog(context);
+                    if (confirm != true) return;
+                  }
+
+                  // Check system permissions when enabling
+                  if (v) {
+                    final status = await Permission.notification.status;
+                    if (!status.isGranted) {
+                      final acked =
+                          await PermissionDisclosureStore.isAcknowledged(
+                              'notification');
+                      if (!acked) {
+                        if (!mounted) return;
+                        final disclosed = await showPermissionDisclosure(
+                          context,
+                          PermissionType.notification,
+                        );
+                        if (!disclosed) return;
+                        await PermissionDisclosureStore.setAcknowledged(
+                            'notification');
+                      }
+                      final requested = await _notificationService
+                          .checkAndRequestPermissions();
+                      if (!requested) {
+                        // Show dialog to open settings
+                        if (!mounted) return;
+                        await _showPermissionDialog(context);
+                        return;
+                      }
+                    }
+
+                    // For Android, also check exact alarm permission
+                    final canScheduleExact =
+                        await _notificationService.canScheduleExactAlarms();
+                    if (!canScheduleExact) {
+                      if (!mounted) return;
+                      await _showExactAlarmPermissionDialog(context);
+                      // Continue anyway - inexact alarms will be used
+                    }
+                  }
+
+                  setState(() => _notificationsEnabled = v);
+                  await _notificationService.setNotificationsEnabled(v);
+
+                  // Reschedule notifications if enabled
+                  if (v) {
+                    final tasks = await DischargeDataManager.loadTasks();
+                    await _notificationService
+                        .scheduleNotificationsForTasks(tasks);
+                  }
+                },
+                title: Text('Enable Notifications',
+                    style: theme.textTheme.bodyMedium),
+                subtitle: const Text('Receive reminders for upcoming tasks'),
+                secondary: Icon(Icons.notifications_active,
+                    color: theme.colorScheme.primary),
+              ),
+              if (_notificationsEnabled)
+                ListTile(
+                  leading:
+                      Icon(Icons.access_time, color: theme.colorScheme.primary),
+                  title: const Text('Notification Times'),
+                  subtitle: Text(
+                      _formatNotificationTimes(_selectedNotificationTimes)),
+                  trailing: Icon(Icons.edit,
+                      size: 20, color: theme.colorScheme.primary),
+                  onTap: () => _showNotificationTimesDialog(context),
+                ),
+            ],
+          ),
+          _sectionLabel(context, 'Accessibility'),
+          _groupCard(
+            children: [
+              ListTile(
+                leading: Semantics(
+                  label: 'Text size slider',
+                  child:
+                      Icon(Icons.format_size, color: theme.colorScheme.primary),
+                ),
+                title: Text('Text Size', style: theme.textTheme.bodyMedium),
+                subtitle: Text(
+                  '${(settings.textScale * 100).round()}%',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: ThemeTokens.spacingMd),
+                child: Slider(
+                  value: settings.textScale.clamp(1.0, 2.0),
+                  min: 1.0,
+                  max: 2.0,
+                  divisions: 10,
+                  label: '${(settings.textScale * 100).round()}%',
+                  onChanged: (v) => settings.updateTextScale(v),
+                ),
+              ),
+              // Screen reader mode is a placeholder; real support is via OS accessibility
+              SwitchListTile(
+                value: _screenReader,
+                onChanged: (v) => setState(() => _screenReader = v),
+                title: Text('Screen Reader Mode',
+                    style: theme.textTheme.bodyMedium),
+                secondary: Semantics(
+                  label: 'Toggle screen reader mode for accessibility',
+                  child: const Icon(Icons.record_voice_over),
+                ),
+              ),
+              SwitchListTile(
+                value: settings.reducedMotion,
+                onChanged: (v) {
+                  settings.updateReducedMotion(v);
+                },
+                title:
+                    Text('Reduced Motion', style: theme.textTheme.bodyMedium),
+                secondary: Semantics(
+                  label: 'Toggle reduced motion for accessibility',
+                  child: const Icon(Icons.motion_photos_off),
+                ),
+              ),
+            ],
+          ),
+          _sectionLabel(context, 'About'),
+          _groupCard(
+            children: [
+              ListTile(
+                leading: Icon(
+                  Icons.info_outline,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                title: const Text('Version'),
+                subtitle: const Text('rxmind v1.0.0'),
+              ),
+              ListTile(
+                leading:
+                    Icon(Icons.privacy_tip, color: theme.colorScheme.primary),
+                title: const Text('Privacy'),
+                subtitle: const Text(
+                    'All data is stored locally and never leaves your device.'),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const PrivacyTermsScreen(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.people, color: theme.colorScheme.secondary),
+                title: const Text('Credits'),
+                subtitle: const Text('Created by the rxmind team.'),
+              ),
+            ],
           ),
         ],
       ),
@@ -799,36 +842,152 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showDeleteConfirmation(BuildContext context) {
+    final controller = TextEditingController();
+    String? liveMessage;
+
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final canDelete = controller.text == 'DELETE';
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+              ),
+              title: const Text('Confirm Deletion'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Semantics(
+                    liveRegion: true,
+                    child: Text(liveMessage ?? ''),
+                  ),
+                  const Text(
+                    'This permanently erases all medications, tasks, documents, '
+                    'and profile data from this device. Type DELETE to confirm.',
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Type DELETE',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => setDialogState(() {}),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+                TextButton(
+                  child: Text(
+                    'Delete All Data',
+                    style: TextStyle(
+                      color: canDelete
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).disabledColor,
+                    ),
+                  ),
+                  onPressed: canDelete
+                      ? () async {
+                          setDialogState(
+                            () =>
+                                liveMessage = 'Erasing all data, please wait.',
+                          );
+                          await SecureWipeService.wipeAll();
+                          if (!mounted) return;
+                          setDialogState(
+                            () => liveMessage = 'All data erased successfully.',
+                          );
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/splash',
+                            (Route<dynamic> route) => false,
+                          );
+                        }
+                      : null,
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<bool?> _showHighContrastPreview(BuildContext context) async {
+    final completer = Completer<bool?>();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if (ctx.mounted && !completer.isCompleted) {
+            Navigator.of(ctx).pop(true);
+            completer.complete(true);
+          }
+        });
         return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: const Text(
-              'Are you sure you want to delete all your data? This action cannot be undone.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(ctx).pop();
+          title: const Text('High-Contrast Preview'),
+          content: Theme(
+            data: AppTheme.highContrastTheme,
+            child: Builder(
+              builder: (previewContext) {
+                final previewTheme = Theme.of(previewContext);
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Sample card',
+                          style: previewTheme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Body text preview with high contrast colors.',
+                          style: previewTheme.textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: () {},
+                          child: const Text('Sample button'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               },
             ),
+          ),
+          actions: [
             TextButton(
-              child: Text('Delete',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
-              onPressed: () async {
-                await DischargeDataManager.clearDischargeData();
-                if (!mounted) return;
-                Navigator.of(ctx).pop(); // Close the dialog
-                // Navigate to a fresh start, e.g., the splash screen
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/splash', (Route<dynamic> route) => false);
+              onPressed: () {
+                if (!completer.isCompleted) completer.complete(false);
+                Navigator.of(ctx).pop();
               },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (!completer.isCompleted) completer.complete(true);
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Apply'),
             ),
           ],
         );
       },
     );
+    return completer.future;
   }
 
   Future<int?> _showNumberPicker(BuildContext context, String title,
@@ -893,45 +1052,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _exportData() async {
+    final theme = Theme.of(context);
+    String exportStatus = 'Starting PDF export';
     try {
-      // Show loading indicator
       if (!mounted) return;
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
+        builder: (context) => Semantics(
+          liveRegion: true,
+          label: exportStatus,
+          child: const Center(child: CircularProgressIndicator()),
         ),
       );
 
-      // Generate PDF
+      exportStatus = 'Generating health report PDF';
       final pdfFile = await PdfExportService.generateHealthReport();
 
-      // Close loading dialog
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      // Navigate to preview screen
+      exportStatus = 'PDF export complete';
       if (!mounted) return;
+      SemanticsService.announce(exportStatus, TextDirection.ltr);
+
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => PdfPreviewScreen(pdfFile: pdfFile),
+          builder: (context) => PdfPreviewScreen(
+            pdfFile: pdfFile,
+            exportAnnouncement: exportStatus,
+          ),
         ),
       );
     } catch (e) {
-      // Close loading dialog if still open
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
 
+      exportStatus = 'PDF export failed';
+      SemanticsService.announce('$exportStatus: $e', TextDirection.ltr);
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error exporting PDF: $e'),
-          backgroundColor: Colors.red,
+          content: Text(
+            'Error exporting PDF: $e',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onError,
+            ),
+          ),
+          backgroundColor: theme.colorScheme.error,
         ),
       );
     }
   }
-
 }

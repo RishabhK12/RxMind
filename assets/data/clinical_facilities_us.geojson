@@ -1,0 +1,7805 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-test-001",
+        "name": "RxMind Test Medical Center",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.3321,
+          47.6062
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00001",
+        "name": "Synthetic Hospital 1",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.959418,
+          27.924062
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00002",
+        "name": "Synthetic Hospital 2",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.182501,
+          41.203706
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00003",
+        "name": "Synthetic Hospital 3",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -115.686821,
+          44.551449
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00004",
+        "name": "Synthetic Hospital 4",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.988481,
+          34.700482
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00005",
+        "name": "Synthetic Hospital 5",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.701086,
+          29.352329
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00006",
+        "name": "Synthetic Hospital 6",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.979019,
+          45.453158
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00007",
+        "name": "Synthetic Hospital 7",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.078907,
+          47.113141
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00008",
+        "name": "Synthetic Hospital 8",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.193623,
+          38.215738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00009",
+        "name": "Synthetic Hospital 9",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -100.14305,
+          38.483132
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00010",
+        "name": "Synthetic Hospital 10",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.706181,
+          41.641036
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00011",
+        "name": "Synthetic Hospital 11",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.668104,
+          44.152421
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00012",
+        "name": "Synthetic Hospital 12",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.230635,
+          42.22966
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00013",
+        "name": "Synthetic Hospital 13",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.751854,
+          36.609926
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00014",
+        "name": "Synthetic Hospital 14",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.175184,
+          33.628948
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00015",
+        "name": "Synthetic Hospital 15",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.252223,
+          27.058456
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00016",
+        "name": "Synthetic Hospital 16",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.566149,
+          39.960966
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00017",
+        "name": "Synthetic Hospital 17",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.231138,
+          34.080124
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00018",
+        "name": "Synthetic Hospital 18",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.186968,
+          28.366173
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00019",
+        "name": "Synthetic Hospital 19",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.872974,
+          28.37152
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00020",
+        "name": "Synthetic Hospital 20",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.800172,
+          40.994234
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00021",
+        "name": "Synthetic Hospital 21",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.605742,
+          30.379804
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00022",
+        "name": "Synthetic Hospital 22",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.880267,
+          27.813585
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00023",
+        "name": "Synthetic Hospital 23",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.0091,
+          36.181548
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00024",
+        "name": "Synthetic Hospital 24",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.835565,
+          29.523769
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00025",
+        "name": "Synthetic Hospital 25",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -115.408888,
+          44.517014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00026",
+        "name": "Synthetic Hospital 26",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.858554,
+          42.473862
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00027",
+        "name": "Synthetic Hospital 27",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.773329,
+          41.182635
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00028",
+        "name": "Synthetic Hospital 28",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.528039,
+          39.987402
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00029",
+        "name": "Synthetic Hospital 29",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.69751,
+          25.443765
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00030",
+        "name": "Synthetic Hospital 30",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.100481,
+          31.207665
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00031",
+        "name": "Synthetic Hospital 31",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.916239,
+          24.964881
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00032",
+        "name": "Synthetic Hospital 32",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -101.883696,
+          38.477466
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00033",
+        "name": "Synthetic Hospital 33",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.46609,
+          39.253758
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00034",
+        "name": "Synthetic Hospital 34",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.561614,
+          40.072386
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00035",
+        "name": "Synthetic Hospital 35",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.382116,
+          35.617936
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00036",
+        "name": "Synthetic Hospital 36",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.221745,
+          33.462797
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00037",
+        "name": "Synthetic Hospital 37",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.33912,
+          43.220596
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00038",
+        "name": "Synthetic Hospital 38",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -101.182641,
+          43.504072
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00039",
+        "name": "Synthetic Hospital 39",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.555416,
+          46.908156
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00040",
+        "name": "Synthetic Hospital 40",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.211005,
+          36.539497
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00041",
+        "name": "Synthetic Hospital 41",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.049973,
+          43.844273
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00042",
+        "name": "Synthetic Hospital 42",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.065148,
+          44.409507
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00043",
+        "name": "Synthetic Hospital 43",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.638922,
+          29.390868
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00044",
+        "name": "Synthetic Hospital 44",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.795364,
+          47.537311
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00045",
+        "name": "Synthetic Hospital 45",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.799723,
+          46.780381
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00046",
+        "name": "Synthetic Hospital 46",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.400201,
+          36.998098
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00047",
+        "name": "Synthetic Hospital 47",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.931102,
+          35.064409
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00048",
+        "name": "Synthetic Hospital 48",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.729885,
+          37.639891
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00049",
+        "name": "Synthetic Hospital 49",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.302618,
+          45.646746
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00050",
+        "name": "Synthetic Hospital 50",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.773671,
+          26.310818
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00051",
+        "name": "Synthetic Hospital 51",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.297573,
+          30.514632
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00052",
+        "name": "Synthetic Hospital 52",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.348093,
+          46.237494
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00053",
+        "name": "Synthetic Hospital 53",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.830079,
+          49.053581
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00054",
+        "name": "Synthetic Hospital 54",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.559489,
+          47.989223
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00055",
+        "name": "Synthetic Hospital 55",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.938839,
+          38.628887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00056",
+        "name": "Synthetic Hospital 56",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.819078,
+          34.070917
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00057",
+        "name": "Synthetic Hospital 57",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.140755,
+          26.506277
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00058",
+        "name": "Synthetic Hospital 58",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.106937,
+          40.84277
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00059",
+        "name": "Synthetic Hospital 59",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.708189,
+          28.16059
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00060",
+        "name": "Synthetic Hospital 60",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.439381,
+          27.75283
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00061",
+        "name": "Synthetic Hospital 61",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.07525,
+          34.729109
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00062",
+        "name": "Synthetic Hospital 62",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.6977,
+          27.591607
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00063",
+        "name": "Synthetic Hospital 63",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.469988,
+          41.617221
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00064",
+        "name": "Synthetic Hospital 64",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.189995,
+          47.053587
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00065",
+        "name": "Synthetic Hospital 65",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.694317,
+          36.232233
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00066",
+        "name": "Synthetic Hospital 66",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.5851,
+          44.695733
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00067",
+        "name": "Synthetic Hospital 67",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.529755,
+          49.157523
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00068",
+        "name": "Synthetic Hospital 68",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.714924,
+          27.642839
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00069",
+        "name": "Synthetic Hospital 69",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.31455,
+          43.346407
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00070",
+        "name": "Synthetic Hospital 70",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.495086,
+          41.858243
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00071",
+        "name": "Synthetic Hospital 71",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.412245,
+          43.140067
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00072",
+        "name": "Synthetic Hospital 72",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.816292,
+          37.270885
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00073",
+        "name": "Synthetic Hospital 73",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.478488,
+          37.301369
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00074",
+        "name": "Synthetic Hospital 74",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -115.046411,
+          44.853475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00075",
+        "name": "Synthetic Hospital 75",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.415071,
+          31.504463
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00076",
+        "name": "Synthetic Hospital 76",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.563949,
+          48.023867
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00077",
+        "name": "Synthetic Hospital 77",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.172039,
+          26.957662
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00078",
+        "name": "Synthetic Hospital 78",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.860336,
+          29.834568
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00079",
+        "name": "Synthetic Hospital 79",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.739675,
+          32.66134
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00080",
+        "name": "Synthetic Hospital 80",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.649899,
+          28.284915
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00081",
+        "name": "Synthetic Hospital 81",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.694267,
+          38.056872
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00082",
+        "name": "Synthetic Hospital 82",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.782024,
+          47.294068
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00083",
+        "name": "Synthetic Hospital 83",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.912415,
+          40.04917
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00084",
+        "name": "Synthetic Hospital 84",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.61579,
+          45.147283
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00085",
+        "name": "Synthetic Hospital 85",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.572572,
+          27.004788
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00086",
+        "name": "Synthetic Hospital 86",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.84091,
+          42.823875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00087",
+        "name": "Synthetic Hospital 87",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.621733,
+          49.337738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00088",
+        "name": "Synthetic Hospital 88",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.946548,
+          46.678156
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00089",
+        "name": "Synthetic Hospital 89",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.114856,
+          43.861465
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00090",
+        "name": "Synthetic Hospital 90",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.752032,
+          26.506496
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00091",
+        "name": "Synthetic Hospital 91",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.336008,
+          35.831445
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00092",
+        "name": "Synthetic Hospital 92",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.983365,
+          34.884289
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00093",
+        "name": "Synthetic Hospital 93",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.363406,
+          45.876649
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00094",
+        "name": "Synthetic Hospital 94",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.190471,
+          43.138589
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00095",
+        "name": "Synthetic Hospital 95",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.464764,
+          37.163054
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00096",
+        "name": "Synthetic Hospital 96",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.876037,
+          43.197531
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00097",
+        "name": "Synthetic Hospital 97",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.183172,
+          43.136123
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00098",
+        "name": "Synthetic Hospital 98",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.275564,
+          41.021729
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00099",
+        "name": "Synthetic Hospital 99",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.328039,
+          26.896617
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00100",
+        "name": "Synthetic Hospital 100",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.08553,
+          34.538616
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00101",
+        "name": "Synthetic Hospital 101",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.906475,
+          31.696125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00102",
+        "name": "Synthetic Hospital 102",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.921773,
+          27.431973
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00103",
+        "name": "Synthetic Hospital 103",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.647004,
+          41.565271
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00104",
+        "name": "Synthetic Hospital 104",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.608389,
+          32.362772
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00105",
+        "name": "Synthetic Hospital 105",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.168444,
+          28.506569
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00106",
+        "name": "Synthetic Hospital 106",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.805391,
+          31.378828
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00107",
+        "name": "Synthetic Hospital 107",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.184081,
+          25.29079
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00108",
+        "name": "Synthetic Hospital 108",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.25982,
+          24.696417
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00109",
+        "name": "Synthetic Hospital 109",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -105.834763,
+          47.504445
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00110",
+        "name": "Synthetic Hospital 110",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -116.371943,
+          28.16191
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00111",
+        "name": "Synthetic Hospital 111",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.196307,
+          44.319811
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00112",
+        "name": "Synthetic Hospital 112",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -107.007341,
+          45.559736
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00113",
+        "name": "Synthetic Hospital 113",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.493882,
+          31.374259
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00114",
+        "name": "Synthetic Hospital 114",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.590252,
+          44.187984
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00115",
+        "name": "Synthetic Hospital 115",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.979154,
+          43.918871
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00116",
+        "name": "Synthetic Hospital 116",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.133564,
+          48.313422
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00117",
+        "name": "Synthetic Hospital 117",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.420288,
+          26.245932
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00118",
+        "name": "Synthetic Hospital 118",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.935542,
+          45.622339
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00119",
+        "name": "Synthetic Hospital 119",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.932204,
+          43.153286
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00120",
+        "name": "Synthetic Hospital 120",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.615704,
+          39.552616
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00121",
+        "name": "Synthetic Hospital 121",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.339695,
+          26.221412
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00122",
+        "name": "Synthetic Hospital 122",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.889126,
+          40.134499
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00123",
+        "name": "Synthetic Hospital 123",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.085675,
+          37.368564
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00124",
+        "name": "Synthetic Hospital 124",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.693489,
+          27.07958
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00125",
+        "name": "Synthetic Hospital 125",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.846438,
+          37.702856
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00126",
+        "name": "Synthetic Hospital 126",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.738274,
+          43.266436
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00127",
+        "name": "Synthetic Hospital 127",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.287508,
+          25.208884
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00128",
+        "name": "Synthetic Hospital 128",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.471024,
+          49.382713
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00129",
+        "name": "Synthetic Hospital 129",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.458361,
+          33.181727
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00130",
+        "name": "Synthetic Hospital 130",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.58904,
+          36.718349
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00131",
+        "name": "Synthetic Hospital 131",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.440789,
+          48.330322
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00132",
+        "name": "Synthetic Hospital 132",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.104674,
+          26.651597
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00133",
+        "name": "Synthetic Hospital 133",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.823694,
+          33.9924
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00134",
+        "name": "Synthetic Hospital 134",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.685941,
+          30.541819
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00135",
+        "name": "Synthetic Hospital 135",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.964568,
+          47.571851
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00136",
+        "name": "Synthetic Hospital 136",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.803292,
+          25.428645
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00137",
+        "name": "Synthetic Hospital 137",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.802679,
+          26.42466
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00138",
+        "name": "Synthetic Hospital 138",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.319553,
+          29.933341
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00139",
+        "name": "Synthetic Hospital 139",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.394915,
+          34.596842
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00140",
+        "name": "Synthetic Hospital 140",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.182496,
+          31.410263
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00141",
+        "name": "Synthetic Hospital 141",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.223858,
+          29.437575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00142",
+        "name": "Synthetic Hospital 142",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.809413,
+          29.16199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00143",
+        "name": "Synthetic Hospital 143",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.919756,
+          25.086039
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00144",
+        "name": "Synthetic Hospital 144",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.872681,
+          45.758301
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00145",
+        "name": "Synthetic Hospital 145",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.740415,
+          25.569907
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00146",
+        "name": "Synthetic Hospital 146",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.31026,
+          25.245852
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00147",
+        "name": "Synthetic Hospital 147",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.13865,
+          28.498954
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00148",
+        "name": "Synthetic Hospital 148",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.83371,
+          29.826849
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00149",
+        "name": "Synthetic Hospital 149",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.451071,
+          31.810348
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00150",
+        "name": "Synthetic Hospital 150",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.826622,
+          46.802475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00151",
+        "name": "Synthetic Hospital 151",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.283504,
+          34.855075
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00152",
+        "name": "Synthetic Hospital 152",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.873263,
+          44.572457
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00153",
+        "name": "Synthetic Hospital 153",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.366021,
+          49.09636
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00154",
+        "name": "Synthetic Hospital 154",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.523037,
+          42.830843
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00155",
+        "name": "Synthetic Hospital 155",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.183056,
+          45.909279
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00156",
+        "name": "Synthetic Hospital 156",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.587812,
+          43.128325
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00157",
+        "name": "Synthetic Hospital 157",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.832113,
+          27.921825
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00158",
+        "name": "Synthetic Hospital 158",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.949209,
+          46.106597
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00159",
+        "name": "Synthetic Hospital 159",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.024404,
+          40.727732
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00160",
+        "name": "Synthetic Hospital 160",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.374237,
+          38.462176
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00161",
+        "name": "Synthetic Hospital 161",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.10575,
+          37.921718
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00162",
+        "name": "Synthetic Hospital 162",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.473131,
+          27.983942
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00163",
+        "name": "Synthetic Hospital 163",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.711584,
+          43.452837
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00164",
+        "name": "Synthetic Hospital 164",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.96537,
+          32.400808
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00165",
+        "name": "Synthetic Hospital 165",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.501393,
+          39.372527
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00166",
+        "name": "Synthetic Hospital 166",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.145763,
+          25.660079
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00167",
+        "name": "Synthetic Hospital 167",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.603886,
+          48.888219
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00168",
+        "name": "Synthetic Hospital 168",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.74386,
+          31.814446
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00169",
+        "name": "Synthetic Hospital 169",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.140349,
+          27.200703
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00170",
+        "name": "Synthetic Hospital 170",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.651814,
+          28.103381
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00171",
+        "name": "Synthetic Hospital 171",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.783933,
+          34.24963
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00172",
+        "name": "Synthetic Hospital 172",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.217341,
+          28.555309
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00173",
+        "name": "Synthetic Hospital 173",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.466935,
+          41.187224
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00174",
+        "name": "Synthetic Hospital 174",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.681278,
+          28.893382
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00175",
+        "name": "Synthetic Hospital 175",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.353388,
+          37.982058
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00176",
+        "name": "Synthetic Hospital 176",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.789915,
+          37.606419
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00177",
+        "name": "Synthetic Hospital 177",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.627303,
+          45.744905
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00178",
+        "name": "Synthetic Hospital 178",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.87173,
+          35.410853
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00179",
+        "name": "Synthetic Hospital 179",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.062133,
+          27.322872
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00180",
+        "name": "Synthetic Hospital 180",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.165139,
+          32.739637
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00181",
+        "name": "Synthetic Hospital 181",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.325162,
+          48.243575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00182",
+        "name": "Synthetic Hospital 182",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.904069,
+          42.017355
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00183",
+        "name": "Synthetic Hospital 183",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.574,
+          36.327247
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00184",
+        "name": "Synthetic Hospital 184",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.336795,
+          40.470885
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00185",
+        "name": "Synthetic Hospital 185",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.216883,
+          41.442335
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00186",
+        "name": "Synthetic Hospital 186",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.961718,
+          47.276172
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00187",
+        "name": "Synthetic Hospital 187",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.342078,
+          27.546749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00188",
+        "name": "Synthetic Hospital 188",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.864203,
+          47.453203
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00189",
+        "name": "Synthetic Hospital 189",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.032412,
+          35.088398
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00190",
+        "name": "Synthetic Hospital 190",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.700479,
+          34.15351
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00191",
+        "name": "Synthetic Hospital 191",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.517993,
+          46.352387
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00192",
+        "name": "Synthetic Hospital 192",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.926326,
+          38.066679
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00193",
+        "name": "Synthetic Hospital 193",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.981149,
+          28.064903
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00194",
+        "name": "Synthetic Hospital 194",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.258125,
+          45.513809
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00195",
+        "name": "Synthetic Hospital 195",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.408205,
+          30.738225
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00196",
+        "name": "Synthetic Hospital 196",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.560226,
+          30.046747
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00197",
+        "name": "Synthetic Hospital 197",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.539622,
+          38.480575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00198",
+        "name": "Synthetic Hospital 198",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.881715,
+          47.415471
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00199",
+        "name": "Synthetic Hospital 199",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.451803,
+          30.60112
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00200",
+        "name": "Synthetic Hospital 200",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.96937,
+          49.496409
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00201",
+        "name": "Synthetic Hospital 201",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.299878,
+          33.904933
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00202",
+        "name": "Synthetic Hospital 202",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.95208,
+          47.965385
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00203",
+        "name": "Synthetic Hospital 203",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.716651,
+          31.049056
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00204",
+        "name": "Synthetic Hospital 204",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.2411,
+          37.192913
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00205",
+        "name": "Synthetic Hospital 205",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.899791,
+          34.147027
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00206",
+        "name": "Synthetic Hospital 206",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.219261,
+          24.201113
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00207",
+        "name": "Synthetic Hospital 207",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.138146,
+          40.180435
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00208",
+        "name": "Synthetic Hospital 208",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.419865,
+          46.030068
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00209",
+        "name": "Synthetic Hospital 209",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.000229,
+          42.048067
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00210",
+        "name": "Synthetic Hospital 210",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.226753,
+          34.223526
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00211",
+        "name": "Synthetic Hospital 211",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.473557,
+          37.929967
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00212",
+        "name": "Synthetic Hospital 212",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.400849,
+          27.699886
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00213",
+        "name": "Synthetic Hospital 213",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.37691,
+          49.925445
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00214",
+        "name": "Synthetic Hospital 214",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.99865,
+          42.439893
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00215",
+        "name": "Synthetic Hospital 215",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.261041,
+          41.77933
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00216",
+        "name": "Synthetic Hospital 216",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.490256,
+          44.466073
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00217",
+        "name": "Synthetic Hospital 217",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.5478,
+          42.413759
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00218",
+        "name": "Synthetic Hospital 218",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.740721,
+          38.643047
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00219",
+        "name": "Synthetic Hospital 219",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.642168,
+          26.461615
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00220",
+        "name": "Synthetic Hospital 220",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -120.065051,
+          42.884918
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00221",
+        "name": "Synthetic Hospital 221",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.386046,
+          27.195521
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00222",
+        "name": "Synthetic Hospital 222",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.196338,
+          41.568458
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00223",
+        "name": "Synthetic Hospital 223",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.996859,
+          34.259297
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00224",
+        "name": "Synthetic Hospital 224",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.687434,
+          40.052414
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00225",
+        "name": "Synthetic Hospital 225",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.99685,
+          30.887397
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00226",
+        "name": "Synthetic Hospital 226",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.711683,
+          29.705176
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00227",
+        "name": "Synthetic Hospital 227",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.797471,
+          48.016417
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00228",
+        "name": "Synthetic Hospital 228",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.921772,
+          41.793488
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00229",
+        "name": "Synthetic Hospital 229",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.731446,
+          38.799125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00230",
+        "name": "Synthetic Hospital 230",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.48858,
+          37.180387
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00231",
+        "name": "Synthetic Hospital 231",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.929237,
+          47.158664
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00232",
+        "name": "Synthetic Hospital 232",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.444416,
+          37.359985
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00233",
+        "name": "Synthetic Hospital 233",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.227967,
+          39.65176
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00234",
+        "name": "Synthetic Hospital 234",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.919123,
+          46.907197
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00235",
+        "name": "Synthetic Hospital 235",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.399499,
+          49.235531
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00236",
+        "name": "Synthetic Hospital 236",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.764311,
+          25.488842
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00237",
+        "name": "Synthetic Hospital 237",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.835859,
+          41.275968
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00238",
+        "name": "Synthetic Hospital 238",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.226772,
+          36.376745
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00239",
+        "name": "Synthetic Hospital 239",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.006703,
+          43.5003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00240",
+        "name": "Synthetic Hospital 240",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.619302,
+          39.449983
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00241",
+        "name": "Synthetic Hospital 241",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.220034,
+          36.829925
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00242",
+        "name": "Synthetic Hospital 242",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.121,
+          28.637804
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00243",
+        "name": "Synthetic Hospital 243",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.831123,
+          35.472074
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00244",
+        "name": "Synthetic Hospital 244",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.677646,
+          49.674634
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00245",
+        "name": "Synthetic Hospital 245",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.770447,
+          48.425096
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00246",
+        "name": "Synthetic Hospital 246",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -100.695502,
+          33.016597
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00247",
+        "name": "Synthetic Hospital 247",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.550804,
+          44.663634
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00248",
+        "name": "Synthetic Hospital 248",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.168038,
+          31.496145
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00249",
+        "name": "Synthetic Hospital 249",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.414976,
+          43.760781
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00250",
+        "name": "Synthetic Hospital 250",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.213581,
+          38.545659
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00251",
+        "name": "Synthetic Hospital 251",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.013598,
+          30.768307
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00252",
+        "name": "Synthetic Hospital 252",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.209017,
+          41.150567
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00253",
+        "name": "Synthetic Hospital 253",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.992056,
+          43.012394
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00254",
+        "name": "Synthetic Hospital 254",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.449186,
+          41.208911
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00255",
+        "name": "Synthetic Hospital 255",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.977391,
+          25.100729
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00256",
+        "name": "Synthetic Hospital 256",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.458193,
+          44.066023
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00257",
+        "name": "Synthetic Hospital 257",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.69148,
+          36.887461
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00258",
+        "name": "Synthetic Hospital 258",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.147493,
+          33.293631
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00259",
+        "name": "Synthetic Hospital 259",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.734173,
+          43.163149
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00260",
+        "name": "Synthetic Hospital 260",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.820055,
+          29.993935
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00261",
+        "name": "Synthetic Hospital 261",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -100.540284,
+          47.982507
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00262",
+        "name": "Synthetic Hospital 262",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.439445,
+          47.577307
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00263",
+        "name": "Synthetic Hospital 263",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.245648,
+          31.189338
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00264",
+        "name": "Synthetic Hospital 264",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.035879,
+          40.482444
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00265",
+        "name": "Synthetic Hospital 265",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.763555,
+          49.851524
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00266",
+        "name": "Synthetic Hospital 266",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.682591,
+          43.520046
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00267",
+        "name": "Synthetic Hospital 267",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.08963,
+          36.957973
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00268",
+        "name": "Synthetic Hospital 268",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.523038,
+          24.533838
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00269",
+        "name": "Synthetic Hospital 269",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.094045,
+          34.717594
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00270",
+        "name": "Synthetic Hospital 270",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.759091,
+          47.907436
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00271",
+        "name": "Synthetic Hospital 271",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.271943,
+          29.411967
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00272",
+        "name": "Synthetic Hospital 272",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.166162,
+          41.635745
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00273",
+        "name": "Synthetic Hospital 273",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.006773,
+          47.926833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00274",
+        "name": "Synthetic Hospital 274",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.773633,
+          32.119983
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00275",
+        "name": "Synthetic Hospital 275",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.093968,
+          37.039625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00276",
+        "name": "Synthetic Hospital 276",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.091285,
+          38.624457
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00277",
+        "name": "Synthetic Hospital 277",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.407872,
+          42.929475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00278",
+        "name": "Synthetic Hospital 278",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -101.374895,
+          24.889688
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00279",
+        "name": "Synthetic Hospital 279",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.461218,
+          37.720351
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00280",
+        "name": "Synthetic Hospital 280",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.840656,
+          45.762908
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00281",
+        "name": "Synthetic Hospital 281",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -120.946799,
+          44.653125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00282",
+        "name": "Synthetic Hospital 282",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.08623,
+          42.77427
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00283",
+        "name": "Synthetic Hospital 283",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.256618,
+          41.608729
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00284",
+        "name": "Synthetic Hospital 284",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.314179,
+          47.289768
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00285",
+        "name": "Synthetic Hospital 285",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.827163,
+          26.70687
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00286",
+        "name": "Synthetic Hospital 286",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.363709,
+          25.424598
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00287",
+        "name": "Synthetic Hospital 287",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.527063,
+          24.383695
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00288",
+        "name": "Synthetic Hospital 288",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.106183,
+          46.310679
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00289",
+        "name": "Synthetic Hospital 289",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.361581,
+          41.590978
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00290",
+        "name": "Synthetic Hospital 290",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -105.732525,
+          28.592792
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00291",
+        "name": "Synthetic Hospital 291",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.644454,
+          41.027148
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00292",
+        "name": "Synthetic Hospital 292",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.976723,
+          47.630343
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00293",
+        "name": "Synthetic Hospital 293",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.685508,
+          44.328848
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00294",
+        "name": "Synthetic Hospital 294",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.191518,
+          36.560406
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00295",
+        "name": "Synthetic Hospital 295",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.754855,
+          39.924414
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00296",
+        "name": "Synthetic Hospital 296",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.208912,
+          36.177051
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00297",
+        "name": "Synthetic Hospital 297",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.934009,
+          40.714504
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00298",
+        "name": "Synthetic Hospital 298",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.353537,
+          36.750998
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00299",
+        "name": "Synthetic Hospital 299",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.37173,
+          43.035973
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00300",
+        "name": "Synthetic Hospital 300",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.100029,
+          32.389061
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00301",
+        "name": "Synthetic Hospital 301",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.804384,
+          49.930315
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00302",
+        "name": "Synthetic Hospital 302",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.565196,
+          31.276155
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00303",
+        "name": "Synthetic Hospital 303",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.658966,
+          36.708057
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00304",
+        "name": "Synthetic Hospital 304",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.721401,
+          39.787996
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00305",
+        "name": "Synthetic Hospital 305",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.759358,
+          40.599062
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00306",
+        "name": "Synthetic Hospital 306",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.627224,
+          49.622071
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00307",
+        "name": "Synthetic Hospital 307",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.588274,
+          33.324416
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00308",
+        "name": "Synthetic Hospital 308",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.141313,
+          40.698813
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00309",
+        "name": "Synthetic Hospital 309",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.357118,
+          37.189505
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00310",
+        "name": "Synthetic Hospital 310",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.365375,
+          35.121796
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00311",
+        "name": "Synthetic Hospital 311",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.860164,
+          48.176507
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00312",
+        "name": "Synthetic Hospital 312",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.709462,
+          37.707583
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00313",
+        "name": "Synthetic Hospital 313",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.457237,
+          47.704281
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00314",
+        "name": "Synthetic Hospital 314",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.339012,
+          36.121364
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00315",
+        "name": "Synthetic Hospital 315",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.877452,
+          44.607795
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00316",
+        "name": "Synthetic Hospital 316",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.656484,
+          43.099095
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00317",
+        "name": "Synthetic Hospital 317",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.173304,
+          26.302805
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00318",
+        "name": "Synthetic Hospital 318",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.193565,
+          41.358401
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00319",
+        "name": "Synthetic Hospital 319",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.056576,
+          32.513226
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00320",
+        "name": "Synthetic Hospital 320",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.962802,
+          41.637318
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00321",
+        "name": "Synthetic Hospital 321",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -116.756267,
+          38.168831
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00322",
+        "name": "Synthetic Hospital 322",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.097856,
+          37.585271
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00323",
+        "name": "Synthetic Hospital 323",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.167353,
+          32.672717
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00324",
+        "name": "Synthetic Hospital 324",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.800203,
+          37.181982
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00325",
+        "name": "Synthetic Hospital 325",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.231563,
+          45.608077
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00326",
+        "name": "Synthetic Hospital 326",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.58141,
+          33.879749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00327",
+        "name": "Synthetic Hospital 327",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.479588,
+          40.515462
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00328",
+        "name": "Synthetic Hospital 328",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.977013,
+          34.151739
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00329",
+        "name": "Synthetic Hospital 329",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.59878,
+          24.002518
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00330",
+        "name": "Synthetic Hospital 330",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.927728,
+          29.923387
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00331",
+        "name": "Synthetic Hospital 331",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.322574,
+          37.227111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00332",
+        "name": "Synthetic Hospital 332",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.751879,
+          39.000985
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00333",
+        "name": "Synthetic Hospital 333",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.341928,
+          33.322395
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00334",
+        "name": "Synthetic Hospital 334",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.013781,
+          44.422447
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00335",
+        "name": "Synthetic Hospital 335",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.808781,
+          44.916712
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00336",
+        "name": "Synthetic Hospital 336",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.768029,
+          41.25869
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00337",
+        "name": "Synthetic Hospital 337",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -107.420117,
+          49.911453
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00338",
+        "name": "Synthetic Hospital 338",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.871599,
+          29.1356
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00339",
+        "name": "Synthetic Hospital 339",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.125745,
+          41.547894
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00340",
+        "name": "Synthetic Hospital 340",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -101.292962,
+          37.525091
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00341",
+        "name": "Synthetic Hospital 341",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.760094,
+          47.342159
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00342",
+        "name": "Synthetic Hospital 342",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.379048,
+          33.076559
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00343",
+        "name": "Synthetic Hospital 343",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.980014,
+          29.862772
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00344",
+        "name": "Synthetic Hospital 344",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -101.673195,
+          41.909765
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00345",
+        "name": "Synthetic Hospital 345",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.281582,
+          37.958817
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00346",
+        "name": "Synthetic Hospital 346",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.201171,
+          48.574377
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00347",
+        "name": "Synthetic Hospital 347",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.854784,
+          45.425182
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00348",
+        "name": "Synthetic Hospital 348",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.908248,
+          32.568485
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00349",
+        "name": "Synthetic Hospital 349",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.150136,
+          28.911765
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00350",
+        "name": "Synthetic Hospital 350",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.518907,
+          36.652205
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00351",
+        "name": "Synthetic Hospital 351",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.433906,
+          40.069082
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00352",
+        "name": "Synthetic Hospital 352",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.705819,
+          24.231849
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00353",
+        "name": "Synthetic Hospital 353",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.815203,
+          45.052927
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00354",
+        "name": "Synthetic Hospital 354",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.161889,
+          45.906326
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00355",
+        "name": "Synthetic Hospital 355",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.544671,
+          26.427252
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00356",
+        "name": "Synthetic Hospital 356",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.765313,
+          28.365827
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00357",
+        "name": "Synthetic Hospital 357",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.78722,
+          27.905429
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00358",
+        "name": "Synthetic Hospital 358",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.870126,
+          40.995688
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00359",
+        "name": "Synthetic Hospital 359",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.163726,
+          35.791485
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00360",
+        "name": "Synthetic Hospital 360",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.129936,
+          46.963864
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00361",
+        "name": "Synthetic Hospital 361",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -107.199677,
+          46.597417
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00362",
+        "name": "Synthetic Hospital 362",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.15325,
+          44.362516
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00363",
+        "name": "Synthetic Hospital 363",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.98065,
+          29.184449
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00364",
+        "name": "Synthetic Hospital 364",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.032899,
+          34.09835
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00365",
+        "name": "Synthetic Hospital 365",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.083083,
+          48.549212
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00366",
+        "name": "Synthetic Hospital 366",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.03941,
+          42.336443
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00367",
+        "name": "Synthetic Hospital 367",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.488365,
+          24.162767
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00368",
+        "name": "Synthetic Hospital 368",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.358167,
+          49.102049
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00369",
+        "name": "Synthetic Hospital 369",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -120.042295,
+          30.932369
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00370",
+        "name": "Synthetic Hospital 370",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.41268,
+          28.92543
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00371",
+        "name": "Synthetic Hospital 371",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.83926,
+          35.763337
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00372",
+        "name": "Synthetic Hospital 372",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.410995,
+          36.168022
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00373",
+        "name": "Synthetic Hospital 373",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -116.032643,
+          31.417203
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00374",
+        "name": "Synthetic Hospital 374",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.636313,
+          47.235409
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00375",
+        "name": "Synthetic Hospital 375",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.017633,
+          33.63627
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00376",
+        "name": "Synthetic Hospital 376",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.663518,
+          27.949975
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00377",
+        "name": "Synthetic Hospital 377",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.139737,
+          39.836256
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00378",
+        "name": "Synthetic Hospital 378",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.088457,
+          39.328071
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00379",
+        "name": "Synthetic Hospital 379",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.134413,
+          31.07357
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00380",
+        "name": "Synthetic Hospital 380",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.303932,
+          46.543973
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00381",
+        "name": "Synthetic Hospital 381",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.890489,
+          31.364827
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00382",
+        "name": "Synthetic Hospital 382",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.029411,
+          45.417382
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00383",
+        "name": "Synthetic Hospital 383",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.743165,
+          41.420388
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00384",
+        "name": "Synthetic Hospital 384",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.098456,
+          46.286827
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00385",
+        "name": "Synthetic Hospital 385",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.70313,
+          28.406149
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00386",
+        "name": "Synthetic Hospital 386",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.23985,
+          43.980554
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00387",
+        "name": "Synthetic Hospital 387",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.068905,
+          34.390964
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00388",
+        "name": "Synthetic Hospital 388",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -116.112685,
+          41.402051
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00389",
+        "name": "Synthetic Hospital 389",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.099948,
+          42.187436
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00390",
+        "name": "Synthetic Hospital 390",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.227418,
+          38.42488
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00391",
+        "name": "Synthetic Hospital 391",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.90669,
+          46.705868
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00392",
+        "name": "Synthetic Hospital 392",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.484338,
+          47.051308
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00393",
+        "name": "Synthetic Hospital 393",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.180559,
+          44.413007
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00394",
+        "name": "Synthetic Hospital 394",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.688365,
+          37.480971
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00395",
+        "name": "Synthetic Hospital 395",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.705803,
+          47.647164
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00396",
+        "name": "Synthetic Hospital 396",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.603738,
+          27.214596
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00397",
+        "name": "Synthetic Hospital 397",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.839627,
+          43.160794
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00398",
+        "name": "Synthetic Hospital 398",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.712774,
+          37.653308
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00399",
+        "name": "Synthetic Hospital 399",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.650699,
+          28.669313
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00400",
+        "name": "Synthetic Hospital 400",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.161452,
+          39.666244
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00401",
+        "name": "Synthetic Hospital 401",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.941713,
+          39.728461
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00402",
+        "name": "Synthetic Hospital 402",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.579099,
+          35.912783
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00403",
+        "name": "Synthetic Hospital 403",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.159327,
+          26.030382
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00404",
+        "name": "Synthetic Hospital 404",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.207518,
+          24.16943
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00405",
+        "name": "Synthetic Hospital 405",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.961771,
+          34.662424
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00406",
+        "name": "Synthetic Hospital 406",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.270773,
+          47.025248
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00407",
+        "name": "Synthetic Hospital 407",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.82736,
+          45.166031
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00408",
+        "name": "Synthetic Hospital 408",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -100.070579,
+          37.662959
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00409",
+        "name": "Synthetic Hospital 409",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.070187,
+          47.87329
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00410",
+        "name": "Synthetic Hospital 410",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.36586,
+          39.784042
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00411",
+        "name": "Synthetic Hospital 411",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.800486,
+          24.282151
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00412",
+        "name": "Synthetic Hospital 412",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -116.827162,
+          33.82663
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00413",
+        "name": "Synthetic Hospital 413",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.748106,
+          34.405625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00414",
+        "name": "Synthetic Hospital 414",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.634721,
+          43.254329
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00415",
+        "name": "Synthetic Hospital 415",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.376745,
+          32.962207
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00416",
+        "name": "Synthetic Hospital 416",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.013244,
+          28.082172
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00417",
+        "name": "Synthetic Hospital 417",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -99.270489,
+          33.182456
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00418",
+        "name": "Synthetic Hospital 418",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.765301,
+          47.706
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00419",
+        "name": "Synthetic Hospital 419",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.19872,
+          32.078743
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00420",
+        "name": "Synthetic Hospital 420",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.617579,
+          26.033712
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00421",
+        "name": "Synthetic Hospital 421",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.305329,
+          30.259738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00422",
+        "name": "Synthetic Hospital 422",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.237131,
+          31.071424
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00423",
+        "name": "Synthetic Hospital 423",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.59663,
+          29.781984
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00424",
+        "name": "Synthetic Hospital 424",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.581485,
+          31.435496
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00425",
+        "name": "Synthetic Hospital 425",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.656329,
+          48.688312
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00426",
+        "name": "Synthetic Hospital 426",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -101.61229,
+          32.256131
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00427",
+        "name": "Synthetic Hospital 427",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.946838,
+          33.43735
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00428",
+        "name": "Synthetic Hospital 428",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.279064,
+          28.346116
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00429",
+        "name": "Synthetic Hospital 429",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.933533,
+          25.272158
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00430",
+        "name": "Synthetic Hospital 430",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.01532,
+          42.937752
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00431",
+        "name": "Synthetic Hospital 431",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.352655,
+          27.089334
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00432",
+        "name": "Synthetic Hospital 432",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.266017,
+          39.052391
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00433",
+        "name": "Synthetic Hospital 433",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.027684,
+          29.668452
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00434",
+        "name": "Synthetic Hospital 434",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.376968,
+          49.441083
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00435",
+        "name": "Synthetic Hospital 435",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.323104,
+          27.607885
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00436",
+        "name": "Synthetic Hospital 436",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.23067,
+          41.351749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00437",
+        "name": "Synthetic Hospital 437",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.674232,
+          45.985349
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00438",
+        "name": "Synthetic Hospital 438",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.135345,
+          26.056885
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00439",
+        "name": "Synthetic Hospital 439",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.003988,
+          49.161218
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00440",
+        "name": "Synthetic Hospital 440",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.464552,
+          38.970664
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00441",
+        "name": "Synthetic Hospital 441",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.659209,
+          30.783141
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00442",
+        "name": "Synthetic Hospital 442",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.87473,
+          30.43764
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00443",
+        "name": "Synthetic Hospital 443",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.287995,
+          47.314462
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00444",
+        "name": "Synthetic Hospital 444",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.806404,
+          45.290026
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00445",
+        "name": "Synthetic Hospital 445",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.956185,
+          30.521908
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00446",
+        "name": "Synthetic Hospital 446",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.126731,
+          38.975278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00447",
+        "name": "Synthetic Hospital 447",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.356881,
+          48.876261
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00448",
+        "name": "Synthetic Hospital 448",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.842179,
+          28.204699
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00449",
+        "name": "Synthetic Hospital 449",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.555519,
+          36.761274
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00450",
+        "name": "Synthetic Hospital 450",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -120.3005,
+          45.557357
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00451",
+        "name": "Synthetic Hospital 451",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.568781,
+          34.995878
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00452",
+        "name": "Synthetic Hospital 452",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.698064,
+          48.654275
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00453",
+        "name": "Synthetic Hospital 453",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.740803,
+          34.06563
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00454",
+        "name": "Synthetic Hospital 454",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.90941,
+          46.852582
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00455",
+        "name": "Synthetic Hospital 455",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.896048,
+          34.525947
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00456",
+        "name": "Synthetic Hospital 456",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.291547,
+          32.757422
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00457",
+        "name": "Synthetic Hospital 457",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.221679,
+          31.35819
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00458",
+        "name": "Synthetic Hospital 458",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.669813,
+          49.703668
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00459",
+        "name": "Synthetic Hospital 459",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.504763,
+          29.388229
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00460",
+        "name": "Synthetic Hospital 460",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.186144,
+          32.447941
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00461",
+        "name": "Synthetic Hospital 461",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.176753,
+          26.552212
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00462",
+        "name": "Synthetic Hospital 462",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.002244,
+          26.723477
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00463",
+        "name": "Synthetic Hospital 463",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.308775,
+          27.346303
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00464",
+        "name": "Synthetic Hospital 464",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.914213,
+          46.156076
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00465",
+        "name": "Synthetic Hospital 465",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -85.912688,
+          34.544022
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00466",
+        "name": "Synthetic Hospital 466",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.867535,
+          31.012696
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00467",
+        "name": "Synthetic Hospital 467",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.750599,
+          48.820018
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00468",
+        "name": "Synthetic Hospital 468",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.377426,
+          35.569403
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00469",
+        "name": "Synthetic Hospital 469",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.345202,
+          27.838848
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00470",
+        "name": "Synthetic Hospital 470",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.927004,
+          26.498631
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00471",
+        "name": "Synthetic Hospital 471",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.662767,
+          29.436931
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00472",
+        "name": "Synthetic Hospital 472",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.660975,
+          39.318169
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00473",
+        "name": "Synthetic Hospital 473",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.714799,
+          40.637426
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00474",
+        "name": "Synthetic Hospital 474",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.373773,
+          31.686187
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00475",
+        "name": "Synthetic Hospital 475",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.83415,
+          36.56586
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00476",
+        "name": "Synthetic Hospital 476",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.055176,
+          37.591199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00477",
+        "name": "Synthetic Hospital 477",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.71202,
+          45.42019
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00478",
+        "name": "Synthetic Hospital 478",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -115.429164,
+          45.679114
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00479",
+        "name": "Synthetic Hospital 479",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.521358,
+          39.165499
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00480",
+        "name": "Synthetic Hospital 480",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.954343,
+          47.595217
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00481",
+        "name": "Synthetic Hospital 481",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.142965,
+          43.346037
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00482",
+        "name": "Synthetic Hospital 482",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.925133,
+          30.300427
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00483",
+        "name": "Synthetic Hospital 483",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.367337,
+          33.10944
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00484",
+        "name": "Synthetic Hospital 484",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.262649,
+          32.829436
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00485",
+        "name": "Synthetic Hospital 485",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.461302,
+          44.599004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00486",
+        "name": "Synthetic Hospital 486",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.200192,
+          35.850753
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00487",
+        "name": "Synthetic Hospital 487",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.711133,
+          29.519232
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00488",
+        "name": "Synthetic Hospital 488",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.666332,
+          32.184963
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00489",
+        "name": "Synthetic Hospital 489",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.531462,
+          44.756875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00490",
+        "name": "Synthetic Hospital 490",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.007656,
+          41.535917
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00491",
+        "name": "Synthetic Hospital 491",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.415541,
+          41.866411
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00492",
+        "name": "Synthetic Hospital 492",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.777067,
+          40.498241
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00493",
+        "name": "Synthetic Hospital 493",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.256648,
+          24.481679
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00494",
+        "name": "Synthetic Hospital 494",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.210062,
+          48.093975
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00495",
+        "name": "Synthetic Hospital 495",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.170607,
+          26.042487
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00496",
+        "name": "Synthetic Hospital 496",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.160119,
+          38.686961
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00497",
+        "name": "Synthetic Hospital 497",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -100.378762,
+          25.260301
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00498",
+        "name": "Synthetic Hospital 498",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.176012,
+          31.281384
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00499",
+        "name": "Synthetic Hospital 499",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.782856,
+          29.804067
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00500",
+        "name": "Synthetic Hospital 500",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.096683,
+          42.745736
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00501",
+        "name": "Synthetic Hospital 501",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.702498,
+          29.189049
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00502",
+        "name": "Synthetic Hospital 502",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -114.65773,
+          29.975406
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00503",
+        "name": "Synthetic Hospital 503",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.530847,
+          37.449638
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00504",
+        "name": "Synthetic Hospital 504",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.21331,
+          24.203704
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00505",
+        "name": "Synthetic Hospital 505",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.338849,
+          42.485737
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00506",
+        "name": "Synthetic Hospital 506",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.03597,
+          46.16397
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00507",
+        "name": "Synthetic Hospital 507",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.170693,
+          42.342304
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00508",
+        "name": "Synthetic Hospital 508",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.857202,
+          29.854368
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00509",
+        "name": "Synthetic Hospital 509",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -109.729521,
+          25.355617
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00510",
+        "name": "Synthetic Hospital 510",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.607298,
+          35.687978
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00511",
+        "name": "Synthetic Hospital 511",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -120.188702,
+          44.830616
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00512",
+        "name": "Synthetic Hospital 512",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -113.492482,
+          31.800164
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00513",
+        "name": "Synthetic Hospital 513",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.977201,
+          33.936555
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00514",
+        "name": "Synthetic Hospital 514",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.706214,
+          26.991422
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00515",
+        "name": "Synthetic Hospital 515",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.406074,
+          33.439377
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00516",
+        "name": "Synthetic Hospital 516",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -107.019883,
+          26.577306
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00517",
+        "name": "Synthetic Hospital 517",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -92.322062,
+          42.083332
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00518",
+        "name": "Synthetic Hospital 518",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -108.546473,
+          31.832365
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-hosp-00519",
+        "name": "Synthetic Hospital 519",
+        "type": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.113299,
+          37.644931
+        ]
+      }
+    }
+  ]
+}

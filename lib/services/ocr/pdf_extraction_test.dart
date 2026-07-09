@@ -9,15 +9,7 @@ class PdfExtractionTest {
   /// and extracting text from it
   static Future<void> testPdfExtraction(BuildContext context) async {
     try {
-      // Initialize Tesseract first
-      final initialized = await TextExtractionService.initializeTesseract();
-      if (!initialized) {
-        _showMessage(context, 'Failed to initialize Tesseract OCR engine');
-        return;
-      }
-
-      // Pick a PDF file
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
       );
@@ -33,12 +25,14 @@ class PdfExtractionTest {
         return;
       }
 
-      // Show loading indicator
+      final bytes = await file.readAsBytes();
+
       _showLoadingDialog(context, 'Extracting text from PDF...');
 
-      // Extract text from PDF
-      final extractionResult =
-          await TextExtractionService.extractTextFromPdf(file.path);
+      final extractionResult = await TextExtractionService.extractTextFromBytes(
+        bytes,
+        fileName: file.path,
+      );
 
       // Hide loading indicator
       Navigator.of(context, rootNavigator: true).pop();

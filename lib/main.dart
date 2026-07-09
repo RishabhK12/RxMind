@@ -1,13 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:workmanager/workmanager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
 import 'screens/onboarding/welcome_carousel.dart';
 import 'screens/onboarding/onboarding_profile_flow.dart';
+import 'screens/onboarding/onboarding_wizard_screen.dart';
 import 'screens/profile/profile_setup_screen.dart';
 import 'screens/home/home_dashboard.dart';
 import 'screens/home/main_navigation_shell.dart';
@@ -22,41 +22,35 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/settings/privacy_gate_screen.dart';
 import 'services/notification_service.dart';
 import 'services/discharge_data_manager.dart';
-
-Future<void> _safeLoadDotEnv() async {
-  try {
-    await dotenv.load();
-  } catch (err) {
-    if (kDebugMode) {
-      debugPrint('[dotenv] skipped (.env missing): $err');
-    }
-  }
-}
+import 'services/background/reminder_sync_scheduler.dart';
+import 'services/background/reminder_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await _safeLoadDotEnv();
 
-  // Initialize timezone database for notifications
   tz.initializeTimeZones();
 
-  // Initialize notification service
+  if (ReminderSyncScheduler.isSupported) {
+    await Workmanager().initialize(reminderSyncCallbackDispatcher);
+  }
+
+  await LocalStorage.initDb();
+
   final notificationService = NotificationService();
   await notificationService.initialize();
 
-  // Schedule notifications for existing tasks
-  final tasks = await DischargeDataManager.loadTasks();
-  await notificationService.scheduleNotificationsForTasks(tasks);
+  try {
+    final tasks = await DischargeDataManager.loadTasks();
+    await notificationService.scheduleNotificationsForTasks(tasks);
+    await ReminderSyncScheduler.registerPeriodicSync();
+  } catch (e) {
+    debugPrint('Task notification scheduling deferred: $e');
+  }
 
-  // Read privacy acceptance before building app
   final prefs = await SharedPreferences.getInstance();
   final hasAcceptedPrivacy = prefs.getBool('privacy_terms_accepted') ?? false;
 
   runApp(RxMindApp(showPrivacyGate: !hasAcceptedPrivacy));
-  // Initialize DB after first frame
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    await LocalStorage.initDb();
-  });
 }
 
 class RxMindApp extends StatefulWidget {
@@ -67,7 +61,7 @@ class RxMindApp extends StatefulWidget {
   State<RxMindApp> createState() => _RxMindAppState();
 }
 
-class _RxMindAppState extends State<RxMindApp> {
+class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   ThemeMode _themeMode = ThemeMode.light;
   bool _highContrast = false;
@@ -78,10 +72,23 @@ class _RxMindAppState extends State<RxMindApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initialRoute = widget.showPrivacyGate ? '/privacyGate' : '/splash';
   }
 
-  // No-op: privacy gate handled via initialRoute for reliability
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ReminderSyncService.flushLockSafeBuffer();
+      ReminderSyncService.rescheduleAllFromDatabase();
+    }
+  }
 
   void updateTheme(ThemeMode mode) => setState(() => _themeMode = mode);
   void updateHighContrast(bool v) => setState(() => _highContrast = v);
@@ -104,9 +111,14 @@ class _RxMindAppState extends State<RxMindApp> {
           navigatorKey: _navigatorKey,
           title: 'rxmind',
           debugShowCheckedModeBanner: false,
-          theme:
-              _highContrast ? AppTheme.highContrastTheme : AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          theme: AppTheme.resolve(
+            mode: _themeMode,
+            highContrast: _highContrast,
+            platformBrightness: MediaQuery.platformBrightnessOf(context),
+          ),
+          darkTheme: _highContrast
+              ? AppTheme.highContrastDarkTheme
+              : AppTheme.darkTheme,
           themeMode: _themeMode,
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context).copyWith(
@@ -119,8 +131,50 @@ class _RxMindAppState extends State<RxMindApp> {
           routes: {
             '/privacyGate': (context) => const PrivacyGateScreen(),
             '/splash': (context) => const SplashScreen(),
+            '/disclaimerGate': (context) => OnboardingWizardScreen(
+                  onDisclaimerAcknowledged: () async {
+                    await LocalStorage.setDisclaimerAcknowledged();
+                  },
+                  onConsentGranted: () async {
+                    await LocalStorage.setChdConsent();
+                  },
+                  onComplete: () {
+                    if (!context.mounted) return;
+                    Navigator.pushReplacementNamed(
+                        context, '/onboardingProfile');
+                  },
+                ),
+            '/chdConsent': (context) => OnboardingWizardScreen(
+                  onDisclaimerAcknowledged: () async {
+                    await LocalStorage.setDisclaimerAcknowledged();
+                  },
+                  onConsentGranted: () async {
+                    await LocalStorage.setChdConsent();
+                  },
+                  onComplete: () {
+                    if (!context.mounted) return;
+                    Navigator.pushReplacementNamed(
+                        context, '/onboardingProfile');
+                  },
+                ),
+            '/onboarding': (context) {
+              final initialStep =
+                  ModalRoute.of(context)?.settings.arguments as int? ?? 0;
+              return OnboardingWizardScreen(
+                initialStep: initialStep,
+                onDisclaimerAcknowledged: () async {
+                  await LocalStorage.setDisclaimerAcknowledged();
+                },
+                onConsentGranted: () async {
+                  await LocalStorage.setChdConsent();
+                },
+                onComplete: () {
+                  if (!context.mounted) return;
+                  Navigator.pushReplacementNamed(context, '/onboardingProfile');
+                },
+              );
+            },
             '/welcomeCarousel': (context) => const WelcomeCarousel(),
-            // Removed permissions prompt since app has permissions by default
             '/permissionsPrompt': (context) => OnboardingProfileFlow(
                   onComplete: () =>
                       Navigator.pushReplacementNamed(context, '/mainNav'),

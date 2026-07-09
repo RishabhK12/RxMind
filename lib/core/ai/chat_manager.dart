@@ -1,10 +1,15 @@
-import 'dart:convert';
-import '../storage/local_storage.dart';
+import '../chd/repositories/chat_message_repository.dart';
+import '../storage/sqlcipher_database.dart';
 
 class ChatManager {
-  // Each chat session is a list of messages with a name
   List<Map<String, dynamic>> _chats = [];
   int _activeChatIndex = 0;
+  ChatMessageRepository? _repo;
+
+  Future<ChatMessageRepository> _repository() async {
+    _repo ??= ChatMessageRepository(await SecureDatabase.instance());
+    return _repo!;
+  }
 
   List<Map<String, dynamic>> get activeChat {
     if (_chats.isEmpty) return [];
@@ -18,43 +23,85 @@ class ChatManager {
 
   int get activeChatIndex => _activeChatIndex;
   int get chatCount => _chats.length;
+  String get activeSessionId => _chats.isNotEmpty
+      ? _chats[_activeChatIndex]['session_id'] as String? ?? 'session_0'
+      : 'session_0';
+
   String get activeChatName => _chats.isNotEmpty
       ? _chats[_activeChatIndex]['name'] ?? 'Chat ${_activeChatIndex + 1}'
       : 'New Chat';
 
+  bool get activeDisclosureAcknowledged {
+    if (_chats.isEmpty) return false;
+    return _chats[_activeChatIndex]['ai_disclosure_ack'] == true;
+  }
+
   Future<void> loadChats() async {
-    final raw = await LocalStorage.readSecure('ai_chats');
-    if (raw != null) {
-      try {
-        final decoded = jsonDecode(raw) as List;
-        _chats = decoded.map((chat) {
-          return {
-            'name': chat['name'] as String? ?? 'Chat',
-            'messages': (chat['messages'] as List?)?.map((msg) {
-                  return Map<String, dynamic>.from(msg as Map);
-                }).toList() ??
-                [],
-          };
-        }).toList();
-      } catch (_) {
-        _chats = [
-          {'name': 'Chat 1', 'messages': <Map<String, dynamic>>[]}
-        ];
-      }
-    } else {
+    final repo = await _repository();
+    final sessions = await repo.getSessions();
+    if (sessions.isEmpty) {
       _chats = [
-        {'name': 'Chat 1', 'messages': <Map<String, dynamic>>[]}
+        {
+          'session_id': 'session_0',
+          'name': 'Chat 1',
+          'ai_disclosure_ack': false,
+          'messages': <Map<String, dynamic>>[],
+        }
       ];
+      return;
     }
+
+    _chats = [];
+    for (final session in sessions) {
+      final sessionId = session['session_id'] as String;
+      final messages = await repo.getMessages(sessionId);
+      _chats.add({
+        'session_id': sessionId,
+        'name': session['name'],
+        'ai_disclosure_ack': session['ai_disclosure_ack'] == true,
+        'messages': messages,
+      });
+    }
+    _activeChatIndex = 0;
   }
 
   Future<void> saveChats() async {
-    await LocalStorage.writeSecure('ai_chats', jsonEncode(_chats));
+    if (_chats.isEmpty) return;
+    final repo = await _repository();
+    for (final chat in _chats) {
+      final sessionId =
+          chat['session_id'] as String? ?? 'session_${_chats.indexOf(chat)}';
+      final messages = (chat['messages'] as List?)
+              ?.map((m) => Map<String, dynamic>.from(m as Map))
+              .toList() ??
+          <Map<String, dynamic>>[];
+      await repo.saveSession(
+        sessionId,
+        chat['name'] as String? ?? 'Chat',
+        messages,
+      );
+      if (chat['ai_disclosure_ack'] == true) {
+        await repo.setDisclosureAck(sessionId, true);
+      }
+    }
+  }
+
+  Future<void> acknowledgeDisclosure() async {
+    if (_chats.isEmpty) return;
+    final sessionId = activeSessionId;
+    _chats[_activeChatIndex]['ai_disclosure_ack'] = true;
+    final repo = await _repository();
+    await repo.setDisclosureAck(sessionId, true);
   }
 
   void addMessage(String role, String content) {
     if (_chats.isEmpty) {
-      _chats.add({'name': 'Chat 1', 'messages': <Map<String, dynamic>>[]});
+      _chats.add({
+        'session_id': 'session_0',
+        'name': 'Chat 1',
+        'ai_disclosure_ack': false,
+        'messages': <Map<String, dynamic>>[],
+      });
     }
 
     final currentMessages = _chats[_activeChatIndex]['messages'];
@@ -70,19 +117,22 @@ class ChatManager {
       messages = <Map<String, dynamic>>[];
     }
 
+    final sessionId = activeSessionId;
+    final msgId =
+        '${sessionId}_${DateTime.now().microsecondsSinceEpoch}_${messages.length}';
+
     messages.add({
+      'id': msgId,
       'role': role,
       'content': content,
-      'timestamp': DateTime.now().toIso8601String()
+      'timestamp': DateTime.now().toIso8601String(),
     });
 
     _chats[_activeChatIndex]['messages'] = messages;
 
-    // Auto-name chat based on first user message if still using default name
     if (_chats[_activeChatIndex]['name'] == 'Chat ${_activeChatIndex + 1}' &&
         role == 'user' &&
         messages.where((m) => m['role'] == 'user').length == 1) {
-      // Use first few words of first user message
       final words = content.split(' ');
       final name = words.take(4).join(' ');
       _chats[_activeChatIndex]['name'] =
@@ -93,9 +143,12 @@ class ChatManager {
   }
 
   void newChat() {
+    final id = 'session_${DateTime.now().millisecondsSinceEpoch}';
     _chats.add({
+      'session_id': id,
       'name': 'Chat ${_chats.length + 1}',
-      'messages': <Map<String, dynamic>>[]
+      'ai_disclosure_ack': false,
+      'messages': <Map<String, dynamic>>[],
     });
     _activeChatIndex = _chats.length - 1;
     saveChats();
@@ -124,6 +177,20 @@ class ChatManager {
       _chats[_activeChatIndex]['messages'] = <Map<String, dynamic>>[];
       saveChats();
     }
+  }
+
+  Future<void> deleteAllChats() async {
+    final repo = await _repository();
+    await repo.deleteAll();
+    _chats = [
+      {
+        'session_id': 'session_0',
+        'name': 'Chat 1',
+        'ai_disclosure_ack': false,
+        'messages': <Map<String, dynamic>>[],
+      }
+    ];
+    _activeChatIndex = 0;
   }
 
   List<Map<String, dynamic>> get allChats => _chats;

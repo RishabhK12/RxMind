@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rxmind_app/theme/brand_shadows.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
+import 'package:rxmind_app/widgets/rx_secondary_button.dart';
 
 class ReviewTextScreen extends StatefulWidget {
   const ReviewTextScreen({super.key});
@@ -47,10 +52,10 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        elevation: 0,
         leading: Semantics(
           label: 'Back',
           button: true,
@@ -74,7 +79,7 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
               icon: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: Icon(_editMode ? Icons.check : Icons.edit,
-                    key: ValueKey(_editMode)),
+                    key: ValueKey(_editMode), color: theme.colorScheme.primary),
               ),
               onPressed: _toggleEdit,
               tooltip: _editMode ? 'Save' : 'Edit',
@@ -83,14 +88,16 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ThemeTokens.spacingMd),
         child: _loading
             ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 16),
+                    CircularProgressIndicator(
+                      color: theme.colorScheme.secondary,
+                    ),
+                    const SizedBox(height: ThemeTokens.spacingMd),
                     Text(
                       'Processing document text...',
                       style: theme.textTheme.bodyLarge,
@@ -98,10 +105,9 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
                   ],
                 ),
               )
-            : Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                elevation: 4,
+            : RxCard(
+                radius: ThemeTokens.radiusMd,
+                padding: EdgeInsets.zero,
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
                   child: _editMode
@@ -116,7 +122,8 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
                                 ?.copyWith(color: theme.colorScheme.onSurface),
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(16),
+                              contentPadding:
+                                  EdgeInsets.all(ThemeTokens.spacingMd),
                             ),
                             autofocus: true,
                           ),
@@ -124,7 +131,8 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
                       : Semantics(
                           label: 'OCR result text',
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding:
+                                const EdgeInsets.all(ThemeTokens.spacingMd),
                             child: SelectableText(
                               _controller.text.isEmpty
                                   ? 'No text was found or extracted from your document. You can enter text manually by tapping the edit button above.'
@@ -139,56 +147,41 @@ class _ReviewTextScreenState extends State<ReviewTextScreen> {
               ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: ThemeTokens.spacingMd,
+          vertical: 12,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
-            ),
-          ],
+          boxShadow: BrandShadows.navTop(theme.brightness),
         ),
-        child: Row(
-          children: [
-            Semantics(
-              label: 'Retake',
-              button: true,
-              child: TextButton(
-                onPressed: _loading
-                    ? null
-                    : () => Navigator.pushReplacementNamed(
-                        context, '/uploadOptions'),
-                style: TextButton.styleFrom(
-                  foregroundColor: theme.colorScheme.primary,
-                  disabledForegroundColor:
-                      theme.colorScheme.primary.withOpacity(0.4),
+        child: SafeArea(
+          child: Row(
+            children: [
+              Semantics(
+                label: 'Retake',
+                button: true,
+                child: RxSecondaryButton(
+                  label: 'Retake',
+                  expand: false,
+                  onPressed: _loading
+                      ? null
+                      : () => Navigator.pushReplacementNamed(
+                          context, '/uploadOptions'),
                 ),
-                child: const Text('Retake'),
               ),
-            ),
-            const Spacer(),
-            Semantics(
-              label: 'Continue',
-              button: true,
-              child: ElevatedButton(
-                onPressed: _loading ? null : _continue,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.secondary,
-                  disabledBackgroundColor:
-                      theme.colorScheme.secondary.withOpacity(0.4),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  elevation: _loading ? 1 : 4,
+              const Spacer(),
+              Semantics(
+                label: 'Continue',
+                button: true,
+                child: RxPrimaryButton(
+                  label: 'Continue',
+                  expand: false,
+                  onPressed: _loading ? null : _continue,
                 ),
-                child: const Text('Continue'),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

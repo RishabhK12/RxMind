@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
-import 'dart:convert';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_app_bar_logo.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
+import 'package:rxmind_app/widgets/rx_section_header.dart';
 
 // Extension to capitalize first letter of string
 extension StringExtension on String {
@@ -54,40 +55,22 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Future<void> _loadWarnings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? warningsJson = prefs.getString('warnings');
-
-    if (warningsJson != null && warningsJson.isNotEmpty) {
-      try {
-        final List<dynamic> parsedWarnings = jsonDecode(warningsJson);
-        setState(() {
-          warnings = List<Map<String, dynamic>>.from(parsedWarnings);
-        });
-      } catch (e) {
-        // Error parsing warnings data
-      }
-    }
+    final loaded = await DischargeDataManager.loadWarnings();
+    setState(() {
+      warnings = loaded;
+    });
   }
 
   Future<void> _loadContacts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? contactsJson = prefs.getString('contacts');
-
-    if (contactsJson != null && contactsJson.isNotEmpty) {
-      try {
-        final List<dynamic> parsedContacts = jsonDecode(contactsJson);
-        setState(() {
-          contacts = List<Map<String, dynamic>>.from(parsedContacts);
-        });
-      } catch (e) {
-        // Error parsing contacts data
-      }
-    }
+    final loaded = await DischargeDataManager.loadContacts();
+    setState(() {
+      contacts = loaded;
+    });
   }
 
   Future<void> _loadUserProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    userName = prefs.getString('userName');
+    final profile = await DischargeDataManager.loadProfileData();
+    userName = profile['name'] as String?;
     dischargeUploaded = await DischargeDataManager.isDischargeUploaded();
 
     if (!dischargeUploaded) {
@@ -262,14 +245,34 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     }
   }
 
+  Color _warningWellFill(Brightness brightness) {
+    if (brightness == Brightness.dark) {
+      return ThemeTokens.darkMuted;
+    }
+    return ThemeTokens.amber50;
+  }
+
+  Color _warningWellFg(Brightness brightness, ColorScheme colorScheme) {
+    if (brightness == Brightness.dark) {
+      return colorScheme.onSurface;
+    }
+    return ThemeTokens.brandFg;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final ext = RxMindThemeExtension.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final warningFill = _warningWellFill(theme.brightness);
+    final warningFg = _warningWellFg(theme.brightness, colorScheme);
+
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
         title: Row(
           children: [
             Semantics(
@@ -280,13 +283,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 onTap: () => Navigator.pushNamed(context, '/settings'),
                 child: CircleAvatar(
                   radius: 22,
-                  backgroundColor: theme.colorScheme.secondary,
+                  backgroundColor: colorScheme.secondary,
                   child: Text(
                     userName != null && userName!.isNotEmpty
                         ? userName![0].toUpperCase()
                         : '?',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: theme.colorScheme.onSecondary,
+                      color: colorScheme.onSecondary,
                       fontWeight: FontWeight.bold,
                       fontSize: 22,
                     ),
@@ -295,28 +298,22 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            Semantics(
-              label: 'Welcome to rxmind',
-              child: Text(
-                'Welcome to RxMind',
-                style: theme.textTheme.titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
+            Expanded(
+              child: Semantics(
+                label: 'Welcome to rxmind',
+                child: Text(
+                  'Welcome to rxmind',
+                  style: theme.textTheme.titleLarge,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ],
         ),
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Semantics(
-              label: 'RxMind logo',
-              child: SvgPicture.asset(
-                'assets/illus/logo.svg',
-                width: 64,
-                height: 64,
-                fit: BoxFit.contain,
-              ),
-            ),
+            padding: EdgeInsets.only(right: 16),
+            child: RxAppBarLogo(showWordmark: false, height: 36),
           ),
         ],
       ),
@@ -330,10 +327,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               sliver: SliverToBoxAdapter(
                 child: Semantics(
                   label: 'Upcoming Tasks',
-                  child: Text(
-                    'Upcoming Tasks',
-                    style: theme.textTheme.titleMedium,
-                  ),
+                  child: const RxSectionHeader(title: 'Upcoming Tasks'),
                 ),
               ),
             ),
@@ -379,70 +373,62 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 sliver: SliverToBoxAdapter(
                   child: Semantics(
                     label: 'Important Reminders',
-                    child: Text(
-                      'Important Reminders',
-                      style: theme.textTheme.titleMedium,
-                    ),
+                    child: const RxSectionHeader(title: 'Important Reminders'),
                   ),
                 ),
               ),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverToBoxAdapter(
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 2,
-                    color: Colors.amber.shade50,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.warning_amber_rounded,
-                                color: Colors.amber.shade700,
-                                size: 24,
+                  child: RxCard(
+                    color: warningFill,
+                    borderColor: isDark
+                        ? ThemeTokens.darkBorder
+                        : ext.warning.withValues(alpha: 0.35),
+                    radius: ThemeTokens.radiusMd,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: ext.warning,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Warnings & Restrictions',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: warningFg,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Warnings & Restrictions',
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  color: Colors.amber.shade900,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ...warnings.map((warning) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.circle,
+                                    size: 8,
+                                    color: ext.warning,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      warning['text'] ?? '',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(color: warningFg),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          ...warnings.map((warning) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      Icons.circle,
-                                      size: 8,
-                                      color: Colors.amber.shade800,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        warning['text'] ?? '',
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(
-                                          color: Colors.grey.shade900,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ],
-                      ),
+                            )),
+                      ],
                     ),
                   ),
                 ),
@@ -459,7 +445,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     child: _ActionTile(
                       icon: Icons.upload_file,
                       label: 'Upload Discharge',
-                      color: theme.colorScheme.primary,
+                      color: colorScheme.primary,
                       onTap: () =>
                           Navigator.pushNamed(context, '/uploadOptions'),
                     ),
@@ -468,9 +454,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     label: 'Medications',
                     button: true,
                     child: _ActionTile(
-                      icon: FontAwesomeIcons.pills,
+                      icon: Icons.medication,
                       label: 'Medications',
-                      color: theme.colorScheme.secondary,
+                      color: colorScheme.secondary,
                       onTap: () => widget.onNavigateToTab
                           ?.call(3), // 3 = Medications tab
                     ),
@@ -481,7 +467,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     child: _ActionTile(
                       icon: Icons.checklist_rtl,
                       label: 'Tasks & Reminders',
-                      color: theme.colorScheme.primary,
+                      color: colorScheme.primary,
                       onTap: () =>
                           widget.onNavigateToTab?.call(2), // 2 = Tasks tab
                     ),
@@ -492,7 +478,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     child: _ActionTile(
                       icon: Icons.bar_chart,
                       label: 'Stats',
-                      color: theme.colorScheme.secondary,
+                      color: colorScheme.secondary,
                       onTap: () =>
                           widget.onNavigateToTab?.call(1), // 1 = Charts tab
                     ),
@@ -514,70 +500,55 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 child: Semantics(
                   label: 'Export Data',
                   button: true,
-                  child: SizedBox(
-                    height: 60,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        try {
-                          // Show loading indicator
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
+                  child: RxPrimaryButton(
+                    label: 'Export Health Report',
+                    icon: Icons.download,
+                    onPressed: () async {
+                      try {
+                        // Show loading indicator
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
 
-                          // Generate PDF
-                          final pdfFile =
-                              await PdfExportService.generateHealthReport();
+                        // Generate PDF
+                        final pdfFile =
+                            await PdfExportService.generateHealthReport();
 
-                          // Close loading dialog
-                          if (!context.mounted) return;
+                        // Close loading dialog
+                        if (!context.mounted) return;
+                        Navigator.of(context).pop();
+
+                        // Navigate to preview screen
+                        if (!context.mounted) return;
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PdfPreviewScreen(pdfFile: pdfFile),
+                          ),
+                        );
+                      } catch (e) {
+                        // Close loading dialog if still open
+                        if (context.mounted && Navigator.of(context).canPop()) {
                           Navigator.of(context).pop();
-
-                          // Navigate to preview screen
-                          if (!context.mounted) return;
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PdfPreviewScreen(pdfFile: pdfFile),
-                            ),
-                          );
-                        } catch (e) {
-                          // Close loading dialog if still open
-                          if (context.mounted &&
-                              Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                          }
-
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error exporting PDF: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
                         }
-                      },
-                      icon: Icon(Icons.download,
-                          color: theme.colorScheme.onPrimary),
-                      label: Text(
-                        'Export Health Report',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onPrimary,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                      ),
-                    ),
+
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Error exporting PDF: $e',
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(color: colorScheme.onError),
+                            ),
+                            backgroundColor: colorScheme.error,
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
               ),
@@ -598,62 +569,52 @@ class _TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    return SizedBox(
       width: 180,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 5,
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  valueColor:
-                      AlwaysStoppedAnimation(theme.colorScheme.secondary),
+      child: RxCard(
+        radius: ThemeTokens.radiusMd,
+        padding: const EdgeInsets.all(ThemeTokens.spacingMd),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 5,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    valueColor:
+                        AlwaysStoppedAnimation(theme.colorScheme.secondary),
+                  ),
                 ),
-              ),
-              Text(
-                '${(progress * 100).round()}%',
-                style: theme.textTheme.labelLarge?.copyWith(
+                Text(
+                  '${(progress * 100).round()}%',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w500,
                   color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Flexible(
-            child: Text(
-              title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w500,
-                fontSize: 15,
-                color: theme.colorScheme.onSurface,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -673,36 +634,23 @@ class _ActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
+    return RxCard(
       onTap: onTap,
-      child: Ink(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+      radius: ThemeTokens.radiusMd,
+      padding: EdgeInsets.zero,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 32, color: color),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                fontSize: 15,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

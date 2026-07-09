@@ -45,5 +45,19 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>RxMind uses the camera so you can capture discharge documents for on-device text extraction. Images are processed locally on your device.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>RxMind accesses your photo library so you can select discharge documents for on-device text extraction. Selected images stay on your device.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>RxMind sends wellness reminders for tasks and recovery entries you schedule. Notification content uses neutral copy only.</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>org.rxmind.app.reminder-sync</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

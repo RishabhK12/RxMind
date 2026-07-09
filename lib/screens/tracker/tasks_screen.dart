@@ -3,6 +3,9 @@ import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/screens/stats/compliance_stats.dart';
 import 'package:rxmind_app/services/notification_service.dart';
 import 'package:rxmind_app/core/task/task_update_helper.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_empty_state.dart';
 
 class TasksScreen extends StatefulWidget {
   final GlobalKey<ComplianceStatsScreenState>? complianceStatsKey;
@@ -37,10 +40,15 @@ class _TasksScreenState extends State<TasksScreen> {
         return Duration(hours: hours);
       }
     }
-    if (lower.contains('once') || lower.contains('daily') || lower.contains('day')) {
-      if (lower.contains('twice') || lower.contains('2')) return const Duration(hours: 12);
-      if (lower.contains('three') || lower.contains('3')) return const Duration(hours: 8);
-      if (lower.contains('four') || lower.contains('4')) return const Duration(hours: 6);
+    if (lower.contains('once') ||
+        lower.contains('daily') ||
+        lower.contains('day')) {
+      if (lower.contains('twice') || lower.contains('2'))
+        return const Duration(hours: 12);
+      if (lower.contains('three') || lower.contains('3'))
+        return const Duration(hours: 8);
+      if (lower.contains('four') || lower.contains('4'))
+        return const Duration(hours: 6);
       return const Duration(hours: 24);
     }
     if (lower.contains('week')) return const Duration(days: 7);
@@ -431,8 +439,8 @@ class _TasksScreenState extends State<TasksScreen> {
         }
       }
 
-  // Sync to related medication (e.g., Take [med])
-  await _updateRelatedMedication(updatedTaskInfo, true);
+      // Sync to related medication (e.g., Take [med])
+      await _updateRelatedMedication(updatedTaskInfo, true);
 
       // Refresh stats screen immediately
       widget.complianceStatsKey?.currentState?.refreshStats();
@@ -446,11 +454,13 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
+    final mutedFg = theme.colorScheme.onSurface.withValues(alpha: 0.55);
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
         title: Semantics(
           label: 'Tasks and Reminders',
           child: Text(
@@ -467,7 +477,12 @@ class _TasksScreenState extends State<TasksScreen> {
               children: [
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                    padding: const EdgeInsets.fromLTRB(
+                      ThemeTokens.spacingSm,
+                      ThemeTokens.spacingSm,
+                      ThemeTokens.spacingSm,
+                      0,
+                    ),
                     children: [
                       for (final task in _safeTasksList)
                         Semantics(
@@ -480,69 +495,39 @@ class _TasksScreenState extends State<TasksScreen> {
                         Semantics(
                           label: 'Upload Discharge Paper',
                           button: true,
-                          child: GestureDetector(
-                            onTap: () =>
+                          child: RxEmptyState(
+                            title: 'Upload discharge paper',
+                            message:
+                                'Add your discharge summary to generate tasks and reminders.',
+                            icon: Icons.upload_file,
+                            actionLabel: 'Upload Discharge Paper',
+                            onAction: () =>
                                 Navigator.pushNamed(context, '/uploadOptions'),
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 6, horizontal: 8),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surface,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.10),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                                border: Border.all(
-                                    color: theme.colorScheme.primary, width: 2),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.upload_file,
-                                      color: theme.colorScheme.primary,
-                                      size: 28),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'Upload Discharge Paper',
-                                    style: theme.textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: theme.colorScheme.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            wellColor: ThemeTokens.blue50,
                           ),
                         ),
                       if (_safeTasksList.isEmpty && dischargeUploaded)
-                        Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            'No tasks yet. Tap + to add a new task.',
-                            style: theme.textTheme.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
+                        const RxEmptyState(
+                          title: 'No tasks yet',
+                          message: 'Tap + to add a new task.',
+                          icon: Icons.checklist_rounded,
+                          wellColor: ThemeTokens.emerald50,
                         ),
                       // Completed tasks dropdown
                       if (completedTasks.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 16),
-                          child: Card(
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            horizontal: ThemeTokens.spacingSm,
+                            vertical: ThemeTokens.spacingMd,
+                          ),
+                          child: RxCard(
+                            radius: ThemeTokens.radiusMd,
+                            padding: EdgeInsets.zero,
                             child: Column(
                               children: [
                                 ListTile(
                                   leading: Icon(Icons.check_circle,
-                                      color: theme.colorScheme.primary),
+                                      color: ext.success),
                                   title: Text(
                                     'Completed Tasks (${completedTasks.length})',
                                     style:
@@ -567,15 +552,16 @@ class _TasksScreenState extends State<TasksScreen> {
                                     return ListTile(
                                       leading: Icon(
                                         Icons.check_circle_outline,
-                                        color: Colors.green,
+                                        color: ext.success,
                                         size: 20,
                                       ),
                                       title: Text(
                                         task['title'],
-                                        style: TextStyle(
+                                        style:
+                                            theme.textTheme.bodyLarge?.copyWith(
                                           decoration:
                                               TextDecoration.lineThrough,
-                                          color: Colors.grey,
+                                          color: mutedFg,
                                         ),
                                       ),
                                       trailing: task['lastCompleted'] != null
@@ -584,7 +570,7 @@ class _TasksScreenState extends State<TasksScreen> {
                                                   task['lastCompleted']),
                                               style: theme.textTheme.bodySmall
                                                   ?.copyWith(
-                                                color: Colors.grey,
+                                                color: mutedFg,
                                               ),
                                             )
                                           : null,
@@ -702,8 +688,6 @@ class _TasksScreenState extends State<TasksScreen> {
               label: 'Add new task',
               button: true,
               child: FloatingActionButton(
-                backgroundColor: theme.colorScheme.secondary,
-                child: const Icon(Icons.add, size: 28, color: Colors.white),
                 onPressed: () async {
                   final result = await showDialog<Map<String, dynamic>>(
                     context: context,
@@ -905,12 +889,13 @@ class _TasksScreenState extends State<TasksScreen> {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            content:
-                                Text('Task "${result['title']}" created!')),
+                          content: Text('Task "${result['title']}" created!'),
+                        ),
                       );
                     }
                   }
                 },
+                child: const Icon(Icons.add, size: 28),
               ),
             )
           : null,
@@ -919,6 +904,13 @@ class _TasksScreenState extends State<TasksScreen> {
 
   Widget _buildTaskCard(BuildContext context, Map<String, dynamic> task) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
+    final isOverdue = task['isOverdue'] == true;
+    final isCompleted = task['completed'] == true;
+    final snoozeCount = (task['snoozeCount'] ?? 0) as int;
+    final warningWell = theme.brightness == Brightness.dark
+        ? ThemeTokens.darkMuted
+        : ThemeTokens.amber50;
 
     DateTime? dueTime;
     if (task['dueTime'] != null) {
@@ -942,106 +934,118 @@ class _TasksScreenState extends State<TasksScreen> {
         ? '${_getDayOfWeekShort(dueTime.weekday)}, ${_getMonthShort(dueTime.month)} ${dueTime.day}'
         : null;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.10),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: task['isOverdue'] == true
-            ? Border.all(color: theme.colorScheme.error, width: 2)
-            : null,
+    final dueAccent = isOverdue
+        ? theme.colorScheme.error
+        : (snoozeCount > 0 ? ext.warning : theme.colorScheme.onSurface);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 6,
+        horizontal: ThemeTokens.spacingSm,
       ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => _toggleCompleteTask(task),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 350),
-              transitionBuilder: (child, anim) =>
-                  ScaleTransition(scale: anim, child: child),
-              child: task['completed'] == true
-                  ? Icon(Icons.check_circle,
-                      key: const ValueKey('checked'),
-                      color: theme.colorScheme.primary,
-                      size: 28)
-                  : Icon(Icons.radio_button_unchecked,
-                      key: const ValueKey('unchecked'),
-                      color: task['isOverdue'] == true
-                          ? theme.colorScheme.error
-                          : theme.colorScheme.secondary,
-                      size: 28),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _showTaskDetails(context, task),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          task['title'],
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: task['isOverdue'] == true
-                                ? theme.colorScheme.error
-                                : theme.colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                      if ((task['snoozeCount'] ?? 0) > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: Icon(Icons.snooze,
-                              color: Colors.orange, size: 20),
-                        ),
-                    ],
-                  ),
-                  if (dueDateStr != null || dueTimeStr != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.schedule,
-                            size: 14,
-                            color: theme.colorScheme.secondary.withOpacity(0.7),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${dueDateStr ?? ''} ${dueTimeStr != null ? 'at $dueTimeStr' : ''}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color:
-                                  theme.colorScheme.secondary.withOpacity(0.9),
-                              fontWeight: FontWeight.w500,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
+      child: RxCard(
+        radius: ThemeTokens.radiusMd,
+        color: snoozeCount > 0 && !isOverdue ? warningWell : null,
+        borderColor: isOverdue
+            ? theme.colorScheme.error
+            : (snoozeCount > 0 ? ext.warning : null),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () => _toggleCompleteTask(task),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                transitionBuilder: (child, anim) =>
+                    ScaleTransition(scale: anim, child: child),
+                child: isCompleted
+                    ? Icon(Icons.check_circle,
+                        key: const ValueKey('checked'),
+                        color: ext.success,
+                        size: 28)
+                    : Icon(Icons.radio_button_unchecked,
+                        key: const ValueKey('unchecked'),
+                        color: isOverdue
+                            ? theme.colorScheme.error
+                            : theme.colorScheme.primary,
+                        size: 28),
               ),
             ),
-          ),
-          if (task['isOverdue'] == true)
-            Icon(Icons.warning, color: theme.colorScheme.error),
-          const SizedBox(width: 8),
-          Icon(Icons.drag_handle,
-              color: theme.colorScheme.onSurface.withOpacity(0.2)),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _showTaskDetails(context, task),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            task['title'],
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              decoration: isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                              color: isCompleted
+                                  ? theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.55)
+                                  : dueAccent,
+                            ),
+                          ),
+                        ),
+                        if (snoozeCount > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Icon(Icons.snooze,
+                                color: ext.warning, size: 20),
+                          ),
+                      ],
+                    ),
+                    if (dueDateStr != null || dueTimeStr != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.schedule,
+                              size: 14,
+                              color: isOverdue
+                                  ? theme.colorScheme.error
+                                      .withValues(alpha: 0.8)
+                                  : (snoozeCount > 0
+                                      ? ext.warning
+                                      : theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.55)),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${dueDateStr ?? ''} ${dueTimeStr != null ? 'at $dueTimeStr' : ''}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: isOverdue
+                                    ? theme.colorScheme.error
+                                    : (snoozeCount > 0
+                                        ? ThemeTokens.brandFgSecondary
+                                        : theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.7)),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            if (isOverdue) Icon(Icons.warning, color: theme.colorScheme.error),
+            const SizedBox(width: 8),
+            Icon(Icons.drag_handle,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
+          ],
+        ),
       ),
     );
   }
@@ -1182,10 +1186,10 @@ class _TasksScreenState extends State<TasksScreen> {
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: theme.colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
                     ),
                   ),
                   child: const Text(
@@ -1222,7 +1226,7 @@ class _TasksScreenState extends State<TasksScreen> {
                 Text(
                   label,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),

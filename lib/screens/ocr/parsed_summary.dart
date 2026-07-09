@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ParsedSummaryScreen extends StatefulWidget {
   final Map<String, dynamic>? parsedJson;
@@ -21,7 +22,6 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   List<Map<String, dynamic>> tasks = [];
   bool _loading = true;
   bool _didRun = false;
-  String _rawOcrText = '';
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -34,8 +34,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   }
 
   Future<void> _parseDischargeData() async {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    _rawOcrText = args?['ocrText'] as String? ?? '';
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final parsedJsonString = args?['parsedJson'] as String? ?? '';
 
     if (parsedJsonString.isNotEmpty) {
@@ -50,7 +50,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         final Map<String, dynamic> parsed = jsonDecode(jsonStr);
 
         // Extract medications
-        if (parsed.containsKey('medications') && parsed['medications'] is List) {
+        if (parsed.containsKey('medications') &&
+            parsed['medications'] is List) {
           medications = (parsed['medications'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
@@ -64,7 +65,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         }
 
         // Extract instructions
-        if (parsed.containsKey('instructions') && parsed['instructions'] is List) {
+        if (parsed.containsKey('instructions') &&
+            parsed['instructions'] is List) {
           instructions = (parsed['instructions'] as List)
               .map((e) => Map<String, dynamic>.from(e as Map))
               .toList();
@@ -80,7 +82,8 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           warnings = [];
 
           for (final task in allTasks) {
-            final description = task['description']?.toString().toLowerCase() ?? '';
+            final description =
+                task['description']?.toString().toLowerCase() ?? '';
 
             // Check for keywords to categorize as warnings/restrictions
             if (description.contains('do not') ||
@@ -127,8 +130,17 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         instructions = [];
         warnings = [];
         tasks = [];
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error parsing data: $e')),
+          SnackBar(
+            content: Text(
+              'Error parsing data: $e',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onError,
+              ),
+            ),
+            backgroundColor: theme.colorScheme.error,
+          ),
         );
       }
     }
@@ -153,8 +165,10 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
+      builder: (context) => Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.secondary,
+        ),
       ),
     );
 
@@ -318,9 +332,7 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
 
               // Save warnings using the same mechanism as other data
               if (warningsForStorage.isNotEmpty) {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setString(
-                    'warnings', jsonEncode(warningsForStorage));
+                await DischargeDataManager.saveWarnings(warningsForStorage);
               }
             }
           }
@@ -416,8 +428,9 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         tasks: tasksForStorage,
         followUps: followUps,
         instructions: instructions,
-        rawOcrText: _rawOcrText,
       );
+
+      await DischargeDataManager.purgeRawOcrText();
 
       // Save contacts separately
       if (contacts.isNotEmpty) {
@@ -445,17 +458,33 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           .pushNamedAndRemoveUntil('/mainNav', (Route<dynamic> route) => false);
 
       // Show success message
+      final theme = Theme.of(context);
+      final ext = RxMindThemeExtension.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Discharge data saved successfully!'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: Text(
+            'Discharge data saved successfully!',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSecondary,
+            ),
+          ),
+          backgroundColor: ext.success,
         ),
       );
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
+      final theme = Theme.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving data: $e')),
+        SnackBar(
+          content: Text(
+            'Error saving data: $e',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onError,
+            ),
+          ),
+          backgroundColor: theme.colorScheme.error,
+        ),
       );
     }
   }
@@ -464,33 +493,51 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Discharge Summary'),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        title: Text('Discharge Summary', style: theme.textTheme.titleLarge),
         actions: [
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.robot),
-            tooltip: 'Chat with Health Assistant',
-            onPressed: () {
-              Navigator.pushNamed(context, '/chat',
-                  arguments: {'initial_context': _rawOcrText});
+            icon: Icon(
+              Icons.smart_toy_outlined,
+              color: theme.colorScheme.primary,
+            ),
+            tooltip: 'Chat with Wellness Guide',
+            onPressed: () async {
+              final meds = await DischargeDataManager.loadMedications();
+              final tasks = await DischargeDataManager.loadTasks();
+              if (!context.mounted) return;
+              Navigator.pushNamed(context, '/chat', arguments: {
+                'structured_context': {
+                  'medications': meds,
+                  'tasks': tasks,
+                },
+              });
             },
           ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.secondary,
+              ),
+            )
           : Scrollbar(
               controller: _scrollController,
               child: ListView(
                 controller: _scrollController,
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(ThemeTokens.spacingMd),
                 children: [
                   Semantics(
                     label: 'Medications section',
                     child: _buildSection(
                       context: context,
-                      icon: FontAwesomeIcons.pills,
+                      icon: Icons.medication,
                       iconColor: theme.colorScheme.secondary,
+                      wellColor: ThemeTokens.emerald50,
                       title: 'Medications',
                       items: medications,
                       itemBuilder: (item) => _buildItemTile(
@@ -501,12 +548,14 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: ThemeTokens.spacingMd),
                   Semantics(
                     label: 'Follow-Ups section',
                     child: _buildSection(
                       context: context,
                       icon: Icons.calendar_today,
                       iconColor: theme.colorScheme.primary,
+                      wellColor: ThemeTokens.blue50,
                       title: 'Follow-Ups',
                       items: followUps,
                       itemBuilder: (item) => _buildItemTile(
@@ -516,12 +565,15 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: ThemeTokens.spacingMd),
                   Semantics(
                     label: 'Instructions section',
                     child: _buildSection(
                       context: context,
                       icon: Icons.menu_book,
-                      iconColor: theme.colorScheme.onSurface.withAlpha(153),
+                      iconColor:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      wellColor: ThemeTokens.amber50,
                       title: 'Instructions',
                       items: instructions,
                       itemBuilder: (item) => _buildItemTile(
@@ -540,19 +592,13 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
         label: 'Confirm and continue',
         button: true,
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(ThemeTokens.spacingMd),
           color: theme.colorScheme.surface,
-          child: ElevatedButton(
-            onPressed: _confirmAndSave,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.secondary,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 4,
+          child: SafeArea(
+            child: RxPrimaryButton(
+              label: 'Confirm & Continue',
+              onPressed: _confirmAndSave,
             ),
-            child: const Text('Confirm & Continue'),
           ),
         ),
       ),
@@ -563,23 +609,43 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
     required BuildContext context,
     required IconData icon,
     required Color iconColor,
+    required Color wellColor,
     required String title,
     required List<Map<String, dynamic>> items,
     required Widget Function(Map<String, dynamic>) itemBuilder,
   }) {
     final theme = Theme.of(context);
-    return ExpansionTile(
-      leading: Icon(icon, color: iconColor, size: 28),
-      title: Text(
-        title,
-        style: theme.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          fontSize: 18,
-          color: theme.colorScheme.onSurface,
-        ),
+    final isDark = theme.brightness == Brightness.dark;
+    return RxCard(
+      radius: ThemeTokens.radiusMd,
+      padding: const EdgeInsets.all(ThemeTokens.spacingMd),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: isDark ? ThemeTokens.darkMuted : wellColor,
+                  borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: ThemeTokens.spacingMd),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: ThemeTokens.spacingSm),
+          ...items.map(itemBuilder),
+        ],
       ),
-      childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      children: items.map(itemBuilder).toList(),
     );
   }
 
@@ -587,11 +653,11 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
       {String? subtitle}) {
     final theme = Theme.of(context);
     return ListTile(
+      contentPadding: EdgeInsets.zero,
       title: Text(
         item['name'] ?? 'Unnamed Item',
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w500,
-          fontSize: 16,
           color: theme.colorScheme.onSurface,
         ),
       ),
@@ -599,14 +665,15 @@ class _ParsedSummaryScreenState extends State<ParsedSummaryScreen> {
           ? Text(
               subtitle,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(153),
-                fontSize: 14,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             )
           : null,
       trailing: IconButton(
-        icon:
-            Icon(Icons.edit, color: theme.colorScheme.onSurface.withAlpha(153)),
+        icon: Icon(
+          Icons.edit,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+        ),
         onPressed: () => _editItem(item),
       ),
       onTap: () => _editItem(item),

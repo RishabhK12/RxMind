@@ -14,9 +14,9 @@ dependencies:
   flutter_svg: ^2.0.9
   smooth_page_indicator:
   provider:
-  font_awesome_flutter:
   flutter_secure_storage:
-  sqflite:
+  sqflite_sqlcipher: ^3.1.0
+  crypto: ^3.0.3
   archive:
   file_picker:
   device_info_plus: ^9.1.2
@@ -25,9 +25,10 @@ dependencies:
   flutter_local_notifications: ^17.0.0
   flutter_slidable:
   flutter_tesseract_ocr: ^0.4.30
-  google_gemini:
+  # AI inference: local-only (Phase 3). flutter_gemma engine linked when SDK >=3.12.
+  # ModelLoader + LocalAiService use FallbackAiBackend until native runtime available.
+  flutter_gemma: ^0.10.1
   image_picker: ^1.2.0
-  flutter_dotenv: ^5.0.2
   permission_handler: ^11.3.0
   flutter_markdown: ^0.7.4+1
   pdfx: ^2.5.0
@@ -35,13 +36,15 @@ dependencies:
   timezone: ^0.9.2
   url_launcher: ^6.2.5
   intl: ^0.18.0
-  http: ^1.2.0
+  workmanager: ^0.5.2
   # Add other dependencies as needed
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints:
+  sqflite_common_ffi: ^2.3.6
+  golden_toolkit: ^0.15.0
   flutter_launcher_icons: ^0.13.1
 
 flutter_launcher_icons:
@@ -58,15 +61,21 @@ flutter:
     - assets/illus/onboard1.svg
     - assets/illus/onboard2.svg
     - assets/illus/onboard3.svg
-    - .env
     - assets/tessdata/
     - assets/tessdata/README.md
     - assets/tessdata_config.json
+    - assets/data/clinical_facilities_us.geojson
     # Add other assets as needed
   fonts:
-    - family: Poppins
+    - family: PlusJakartaSans
       fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-        - asset: assets/fonts/Poppins-Bold.ttf
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-ExtraBold.ttf
+          weight: 800

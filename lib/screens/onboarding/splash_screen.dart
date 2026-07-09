@@ -94,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen>
             theme.colorScheme.primary,
             BlendMode.srcIn,
           ),
-          semanticsLabel: 'RxMind logo',
+          semanticsLabel: 'rxmind logo',
           errorBuilder: (context, error, stackTrace) {
             return Icon(
               Icons.medical_services_rounded,
@@ -131,7 +131,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
         child: Semantics(
-          label: 'Loading RxMind',
+          label: 'Loading rxmind',
           child: content,
         ),
       ),

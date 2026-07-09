@@ -7,6 +7,7 @@ import 'package:rxmind_app/theme/app_theme.dart';
 import 'package:rxmind_app/theme/theme_tokens.dart';
 import 'package:rxmind_app/screens/settings/contacts_screen.dart';
 import 'package:rxmind_app/core/storage/secure_wipe_service.dart';
+import 'package:rxmind_app/screens/settings/privacy_terms_screen.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
@@ -526,7 +527,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 title: const Text('Version'),
-                subtitle: const Text('RxMind v1.0.0'),
+                subtitle: const Text('rxmind v1.0.0'),
               ),
               ListTile(
                 leading:
@@ -539,11 +540,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   size: 20,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const PrivacyTermsScreen(),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 leading: Icon(Icons.people, color: theme.colorScheme.secondary),
                 title: const Text('Credits'),
-                subtitle: const Text('Created by the RxMind team.'),
+                subtitle: const Text('Created by the rxmind team.'),
               ),
             ],
           ),
@@ -584,7 +592,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Notification Permission Required'),
         content: const Text(
-          'RxMind needs notification permission to remind you about upcoming tasks. '
+          'rxmind needs notification permission to remind you about upcoming tasks. '
           'Please enable notifications in your device settings.',
         ),
         actions: [
@@ -610,10 +618,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Exact Alarm Permission'),
         content: const Text(
-          'For more precise notification timing, RxMind needs permission to schedule exact alarms. '
+          'For more precise notification timing, rxmind needs permission to schedule exact alarms. '
           'Without this permission, notifications may be slightly delayed.\n\n'
           'You can grant this permission in your device settings under:\n'
-          'Settings → Apps → RxMind → Alarms & reminders',
+          'Settings → Apps → rxmind → Alarms & reminders',
         ),
         actions: [
           TextButton(

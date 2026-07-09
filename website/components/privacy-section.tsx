@@ -17,7 +17,7 @@ export function PrivacySection() {
           </h2>
           <p className="text-lg font-medium leading-relaxed text-slate-600">
             Recovery logs, medication schedules, and extracted discharge text
-            stay on your phone. RxMind does not sync Consumer Health Data to
+            stay on your phone. rxmind does not sync Consumer Health Data to
             cloud servers. You can erase everything anytime in Settings.
           </p>
           <div className="flex flex-wrap gap-4 pt-2">
@@ -76,7 +76,7 @@ export function PrivacySection() {
 
             <div className="relative z-10 my-8 space-y-4">
               <div className="text-2xl font-bold tracking-tight">
-                RxMind Sandbox Active
+                rxmind sandbox active
               </div>
               <p className="text-sm leading-relaxed text-slate-400">
                 Plans, logs, and reminders stay inside your device sandbox.

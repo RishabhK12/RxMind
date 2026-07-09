@@ -8,7 +8,7 @@ class PrivacyTermsScreen extends StatelessWidget {
   static const _privacyPolicy = '''
 Last Updated: July 8, 2026
 
-RxMind is a personal recovery organizer. This Privacy Policy explains how we handle your data when you use our mobile application.
+rxmind is a personal recovery organizer. This Privacy Policy explains how we handle your data when you use our mobile application.
 
 What Information We Collect
 
@@ -16,10 +16,10 @@ Information You Provide
 You may provide photos or PDFs of discharge papers, manually entered medications, schedules, tasks, follow-up appointments, notes, reminders, and questions for on-device wellness clarification. This may include health information.
 
 Automatically Collected Data
-RxMind does not automatically collect or upload health-related information. We do not use advertising SDKs or analytics on screens that display your health logs.
+rxmind does not automatically collect or upload health-related information. We do not use advertising SDKs or analytics on screens that display your health logs.
 
 No Account Required
-You may use RxMind without creating an account.
+You may use rxmind without creating an account.
 
 How Your Data Is Stored
 
@@ -39,7 +39,7 @@ You may delete all app data via Settings → Delete All Data, remove individual 
 
 Children's Privacy
 
-RxMind is not intended for children under 13.
+rxmind is not intended for children under 13.
 
 Security Measures
 
@@ -53,12 +53,12 @@ privacy@rxmind.app
   static const _termsOfService = '''
 Last Updated: July 8, 2026
 
-These Terms of Service govern your use of the RxMind application.
+These Terms of Service govern your use of the rxmind application.
 
 Purpose of the App
 
-RxMind helps users manage post-discharge recovery by scanning documents, organizing tasks and medications, providing reminders, and offering on-device wellness clarification.
-RxMind does not replace professional healthcare, suggest medication changes, make treatment decisions, or handle emergencies.
+rxmind helps users manage post-discharge recovery by scanning documents, organizing tasks and medications, providing reminders, and offering on-device wellness clarification.
+rxmind does not replace professional healthcare, suggest medication changes, make treatment decisions, or handle emergencies.
 You must consult your healthcare provider for medical needs.
 
 License to Use the App
@@ -75,7 +75,7 @@ OCR accuracy depends on image quality. Extracted data is not guaranteed to be ac
 
 Limitations of Liability
 
-RxMind is provided "as is." We are not liable for medical decisions you make, incorrect OCR results, missed reminders, or data loss on your device.
+rxmind is provided "as is." We are not liable for medical decisions you make, incorrect OCR results, missed reminders, or data loss on your device.
 
 Privacy Policy
 

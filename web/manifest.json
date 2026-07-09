@@ -1,11 +1,11 @@
 {
-    "name": "rxmind_app",
-    "short_name": "rxmind_app",
+    "name": "rxmind",
+    "short_name": "rxmind",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "RxMind — log, organize, and remind yourself about post-discharge recovery. All data stays on your device.",
+    "background_color": "#3B82F6",
+    "theme_color": "#3B82F6",
+    "description": "Private on-device recovery organizer.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:workmanager/workmanager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/storage/local_storage.dart';
 import 'theme/app_theme.dart';
 import 'screens/onboarding/splash_screen.dart';
@@ -18,7 +19,7 @@ import 'screens/tracker/tasks_screen.dart';
 import 'screens/tracker/medications_screen.dart';
 import 'screens/stats/compliance_stats.dart';
 import 'screens/settings/settings_screen.dart';
-import 'screens/settings/privacy_terms_screen.dart';
+import 'screens/settings/privacy_gate_screen.dart';
 import 'services/notification_service.dart';
 import 'services/discharge_data_manager.dart';
 import 'services/background/reminder_sync_scheduler.dart';
@@ -46,26 +47,33 @@ void main() async {
     debugPrint('Task notification scheduling deferred: $e');
   }
 
-  runApp(const RxMindApp());
+  final prefs = await SharedPreferences.getInstance();
+  final hasAcceptedPrivacy = prefs.getBool('privacy_terms_accepted') ?? false;
+
+  runApp(RxMindApp(showPrivacyGate: !hasAcceptedPrivacy));
 }
 
 class RxMindApp extends StatefulWidget {
-  const RxMindApp({super.key});
+  final bool showPrivacyGate;
+  const RxMindApp({super.key, required this.showPrivacyGate});
 
   @override
   State<RxMindApp> createState() => _RxMindAppState();
 }
 
 class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   ThemeMode _themeMode = ThemeMode.light;
   bool _highContrast = false;
   double _textScale = 1.0;
   bool _reducedMotion = false;
+  late final String _initialRoute;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _initialRoute = widget.showPrivacyGate ? '/privacyGate' : '/splash';
   }
 
   @override
@@ -100,7 +108,8 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
       updateReducedMotion: updateReducedMotion,
       child: Builder(
         builder: (context) => MaterialApp(
-          title: 'RxMind',
+          navigatorKey: _navigatorKey,
+          title: 'rxmind',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.resolve(
             mode: _themeMode,
@@ -118,8 +127,9 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
             ),
             child: child!,
           ),
-          initialRoute: '/splash',
+          initialRoute: _initialRoute,
           routes: {
+            '/privacyGate': (context) => const PrivacyGateScreen(),
             '/splash': (context) => const SplashScreen(),
             '/disclaimerGate': (context) => OnboardingWizardScreen(
                   onDisclaimerAcknowledged: () async {
@@ -184,7 +194,6 @@ class _RxMindAppState extends State<RxMindApp> with WidgetsBindingObserver {
             '/medications': (context) => const MedicationsScreen(),
             '/stats': (context) => ComplianceStatsScreen(),
             '/settings': (context) => const SettingsScreen(),
-            '/privacyTerms': (context) => const PrivacyTermsScreen(),
           },
         ),
       ),

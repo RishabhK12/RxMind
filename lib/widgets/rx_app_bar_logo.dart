@@ -27,7 +27,7 @@ class RxAppBarLogo extends StatelessWidget {
             theme.colorScheme.primary,
             BlendMode.srcIn,
           ),
-          semanticsLabel: 'RxMind logo',
+          semanticsLabel: 'rxmind logo',
         ),
         if (showWordmark) ...[
           const SizedBox(width: 8),

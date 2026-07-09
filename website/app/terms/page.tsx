@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { SiteChrome } from "@/components/site-chrome";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — RxMind",
-  description: "RxMind terms of use for personal wellness organization.",
+  title: "Terms of Use — rxmind",
+  description: "rxmind terms of use for personal wellness organization.",
 };
 
 export default function TermsPage() {
@@ -15,8 +15,8 @@ export default function TermsPage() {
           <strong>Effective date:</strong> July 8, 2026
         </p>
         <p>
-          By using RxMind you agree to use the app for personal wellness
-          organization only. RxMind does not provide medical advice, diagnosis,
+          By using rxmind you agree to use the app for personal wellness
+          organization only. rxmind does not provide medical advice, diagnosis,
           or treatment recommendations.
         </p>
         <p>
@@ -25,7 +25,7 @@ export default function TermsPage() {
           professionals for medical decisions.
         </p>
         <p>
-          RxMind is provided as-is. To the extent permitted by law, we disclaim
+          rxmind is provided as-is. To the extent permitted by law, we disclaim
           warranties and limit liability for personal use of the application.
         </p>
       </article>

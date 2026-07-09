@@ -45,7 +45,7 @@ const FEATURES = [
   },
   {
     title: "On-device privacy sandbox",
-    body: "Recovery plans and logs live in an encrypted local database. No cloud sync of your health data to RxMind servers.",
+    body: "Recovery plans and logs live in an encrypted local database. No cloud sync of your health data to rxmind servers.",
     icon: Shield,
     accent: "bg-violet-100 text-violet-600",
     disc: "bg-violet-200/45",

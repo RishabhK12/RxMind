@@ -9,7 +9,7 @@ class PdfExtractionTest {
   /// and extracting text from it
   static Future<void> testPdfExtraction(BuildContext context) async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
       );

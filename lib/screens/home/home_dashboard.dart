@@ -300,9 +300,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Semantics(
-                label: 'Welcome to RxMind',
+                label: 'Welcome to rxmind',
                 child: Text(
-                  'Welcome to RxMind',
+                  'Welcome to rxmind',
                   style: theme.textTheme.titleLarge,
                   overflow: TextOverflow.ellipsis,
                 ),

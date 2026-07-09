@@ -8,7 +8,8 @@ class ProfileRepository {
   final Database _db;
 
   Future<Map<String, dynamic>> get() async {
-    final rows = await _db.query('profile', where: 'id = ?', whereArgs: ['default']);
+    final rows =
+        await _db.query('profile', where: 'id = ?', whereArgs: ['default']);
     if (rows.isEmpty) return {};
     final row = rows.first;
     return {

@@ -57,7 +57,8 @@ class TextExtractionService {
     }
   }
 
-  static Future<ExtractionResult> _extractFromImageBytes(Uint8List bytes) async {
+  static Future<ExtractionResult> _extractFromImageBytes(
+      Uint8List bytes) async {
     final buffer = SecureBytes(Uint8List.fromList(bytes));
     try {
       final text = await OcrService.extractTextFromJpegBytes(buffer.data);
@@ -71,7 +72,8 @@ class TextExtractionService {
     }
   }
 
-  static Future<ExtractionResult> _extractFromPdfBytes(Uint8List pdfBytes) async {
+  static Future<ExtractionResult> _extractFromPdfBytes(
+      Uint8List pdfBytes) async {
     final docBuffer = SecureBytes(Uint8List.fromList(pdfBytes));
     try {
       final document = await PdfDocument.openData(docBuffer.data);

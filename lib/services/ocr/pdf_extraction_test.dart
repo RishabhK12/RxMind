@@ -29,8 +29,7 @@ class PdfExtractionTest {
 
       _showLoadingDialog(context, 'Extracting text from PDF...');
 
-      final extractionResult =
-          await TextExtractionService.extractTextFromBytes(
+      final extractionResult = await TextExtractionService.extractTextFromBytes(
         bytes,
         fileName: file.path,
       );

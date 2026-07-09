@@ -15,8 +15,7 @@ class RateLimiter {
   static Future<bool> canMakeRequest() async {
     final meta = await _meta();
     final now = DateTime.now();
-    final lastResetMs =
-        int.tryParse(await meta.get(_lastResetKey) ?? '0') ?? 0;
+    final lastResetMs = int.tryParse(await meta.get(_lastResetKey) ?? '0') ?? 0;
     final lastReset = DateTime.fromMillisecondsSinceEpoch(lastResetMs);
 
     if (now.difference(lastReset) >= _resetInterval) {
@@ -39,8 +38,7 @@ class RateLimiter {
   static Future<int> getRemainingRequests() async {
     final meta = await _meta();
     final now = DateTime.now();
-    final lastResetMs =
-        int.tryParse(await meta.get(_lastResetKey) ?? '0') ?? 0;
+    final lastResetMs = int.tryParse(await meta.get(_lastResetKey) ?? '0') ?? 0;
     final lastReset = DateTime.fromMillisecondsSinceEpoch(lastResetMs);
 
     if (now.difference(lastReset) >= _resetInterval) {

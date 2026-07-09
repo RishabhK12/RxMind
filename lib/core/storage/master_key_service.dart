@@ -44,7 +44,8 @@ class MasterKeyService {
 
   Future<Uint8List> deriveDatabaseKey() async {
     try {
-      final result = await _channel.invokeMethod<Uint8List>('deriveDatabaseKey');
+      final result =
+          await _channel.invokeMethod<Uint8List>('deriveDatabaseKey');
       if (result != null && result.isNotEmpty) {
         return Uint8List.fromList(result);
       }
@@ -114,7 +115,8 @@ class MasterKeyService {
       final saltB64 = await _fallbackStorage.read(key: _fallbackSaltKey);
       final dekB64 = await _fallbackStorage.read(key: _fallbackDekKey);
       if (saltB64 != null && dekB64 != null) {
-        return _pbkdf2(_b64ToBytes(dekB64), _b64ToBytes(saltB64), pbkdf2Iterations, 32);
+        return _pbkdf2(
+            _b64ToBytes(dekB64), _b64ToBytes(saltB64), pbkdf2Iterations, 32);
       }
     } catch (_) {}
     final saltB64 = _memoryFallbackStore[_fallbackSaltKey];
@@ -122,7 +124,8 @@ class MasterKeyService {
     if (saltB64 == null || dekB64 == null) {
       throw DatabaseKeyException('Fallback key not provisioned');
     }
-    return _pbkdf2(_b64ToBytes(dekB64), _b64ToBytes(saltB64), pbkdf2Iterations, 32);
+    return _pbkdf2(
+        _b64ToBytes(dekB64), _b64ToBytes(saltB64), pbkdf2Iterations, 32);
   }
 
   static Uint8List _pbkdf2(

@@ -31,8 +31,8 @@ class ChatMigration {
               'role': msg['role'] ?? 'user',
               'content': msg['content'] ?? '',
               'created_at': DateTime.tryParse(
-                        msg['timestamp']?.toString() ?? '',
-                      )?.millisecondsSinceEpoch ??
+                    msg['timestamp']?.toString() ?? '',
+                  )?.millisecondsSinceEpoch ??
                   DateTime.now().millisecondsSinceEpoch,
             },
             conflictAlgorithm: ConflictAlgorithm.replace,

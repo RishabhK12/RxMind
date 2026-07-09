@@ -28,7 +28,8 @@ class MedicationRepository implements MedicationRepositoryBase {
       final item = items[i];
       batch.insert('medications', {
         'id': item['id']?.toString() ?? 'med_$i',
-        'name': item['name']?.toString() ?? item['medication']?.toString() ?? '',
+        'name':
+            item['name']?.toString() ?? item['medication']?.toString() ?? '',
         'dose': item['dose']?.toString(),
         'frequency': item['frequency']?.toString(),
         'payload_json': jsonEncode(item),

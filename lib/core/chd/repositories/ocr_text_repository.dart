@@ -6,7 +6,8 @@ class OcrTextRepository {
   final Database _db;
 
   Future<String?> get() async {
-    final rows = await _db.query('ocr_text', where: 'id = ?', whereArgs: ['default']);
+    final rows =
+        await _db.query('ocr_text', where: 'id = ?', whereArgs: ['default']);
     if (rows.isEmpty) return null;
     return rows.first['content'] as String?;
   }

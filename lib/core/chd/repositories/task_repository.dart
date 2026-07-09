@@ -33,9 +33,8 @@ class TaskRepository implements TaskRepositoryBase {
         'id': item['id']?.toString() ?? 'task_$i',
         'title': item['title']?.toString() ?? item['name']?.toString() ?? '',
         'due_time': item['dueTime']?.toString() ?? item['dueDate']?.toString(),
-        'completed': (item['completed'] == true || item['isCompleted'] == true)
-            ? 1
-            : 0,
+        'completed':
+            (item['completed'] == true || item['isCompleted'] == true) ? 1 : 0,
         'payload_json': jsonEncode(item),
         'updated_at': now,
       });

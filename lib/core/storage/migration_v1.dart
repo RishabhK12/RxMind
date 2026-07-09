@@ -75,7 +75,8 @@ class MigrationV1 {
           'follow_ups',
           {
             'id': item['id']?.toString() ?? 'fu_$i',
-            'title': item['title']?.toString() ?? item['name']?.toString() ?? '',
+            'title':
+                item['title']?.toString() ?? item['name']?.toString() ?? '',
             'due_time': item['dueTime']?.toString() ?? item['date']?.toString(),
             'payload_json': jsonEncode(item),
             'updated_at': now,

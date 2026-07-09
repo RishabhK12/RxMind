@@ -32,6 +32,7 @@ context.txt
 
 # Flutter/Dart/Pub related
 **/doc/api/
+jules-reference.md
 **/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
@@ -52,3 +53,8 @@ app.*.map.json
 /android/app/release
 
 /node_modules/
+website/node_modules/
+website/.next/
+website/out/
+website/tsconfig.tsbuildinfo
+*.tsbuildinfo

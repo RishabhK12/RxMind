@@ -2,6 +2,8 @@
 
 **Your Personal Health Recovery Assistant**
 
+**Public site:** https://rishabhk12.github.io/RxMind/ (built from [`website/`](website/); see [`website/README.md`](website/README.md) for Play URL / basePath config).
+
 RxMind is a mobile app designed to help patients manage their post-discharge care more effectively. We built this because navigating medical discharge papers can be overwhelming - they're full of complicated instructions, medication schedules, and follow-up appointments that are easy to miss. RxMind simplifies this by scanning your discharge papers and organizing everything into an easy-to-follow plan.
 
 ## What Does It Do?

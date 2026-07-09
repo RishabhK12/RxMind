@@ -14,7 +14,6 @@ dependencies:
   flutter_svg: ^2.0.9
   smooth_page_indicator:
   provider:
-  font_awesome_flutter:
   flutter_secure_storage:
   sqflite_sqlcipher: ^3.1.0
   crypto: ^3.0.3
@@ -60,9 +59,15 @@ flutter:
     - assets/data/clinical_facilities_us.geojson
     # Add other assets as needed
   fonts:
-    - family: Poppins
+    - family: PlusJakartaSans
       fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-        - asset: assets/fonts/Poppins-Bold.ttf
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-ExtraBold.ttf
+          weight: 800

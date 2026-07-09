@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
+import 'package:rxmind_app/widgets/rx_secondary_button.dart';
 
 enum PermissionType { camera, photoLibrary, notification }
 
@@ -59,41 +62,48 @@ Future<bool> showPermissionDisclosure(
   final result = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
-    builder: (ctx) => AlertDialog(
-      title: Text(content.title),
-      content: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('What we access', style: Theme.of(ctx).textTheme.titleSmall),
-            const SizedBox(height: 4),
-            Text(content.dataCollected),
-            const SizedBox(height: 12),
-            Text('How it is stored', style: Theme.of(ctx).textTheme.titleSmall),
-            const SizedBox(height: 4),
-            Text(content.storage),
-            const SizedBox(height: 12),
-            Text('Why you benefit', style: Theme.of(ctx).textTheme.titleSmall),
-            const SizedBox(height: 4),
-            Text(content.benefit),
-          ],
+    builder: (ctx) {
+      final theme = Theme.of(ctx);
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
         ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(false),
-          child: const Text('Cancel'),
-        ),
-        SizedBox(
-          height: 48,
-          child: FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Continue'),
+        title: Text(content.title, style: theme.textTheme.titleLarge),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('What we access', style: theme.textTheme.titleSmall),
+              const SizedBox(height: 4),
+              Text(content.dataCollected, style: theme.textTheme.bodyMedium),
+              const SizedBox(height: 12),
+              Text('How it is stored', style: theme.textTheme.titleSmall),
+              const SizedBox(height: 4),
+              Text(content.storage, style: theme.textTheme.bodyMedium),
+              const SizedBox(height: 12),
+              Text('Why you benefit', style: theme.textTheme.titleSmall),
+              const SizedBox(height: 4),
+              Text(content.benefit, style: theme.textTheme.bodyMedium),
+            ],
           ),
         ),
-      ],
-    ),
+        actionsAlignment: MainAxisAlignment.end,
+        actions: [
+          RxSecondaryButton(
+            label: 'Cancel',
+            expand: false,
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          const SizedBox(width: ThemeTokens.spacingSm),
+          RxPrimaryButton(
+            label: 'Continue',
+            expand: false,
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
+      );
+    },
   );
   return result ?? false;
 }

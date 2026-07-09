@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-/// A widget that renders markdown text from Gemini API responses
-/// Converts markdown formatting to proper Flutter widgets with styling
+/// Renders markdown using the ambient [ThemeData.textTheme] / colorScheme.
 class MarkdownText extends StatelessWidget {
   final String data;
   final TextStyle? style;
@@ -63,19 +62,17 @@ class MarkdownText extends StatelessWidget {
           backgroundColor: theme.colorScheme.surfaceContainerHighest,
         ),
         blockquote: baseStyle?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           fontStyle: FontStyle.italic,
         ),
       ),
     );
   }
 
-  /// Clean up common Gemini API response artifacts
+  /// Clean up common markdown fence artifacts from model output.
   String _cleanMarkdown(String text) {
-    // Remove markdown code block markers if present
     String cleaned = text.trim();
 
-    // Remove ```markdown or ```json wrapping
     if (cleaned.startsWith('```')) {
       final lines = cleaned.split('\n');
       if (lines.length > 2) {

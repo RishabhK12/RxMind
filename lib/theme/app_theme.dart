@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'brand_shadows.dart';
 import 'theme_tokens.dart';
 
 class AppTheme {
@@ -17,6 +19,10 @@ class AppTheme {
         focus: ThemeTokens.lightFocus,
         navInactive: ThemeTokens.lightNavInactive,
         hint: ThemeTokens.lightHint,
+        success: ThemeTokens.lightSuccess,
+        warning: ThemeTokens.lightWarning,
+        aiAccent: ThemeTokens.lightAiAccent,
+        border: ThemeTokens.lightBorder,
         bold: false,
       );
 
@@ -35,6 +41,10 @@ class AppTheme {
         focus: ThemeTokens.darkFocus,
         navInactive: ThemeTokens.darkNavInactive,
         hint: ThemeTokens.darkNavInactive,
+        success: ThemeTokens.darkSuccess,
+        warning: ThemeTokens.darkWarning,
+        aiAccent: ThemeTokens.darkAiAccent,
+        border: ThemeTokens.darkBorder,
         bold: false,
       );
 
@@ -53,6 +63,10 @@ class AppTheme {
         focus: ThemeTokens.hcLightFocus,
         navInactive: ThemeTokens.hcLightOnSurface,
         hint: ThemeTokens.hcLightOnSurface,
+        success: ThemeTokens.hcLightSecondary,
+        warning: ThemeTokens.hcLightSecondary,
+        aiAccent: ThemeTokens.hcLightPrimary,
+        border: ThemeTokens.hcLightOnSurface,
         bold: true,
       );
 
@@ -71,6 +85,10 @@ class AppTheme {
         focus: ThemeTokens.hcDarkFocus,
         navInactive: ThemeTokens.hcDarkOnSurface,
         hint: ThemeTokens.hcDarkOnSurface,
+        success: ThemeTokens.hcDarkSecondary,
+        warning: ThemeTokens.hcDarkPrimary,
+        aiAccent: ThemeTokens.hcDarkSecondary,
+        border: ThemeTokens.hcDarkOnSurface,
         bold: true,
       );
 
@@ -106,6 +124,10 @@ class AppTheme {
     required Color focus,
     required Color navInactive,
     required Color hint,
+    required Color success,
+    required Color warning,
+    required Color aiAccent,
+    required Color border,
     required bool bold,
   }) {
     final colorScheme = ColorScheme(
@@ -121,6 +143,15 @@ class AppTheme {
     );
 
     final textTheme = ThemeTokens.textTheme(bold: bold, brightness: brightness);
+    final pill = StadiumBorder(
+      side: BorderSide.none,
+    );
+    final softShadows = BrandShadows.softCardFor(brightness);
+
+    final buttonText = textTheme.labelLarge?.copyWith(
+      fontSize: bold ? 16 : 14,
+      fontWeight: FontWeight.w700,
+    );
 
     return ThemeData(
       brightness: brightness,
@@ -135,46 +166,129 @@ class AppTheme {
           focusRing: focus,
           navInactive: navInactive,
           focusRingWidth: ThemeTokens.focusRingWidth,
+          success: success,
+          warning: warning,
+          aiAccent: aiAccent,
+          border: border,
+          softShadow: softShadows,
         ),
       ],
       appBarTheme: AppBarTheme(
         backgroundColor: surface,
-        elevation: 1,
+        elevation: 0,
+        scrolledUnderElevation: 1,
         iconTheme: IconThemeData(color: onSurface),
         titleTextStyle: textTheme.titleLarge?.copyWith(color: onSurface),
+      ),
+      cardTheme: CardThemeData(
+        color: surface,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+          side: BorderSide(color: border),
+        ),
+        margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: onPrimary,
-          textStyle: textTheme.labelLarge?.copyWith(fontSize: bold ? 18 : 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
-          ),
-          elevation: 4,
+          disabledBackgroundColor: primary.withValues(alpha: 0.38),
+          disabledForegroundColor: onPrimary.withValues(alpha: 0.38),
+          textStyle: buttonText,
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          elevation: 0,
+          shape: pill,
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: onPrimary,
-          minimumSize: const Size.fromHeight(48),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
-          ),
+          disabledBackgroundColor: primary.withValues(alpha: 0.38),
+          disabledForegroundColor: onPrimary.withValues(alpha: 0.38),
+          textStyle: buttonText,
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: pill,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: onSurface,
+          disabledForegroundColor: onSurface.withValues(alpha: 0.38),
+          textStyle: buttonText,
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          side: BorderSide(color: border),
+          shape: const StadiumBorder(),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: link,
-          textStyle: textTheme.labelLarge?.copyWith(fontSize: bold ? 16 : 16),
+          textStyle: textTheme.labelLarge?.copyWith(fontSize: bold ? 16 : 14),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: primary,
+        foregroundColor: onPrimary,
+        elevation: 2,
+        shape: const CircleBorder(),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: brightness == Brightness.dark
+            ? ThemeTokens.darkMuted
+            : ThemeTokens.brandMuted,
+        selectedColor: primary.withValues(alpha: 0.16),
+        labelStyle: textTheme.labelMedium?.copyWith(color: onSurface),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        shape: const StadiumBorder(),
+        side: BorderSide.none,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(ThemeTokens.radiusLg),
+          ),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: onSurface,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
+          color: brightness == Brightness.dark
+              ? ThemeTokens.brandFg
+              : ThemeTokens.brandCanvas,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: InputBorder.none,
+        filled: true,
+        fillColor: surface,
         contentPadding: const EdgeInsets.all(ThemeTokens.spacingMd),
         hintStyle: textTheme.bodyLarge?.copyWith(color: hint),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+          borderSide: BorderSide(color: border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+          borderSide: BorderSide(color: border),
+        ),
         focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
           borderSide: BorderSide(
             color: focus,
             width: ThemeTokens.focusRingWidth,
@@ -186,7 +300,7 @@ class AppTheme {
       highlightColor: focus.withValues(alpha: 0.12),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surface,
-        selectedItemColor: secondary,
+        selectedItemColor: primary,
         unselectedItemColor: navInactive,
       ),
     );

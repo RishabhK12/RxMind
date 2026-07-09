@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxmind_app/screens/tracker/glossary_detail_screen.dart';
 import 'package:rxmind_app/screens/ai/local_ai_service.dart';
 import 'package:rxmind_app/core/ai/local_ai_stub.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_empty_state.dart';
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
@@ -310,11 +312,12 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
         title: Semantics(
           header: true,
           label: 'My Medications screen',
@@ -325,64 +328,57 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ThemeTokens.spacingMd),
         children: [
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 4,
-            margin: const EdgeInsets.only(bottom: 16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Health Glossary', style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  Container(
-                    constraints: const BoxConstraints(maxHeight: 300),
-                    child: Scrollbar(
+          RxCard(
+            radius: ThemeTokens.radiusMd,
+            padding: const EdgeInsets.all(ThemeTokens.spacingMd),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Health Glossary', style: theme.textTheme.titleMedium),
+                const SizedBox(height: ThemeTokens.spacingSm),
+                Container(
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  child: Scrollbar(
+                    controller: _glossaryScrollController,
+                    child: ListView.builder(
                       controller: _glossaryScrollController,
-                      child: ListView.builder(
-                        controller: _glossaryScrollController,
-                        shrinkWrap: true,
-                        itemCount: glossaryTerms.length,
-                        itemBuilder: (context, index) {
-                          final term = glossaryTerms[index];
-                          return Semantics(
-                            button: true,
-                            label: 'Glossary term: $term. Tap for definition.',
-                            child: ListTile(
-                              title:
-                                  Text(term, style: theme.textTheme.bodyLarge),
-                              trailing: Icon(Icons.info_outline,
-                                  color: theme.colorScheme.primary),
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        GlossaryDetailScreen(term: term),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
+                      shrinkWrap: true,
+                      itemCount: glossaryTerms.length,
+                      itemBuilder: (context, index) {
+                        final term = glossaryTerms[index];
+                        return Semantics(
+                          button: true,
+                          label: 'Glossary term: $term. Tap for definition.',
+                          child: ListTile(
+                            title: Text(term, style: theme.textTheme.bodyLarge),
+                            trailing: Icon(Icons.info_outline,
+                                color: theme.colorScheme.primary),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      GlossaryDetailScreen(term: term),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: ThemeTokens.spacingMd),
           if (medicationsList.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                'No medications yet. Tap + to add a new medication.',
-                style: theme.textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
+            const RxEmptyState(
+              title: 'No medications yet',
+              message: 'Tap + to add a new medication.',
+              icon: Icons.medication,
+              wellColor: ThemeTokens.violet50,
             ),
           ...List.generate(medicationsList.length, (i) {
             final med = medicationsList[i];
@@ -409,31 +405,38 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                 if (isExpanded)
                   Container(
                     width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
-                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(
+                      bottom: ThemeTokens.spacingSm,
+                      left: ThemeTokens.spacingSm,
+                      right: ThemeTokens.spacingSm,
+                    ),
+                    padding: const EdgeInsets.all(ThemeTokens.spacingMd),
                     decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
+                      color: theme.brightness == Brightness.dark
+                          ? ThemeTokens.darkMuted
+                          : ThemeTokens.blue50,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+                      border: Border.all(color: ext.border),
                     ),
                     child: medGlossary[med['name']] == null
                         ? Row(
                             children: [
-                              const SizedBox(
+                              SizedBox(
                                 width: 20,
                                 height: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
-                              SizedBox(width: 12),
+                              const SizedBox(width: 12),
                               Text('Loading info...',
-                                  style:
-                                      Theme.of(context).textTheme.bodyMedium),
+                                  style: theme.textTheme.bodyMedium),
                             ],
                           )
                         : Text(
                             medGlossary[med['name']]!,
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: theme.textTheme.bodyMedium,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 10,
                           ),
@@ -448,8 +451,6 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
               label: 'Add new medication',
               button: true,
               child: FloatingActionButton(
-                backgroundColor: theme.colorScheme.secondary,
-                child: const Icon(Icons.add, size: 28, color: Colors.white),
                 onPressed: () async {
                   showDialog(
                     context: context,
@@ -542,6 +543,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                     },
                   );
                 },
+                child: const Icon(Icons.add, size: 28),
               ),
             )
           : null,
@@ -565,220 +567,237 @@ class _MedicationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     // Parse nextDoseTime from string to DateTime
     final DateTime nextDose = med['nextDoseTime'] is String
         ? DateTime.parse(med['nextDoseTime'])
         : med['nextDoseTime'];
     final bool isOverdue = med['isOverdue'] == true;
+    final bool takenToday = med['takenToday'] == true;
     final Duration diff = nextDose.difference(DateTime.now());
     final String countdown = isOverdue
         ? 'Overdue by ${diff.inHours.abs()}h ${diff.inMinutes.abs() % 60}m'
         : 'in ${diff.inHours}h ${diff.inMinutes % 60}m';
+    final successWell = theme.brightness == Brightness.dark
+        ? ThemeTokens.darkMuted
+        : ThemeTokens.emerald50;
+
     return Semantics(
       container: true,
       label:
           'Medication card for ${med['name']}, next dose ${isOverdue ? 'overdue' : 'in time'}',
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.10),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Semantics(
-              label: 'Medication icon',
-              child: Icon(FontAwesomeIcons.pills,
-                  color: theme.colorScheme.secondary, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Semantics(
-                          label: 'Medication name: ${med['name']}',
-                          child: Text(
-                            med['name'],
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Icon(
-                        isExpanded ? Icons.expand_less : Icons.expand_more,
-                        size: 20,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  if ((med['frequency']?.toString().isNotEmpty ?? false))
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: ThemeTokens.spacingSm),
+        child: RxCard(
+          radius: ThemeTokens.radiusMd,
+          color: isOverdue
+              ? (theme.brightness == Brightness.dark
+                  ? ThemeTokens.darkMuted
+                  : ThemeTokens.rose50)
+              : (takenToday ? successWell : null),
+          borderColor: isOverdue
+              ? theme.colorScheme.error
+              : (takenToday ? ext.success : null),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semantics(
+                label: 'Medication icon',
+                child: Icon(Icons.medication,
+                    color: theme.colorScheme.primary, size: 28),
+              ),
+              const SizedBox(width: ThemeTokens.spacingMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       children: [
-                        Icon(Icons.repeat,
-                            size: 16, color: theme.colorScheme.secondary),
+                        Expanded(
+                          child: Semantics(
+                            label: 'Medication name: ${med['name']}',
+                            child: Text(
+                              med['name'],
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          isExpanded ? Icons.expand_less : Icons.expand_more,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    if ((med['frequency']?.toString().isNotEmpty ?? false))
+                      Row(
+                        children: [
+                          Icon(Icons.repeat,
+                              size: 16, color: theme.colorScheme.secondary),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'Frequency: ${med['frequency']}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: ThemeTokens.spacingSm),
+                    Row(
+                      children: [
+                        Semantics(
+                          label: 'Timer icon',
+                          child: Icon(Icons.timer,
+                              size: 20,
+                              color: isOverdue
+                                  ? theme.colorScheme.error
+                                  : theme.colorScheme.primary),
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
-                          child: Text(
-                            'Frequency: ${med['frequency']}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.7),
-                              fontWeight: FontWeight.w500,
+                          child: Semantics(
+                            label: isOverdue
+                                ? 'Overdue by ${diff.inHours.abs()} hours and ${diff.inMinutes.abs() % 60} minutes'
+                                : 'Next dose in ${diff.inHours} hours and ${diff.inMinutes % 60} minutes',
+                            child: Text(
+                              countdown,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: isOverdue
+                                    ? theme.colorScheme.error
+                                    : theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.7),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
                           ),
                         ),
                       ],
                     ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Semantics(
-                        label: 'Timer icon',
-                        child: Icon(Icons.timer,
-                            size: 20, color: theme.colorScheme.primary),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Semantics(
-                          label: isOverdue
-                              ? 'Overdue by ${diff.inHours.abs()} hours and ${diff.inMinutes.abs() % 60} minutes'
-                              : 'Next dose in ${diff.inHours} hours and ${diff.inMinutes % 60} minutes',
-                          child: Text(
-                            countdown,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: isOverdue
-                                  ? theme.colorScheme.error
-                                  : theme.colorScheme.onSurface
-                                      .withOpacity(0.7),
+                  ],
+                ),
+              ),
+              const SizedBox(width: ThemeTokens.spacingMd),
+              Column(
+                children: [
+                  Semantics(
+                    button: true,
+                    label: isOverdue
+                        ? 'Snooze medication ${med['name']} for 1 hour'
+                        : takenToday
+                            ? 'Unmark medication ${med['name']}'
+                            : 'Mark medication ${med['name']} as taken',
+                    child: isOverdue
+                        ? ElevatedButton(
+                            onPressed: onSnooze,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ext.warning,
+                              foregroundColor: ThemeTokens.brandInk,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(ThemeTokens.radiusSm),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
+                            child: Text(
+                              'Snooze +1h',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: ThemeTokens.brandInk,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                          )
+                        : takenToday
+                            ? ElevatedButton.icon(
+                                onPressed: onUnmark,
+                                icon: Icon(Icons.check_circle,
+                                    color: theme.colorScheme.onSecondary,
+                                    size: 20),
+                                label: Text(
+                                  'Completed',
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.onSecondary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ext.success,
+                                  foregroundColor:
+                                      theme.colorScheme.onSecondary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        ThemeTokens.radiusSm),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 10),
+                                ),
+                              )
+                            : ElevatedButton(
+                                onPressed: onMarkTaken,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.secondary,
+                                  foregroundColor:
+                                      theme.colorScheme.onSecondary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        ThemeTokens.radiusSm),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 10),
+                                ),
+                                child: Text(
+                                  'Mark Taken',
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.onSecondary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                  ),
+                  if (takenToday) ...[
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: onUnmark,
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        minimumSize: const Size(0, 0),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        'Undo',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.error,
+                          fontSize: 12,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ],
               ),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              children: [
-                Semantics(
-                  button: true,
-                  label: isOverdue
-                      ? 'Snooze medication ${med['name']} for 1 hour'
-                      : med['takenToday'] == true
-                          ? 'Unmark medication ${med['name']}'
-                          : 'Mark medication ${med['name']} as taken',
-                  child: isOverdue
-                      ? ElevatedButton(
-                          onPressed: onSnooze,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.error,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
-                          ),
-                          child: Text(
-                            'Snooze +1h',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSecondary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
-                          ),
-                        )
-                      : med['takenToday'] == true
-                          ? ElevatedButton.icon(
-                              onPressed: onUnmark,
-                              icon: const Icon(Icons.check_circle,
-                                  color: Colors.white, size: 20),
-                              label: Text(
-                                'Completed',
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 10),
-                              ),
-                            )
-                          : ElevatedButton(
-                              onPressed: onMarkTaken,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.colorScheme.secondary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 10),
-                              ),
-                              child: Text(
-                                'Mark Taken',
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.onSecondary,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                ),
-                if (med['takenToday'] == true) ...[
-                  const SizedBox(height: 4),
-                  TextButton(
-                    onPressed: onUnmark,
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'Undo',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.error,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

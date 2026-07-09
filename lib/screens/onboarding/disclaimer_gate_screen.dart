@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
 
 /// Mandatory non-medical-device disclaimer shown before any health data entry.
 class DisclaimerGateScreen extends StatelessWidget {
@@ -18,10 +20,10 @@ class DisclaimerGateScreen extends StatelessWidget {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: theme.colorScheme.surface,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(ThemeTokens.spacingLg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -31,30 +33,31 @@ class DisclaimerGateScreen extends StatelessWidget {
                   size: 64,
                   color: theme.colorScheme.primary,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: ThemeTokens.spacingLg),
                 Text(
                   'Important Notice',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: ThemeTokens.spacingLg),
                 Text(
                   disclaimerText,
-                  style: theme.textTheme.bodyLarge,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    height: 1.5,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const Spacer(),
                 Semantics(
                   label: 'I Understand',
                   button: true,
-                  child: FilledButton(
+                  child: RxPrimaryButton(
+                    label: 'I Understand',
                     onPressed: onAcknowledged,
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                    ),
-                    child: const Text('I Understand'),
                   ),
                 ),
               ],

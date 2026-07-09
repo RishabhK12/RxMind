@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
 
 class AiDisclosureBanner extends StatelessWidget {
   const AiDisclosureBanner({super.key, required this.onAcknowledged});
@@ -11,36 +13,41 @@ class AiDisclosureBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final accent =
+        Theme.of(context).extension<RxMindThemeExtension>()?.aiAccent ??
+            ThemeTokens.brandViolet;
+
     return Material(
-      color: theme.colorScheme.surfaceContainerHighest,
+      color: theme.colorScheme.surface,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(ThemeTokens.spacingLg),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.smart_toy_outlined,
-                  size: 48, color: theme.colorScheme.primary),
-              const SizedBox(height: 24),
+              Icon(
+                Icons.smart_toy_outlined,
+                size: 28,
+                color: accent,
+              ),
+              const SizedBox(height: ThemeTokens.spacingLg),
               Semantics(
                 header: true,
                 child: Text(
                   disclosureText,
-                  style: theme.textTheme.titleMedium,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    height: 1.4,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: ThemeTokens.spacingXl),
               Semantics(
                 label: 'I Understand',
                 button: true,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: FilledButton(
-                    onPressed: onAcknowledged,
-                    child: const Text('I Understand'),
-                  ),
+                child: RxPrimaryButton(
+                  label: 'I Understand',
+                  onPressed: onAcknowledged,
                 ),
               ),
             ],

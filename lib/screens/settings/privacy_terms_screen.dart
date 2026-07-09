@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_app_bar_logo.dart';
 
 class PrivacyTermsScreen extends StatelessWidget {
   const PrivacyTermsScreen({super.key});
@@ -82,26 +84,47 @@ Your use of the app is governed by the Privacy Policy above.
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Privacy Policy & Terms of Service'),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        title: Text(
+          'Privacy Policy & Terms of Service',
+          style: theme.textTheme.titleLarge,
+        ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: const [
+        padding: const EdgeInsets.all(ThemeTokens.spacingMd),
+        children: [
+          const Center(
+            child: RxAppBarLogo(showWordmark: true, height: 40),
+          ),
+          const SizedBox(height: ThemeTokens.spacingLg),
           Text(
             'Privacy Policy',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          SizedBox(height: 8),
-          Text(_privacyPolicy),
-          SizedBox(height: 16),
+          const SizedBox(height: ThemeTokens.spacingSm),
+          Text(
+            _privacyPolicy,
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: ThemeTokens.spacingMd),
           Text(
             'Terms of Service',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          SizedBox(height: 8),
-          Text(_termsOfService),
+          const SizedBox(height: ThemeTokens.spacingSm),
+          Text(
+            _termsOfService,
+            style: theme.textTheme.bodyMedium,
+          ),
         ],
       ),
     );

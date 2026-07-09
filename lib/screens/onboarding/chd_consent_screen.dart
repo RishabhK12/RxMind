@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
+import 'package:rxmind_app/widgets/rx_secondary_button.dart';
 import '../settings/privacy_terms_screen.dart';
 
 /// Standalone Consumer Health Data consent panel — not bundled with Terms.
@@ -16,14 +19,14 @@ class ChdConsentScreen extends StatelessWidget {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: theme.colorScheme.surface,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text('Health Data Consent'),
           automaticallyImplyLeading: false,
         ),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(ThemeTokens.spacingLg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -36,12 +39,17 @@ class ChdConsentScreen extends StatelessWidget {
                           'Consumer Health Data',
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
+                        const SizedBox(height: ThemeTokens.spacingMd),
+                        Text(
                           'RxMind collects and stores the following categories of '
                           'Consumer Health Data locally on your device only:',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurface,
+                            height: 1.5,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         const _Bullet(
@@ -56,23 +64,32 @@ class ChdConsentScreen extends StatelessWidget {
                         const _Bullet(
                           'Optional profile and scheduling preferences',
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
+                        const SizedBox(height: ThemeTokens.spacingMd),
+                        Text(
                           'Your data is stored locally on your device. It is not '
                           'uploaded to cloud servers as part of routine app use.',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurface,
+                            height: 1.5,
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'You may withdraw consent at any time by going to '
                           'Settings → Delete All Data, which permanently erases '
                           'all stored health information.',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurface,
+                            height: 1.5,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                OutlinedButton(
+                const SizedBox(height: ThemeTokens.spacingMd),
+                RxSecondaryButton(
+                  label: 'View Privacy Policy',
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -81,18 +98,14 @@ class ChdConsentScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text('View Privacy Policy'),
                 ),
                 const SizedBox(height: 8),
                 Semantics(
                   label: 'I Agree',
                   button: true,
-                  child: FilledButton(
+                  child: RxPrimaryButton(
+                    label: 'I Agree',
                     onPressed: onConsentGranted,
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                    ),
-                    child: const Text('I Agree'),
                   ),
                 ),
               ],

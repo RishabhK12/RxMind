@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rxmind_app/core/widgets/markdown_text.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
 
 class AssistantMessageBubble extends StatelessWidget {
   const AssistantMessageBubble({
@@ -14,32 +15,54 @@ class AssistantMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final border =
+        Theme.of(context).extension<RxMindThemeExtension>()?.border ??
+            ThemeTokens.brandBorder;
+    final isDark = theme.brightness == Brightness.dark;
+    final fill = isDark
+        ? theme.colorScheme.surface
+        : Color.alphaBlend(
+            ThemeTokens.violet50.withValues(alpha: 0.65),
+            theme.colorScheme.surface,
+          );
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(
+        vertical: ThemeTokens.spacingXs,
+        horizontal: ThemeTokens.spacingMd - 4,
+      ),
+      padding: const EdgeInsets.all(ThemeTokens.spacingMd - 4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        color: fill,
+        borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+        border: Border.all(color: border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           MarkdownText(data: content, selectable: true),
-          const SizedBox(height: 8),
+          const SizedBox(height: ThemeTokens.spacingSm),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('On-device AI', style: theme.textTheme.labelSmall),
               Semantics(
-                label: 'Report Output',
+                label: 'Report Content',
                 button: true,
-                child: SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: IconButton(
-                    icon: const Icon(Icons.flag_outlined, size: 20),
-                    tooltip: 'Report Output',
-                    onPressed: onReport,
+                child: TextButton(
+                  onPressed: onReport,
+                  style: TextButton.styleFrom(
+                    foregroundColor:
+                        theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: ThemeTokens.spacingSm,
+                    ),
+                    minimumSize: const Size(48, 48),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    'Report Content',
+                    style: theme.textTheme.labelSmall,
                   ),
                 ),
               ),

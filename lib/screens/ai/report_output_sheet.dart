@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxmind_app/core/ai/report_reason.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
 
 class ReportOutputSheet extends StatefulWidget {
   const ReportOutputSheet({
@@ -55,14 +57,30 @@ class _ReportOutputSheetState extends State<ReportOutputSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(ThemeTokens.spacingLg),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Report Output', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 16),
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: ThemeTokens.spacingMd),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                        .extension<RxMindThemeExtension>()
+                        ?.border ??
+                    ThemeTokens.brandBorder,
+                borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+              ),
+            ),
+          ),
+          Text('Report Output', style: theme.textTheme.titleLarge),
+          const SizedBox(height: ThemeTokens.spacingMd),
           ...ReportReason.values.map((reason) {
             return RadioListTile<ReportReason>(
               title: Text(reason.label),
@@ -77,26 +95,27 @@ class _ReportOutputSheetState extends State<ReportOutputSheet> {
             maxLines: 3,
             decoration: const InputDecoration(
               labelText: 'Optional note',
-              border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: ThemeTokens.spacingSm),
           Semantics(
             label: 'Submit report',
             button: true,
-            child: SizedBox(
-              height: 48,
-              child: FilledButton(
-                onPressed: _selected == null || _submitting ? null : _submit,
-                child: _submitting
-                    ? const SizedBox(
+            child: _submitting
+                ? const SizedBox(
+                    height: 48,
+                    child: Center(
+                      child: SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Submit'),
-              ),
-            ),
+                      ),
+                    ),
+                  )
+                : RxPrimaryButton(
+                    label: 'Submit',
+                    onPressed: _selected == null ? null : _submit,
+                  ),
           ),
         ],
       ),

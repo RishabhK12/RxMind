@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxmind_app/services/contacts/native_contact_picker_service.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -63,6 +64,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+          ),
           title: Text(index == null ? 'Add Contact' : 'Edit Contact'),
           content: SingleChildScrollView(
             child: Column(
@@ -128,8 +132,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
       await launchUrl(phoneUri);
     } else {
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not launch phone dialer')),
+          SnackBar(
+            content: Text(
+              'Could not launch phone dialer',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onInverseSurface,
+              ),
+            ),
+          ),
         );
       }
     }
@@ -137,12 +149,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Medical Contacts'),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        title: Text('Medical Contacts', style: theme.textTheme.titleLarge),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: Icon(Icons.add, color: theme.colorScheme.primary),
             onPressed: () => _addOrEditContact(),
           ),
         ],
@@ -151,7 +167,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         children: [
           if (_pickerService.isSupported)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(ThemeTokens.spacingMd),
               child: Semantics(
                 button: true,
                 label: 'Add from device contacts',
@@ -160,15 +176,25 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   height: 48,
                   child: OutlinedButton.icon(
                     onPressed: _pickFromDevice,
-                    icon: const Icon(Icons.contacts),
-                    label: const Column(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(ThemeTokens.radiusPill),
+                      ),
+                    ),
+                    icon:
+                        Icon(Icons.contacts, color: theme.colorScheme.primary),
+                    label: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Add from device contacts'),
+                        Text(
+                          'Add from device contacts',
+                          style: theme.textTheme.bodyMedium,
+                        ),
                         Text(
                           "You'll choose one contact. RxMind cannot access your full contact list.",
-                          style: TextStyle(fontSize: 12),
+                          style: theme.textTheme.bodySmall,
                         ),
                       ],
                     ),
@@ -191,8 +217,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                           onTap: () => _makePhoneCall(contact['phone']),
                           child: Text(
                             contact['phone'],
-                            style: const TextStyle(
-                              color: Colors.blue,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.primary,
                               decoration: TextDecoration.underline,
                             ),
                           ),
@@ -204,7 +230,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                       if (hasPhone)
                         IconButton(
                           icon: const Icon(Icons.phone),
-                          color: Colors.green,
+                          color: theme.colorScheme.secondary,
                           onPressed: () => _makePhoneCall(contact['phone']),
                         ),
                       IconButton(

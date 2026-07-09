@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -41,10 +43,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
               color: theme.colorScheme.onSurface, size: 20),
@@ -59,16 +61,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         scale: _saving ? 0.98 : 1.0,
         duration: const Duration(milliseconds: 200),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: ThemeTokens.spacingLg,
+            vertical: ThemeTokens.spacingMd,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 4,
+                RxCard(
+                  radius: ThemeTokens.radiusMd,
+                  padding: EdgeInsets.zero,
                   child: TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
@@ -76,18 +80,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           Icon(Icons.person, color: theme.colorScheme.primary),
                       hintText: 'Name',
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
+                      contentPadding:
+                          const EdgeInsets.all(ThemeTokens.spacingMd),
                     ),
                     style: theme.textTheme.bodyLarge,
                     validator: (v) =>
                         v == null || v.trim().isEmpty ? 'Name required' : null,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 4,
+                const SizedBox(height: ThemeTokens.spacingMd),
+                RxCard(
+                  radius: ThemeTokens.radiusMd,
+                  padding: EdgeInsets.zero,
                   child: TextFormField(
                     controller: _ageController,
                     keyboardType: TextInputType.number,
@@ -96,7 +100,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           Icon(Icons.cake, color: theme.colorScheme.secondary),
                       hintText: 'Age',
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
+                      contentPadding:
+                          const EdgeInsets.all(ThemeTokens.spacingMd),
                     ),
                     style: theme.textTheme.bodyLarge,
                     validator: (v) {
@@ -108,11 +113,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     },
                   ),
                 ),
-                const SizedBox(height: 16),
-                Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 4,
+                const SizedBox(height: ThemeTokens.spacingMd),
+                RxCard(
+                  radius: ThemeTokens.radiusMd,
+                  padding: EdgeInsets.zero,
                   child: TextFormField(
                     controller: _conditionsController,
                     maxLines: 3,
@@ -121,24 +125,27 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           color: theme.colorScheme.primary),
                       hintText: 'Health Conditions (optional)',
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
+                      contentPadding:
+                          const EdgeInsets.all(ThemeTokens.spacingMd),
                     ),
                     style: theme.textTheme.bodyLarge,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: ThemeTokens.spacingMd),
                 Row(
                   children: [
                     Icon(Icons.lock,
                         size: 20,
-                        color: theme.colorScheme.onSurface.withOpacity(0.5)),
-                    const SizedBox(width: 8),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                    const SizedBox(width: ThemeTokens.spacingSm),
                     Expanded(
                       child: Text(
                         'All information is encrypted and stored only on this device.',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                            color:
-                                theme.colorScheme.onSurface.withOpacity(0.6)),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
+                        ),
                       ),
                     ),
                   ],
@@ -153,10 +160,14 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         duration: const Duration(milliseconds: 120),
         child: FloatingActionButton(
           backgroundColor: theme.colorScheme.secondary,
+          foregroundColor: theme.colorScheme.onSecondary,
           onPressed: _saving ? null : _saveProfile,
           child: _saving
-              ? const CircularProgressIndicator(color: Colors.white)
-              : const Icon(Icons.check, color: Colors.white, size: 28),
+              ? CircularProgressIndicator(
+                  color: theme.colorScheme.onSecondary,
+                )
+              : Icon(Icons.check,
+                  color: theme.colorScheme.onSecondary, size: 28),
         ),
       ),
     );

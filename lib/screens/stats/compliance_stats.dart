@@ -4,6 +4,9 @@ import 'package:rxmind_app/services/discharge_data_manager.dart';
 import 'package:rxmind_app/services/pdf_export_service.dart';
 import 'package:rxmind_app/screens/pdf/pdf_preview_screen.dart';
 import 'package:rxmind_app/core/stats/compliance_calculator.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_empty_state.dart';
 
 class ComplianceStatsScreen extends StatefulWidget {
   const ComplianceStatsScreen({super.key});
@@ -285,9 +288,9 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
 
       // Build enhanced pie chart with the updated compliance data
       final List<PieData> pieChartData = [
-        PieData('Completed', completionPercentage, Colors.green),
-        PieData('Pending', pendingPercentage, Colors.amber),
-        PieData('Overdue', overduePercentage, Colors.red),
+        PieData('Completed', completionPercentage, ThemeTokens.brandEmerald),
+        PieData('Pending', pendingPercentage, ThemeTokens.brandAmber),
+        PieData('Overdue', overduePercentage, ThemeTokens.brandRose),
       ];
 
       // Health score weighs completion heavily and penalizes overdue items
@@ -368,25 +371,25 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
 
   Color _getColumnColor(int value, ThemeData theme) {
     if (value >= 80) {
-      return Colors.green[400] ?? Colors.green;
+      return ThemeTokens.brandEmerald;
     } else if (value >= 50) {
-      return Colors.amber;
+      return ThemeTokens.brandAmber;
     } else {
-      return Colors.redAccent;
+      return theme.colorScheme.error;
     }
   }
 
-  Color _getHealthScoreColor(int score) {
+  Color _getHealthScoreAccent(int score, ThemeData theme) {
     if (score >= 80) {
-      return Colors.green[600] ?? Colors.green;
+      return ThemeTokens.brandEmerald;
     } else if (score >= 60) {
-      return Colors.lightGreen[700] ?? Colors.lightGreen;
+      return ThemeTokens.brandBlue;
     } else if (score >= 40) {
-      return Colors.amber[700] ?? Colors.amber;
+      return ThemeTokens.brandAmber;
     } else if (score >= 20) {
-      return Colors.deepOrange;
+      return ThemeTokens.brandViolet;
     } else {
-      return Colors.red[700] ?? Colors.red;
+      return theme.colorScheme.error;
     }
   }
 
@@ -436,11 +439,26 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
+    final scoreAccent = _getHealthScoreAccent(healthScore, theme);
+    final isDark = theme.brightness == Brightness.dark;
+    // Soft blue→emerald wash at low opacity; dark text for contrast.
+    final headerWash = LinearGradient(
+      colors: [
+        ThemeTokens.brandBlue.withValues(alpha: isDark ? 0.22 : 0.12),
+        ThemeTokens.brandEmerald.withValues(alpha: isDark ? 0.18 : 0.10),
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+    final headerFg = theme.colorScheme.onSurface;
+    final headerFgMuted = theme.colorScheme.onSurface.withValues(alpha: 0.7);
+
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
         title: Semantics(
           header: true,
           label: 'Your Health Trends screen',
@@ -451,7 +469,7 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ThemeTokens.spacingMd),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -459,24 +477,13 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
               label: 'Your health score is $healthScore',
               child: Container(
                 padding: const EdgeInsets.all(20),
-                margin: const EdgeInsets.only(bottom: 24),
+                margin: const EdgeInsets.only(bottom: ThemeTokens.spacingLg),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      _getHealthScoreColor(healthScore),
-                      _getHealthScoreColor(healthScore).withOpacity(0.7),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _getHealthScoreColor(healthScore).withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  gradient: headerWash,
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                  border: Border.all(color: ext.border),
+                  boxShadow: ext.softShadow,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -488,7 +495,7 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                         Text(
                           'Health Score',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.9),
+                            color: headerFgMuted,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -500,7 +507,7 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                             Text(
                               '$healthScore',
                               style: theme.textTheme.displayLarge?.copyWith(
-                                color: Colors.white,
+                                color: headerFg,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -509,7 +516,7 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                               child: Text(
                                 '/100',
                                 style: theme.textTheme.titleMedium?.copyWith(
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: headerFgMuted,
                                 ),
                               ),
                             ),
@@ -521,13 +528,13 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: scoreAccent.withValues(alpha: 0.16),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
                         child: Icon(
                           _getHealthScoreIcon(healthScore),
-                          color: Colors.white,
+                          color: scoreAccent,
                           size: 40,
                         ),
                       ),
@@ -539,111 +546,95 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
             if (weekData.isNotEmpty)
               Semantics(
                 label: 'Weekly medication compliance bar chart',
-                child: Container(
-                  height: 250,
+                child: RxCard(
+                  radius: ThemeTokens.radiusMd,
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.shadow.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: SfCartesianChart(
-                    title: ChartTitle(
-                      text: 'Weekly Task Compliance',
-                      textStyle: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      alignment: ChartAlignment.near,
-                    ),
-                    primaryXAxis: CategoryAxis(
-                      majorGridLines: const MajorGridLines(width: 0),
-                      labelStyle: theme.textTheme.bodyMedium,
-                    ),
-                    primaryYAxis: NumericAxis(
-                      minimum: 0,
-                      maximum: 100,
-                      interval: 20,
-                      labelFormat: '{value}%',
-                      labelStyle: theme.textTheme.bodySmall,
-                      axisLine: const AxisLine(width: 0),
-                      majorTickLines: const MajorTickLines(size: 0),
-                    ),
-                    series: <CartesianSeries<dynamic, dynamic>>[
-                      ColumnSeries<dynamic, dynamic>(
-                        dataSource: weekData,
-                        xValueMapper: (d, _) => d.day,
-                        yValueMapper: (d, _) => d.count,
-                        pointColorMapper: (d, _) =>
-                            _getColumnColor(d.count, theme),
-                        borderRadius: BorderRadius.circular(4),
-                        dataLabelSettings: DataLabelSettings(
-                          isVisible: true,
-                          labelAlignment: ChartDataLabelAlignment.top,
-                          textStyle: theme.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                          labelPosition: ChartDataLabelPosition.outside,
-                          builder: (dynamic data, dynamic point, dynamic series,
-                              int pointIndex, int seriesIndex) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 4, vertical: 2),
-                              child: Text(
-                                '${data.count}%',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            );
-                          },
+                  child: SizedBox(
+                    height: 250,
+                    child: SfCartesianChart(
+                      title: ChartTitle(
+                        text: 'Weekly Task Compliance',
+                        textStyle: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        animationDuration: 800,
-                        animationDelay: 100,
-                        width: 0.7,
+                        alignment: ChartAlignment.near,
                       ),
-                    ],
-                    tooltipBehavior: TooltipBehavior(
-                      enable: true,
-                      format: 'point.x: point.y%',
-                      header: '',
+                      primaryXAxis: CategoryAxis(
+                        majorGridLines: const MajorGridLines(width: 0),
+                        labelStyle: theme.textTheme.bodyMedium,
+                      ),
+                      primaryYAxis: NumericAxis(
+                        minimum: 0,
+                        maximum: 100,
+                        interval: 20,
+                        labelFormat: '{value}%',
+                        labelStyle: theme.textTheme.bodySmall,
+                        axisLine: const AxisLine(width: 0),
+                        majorTickLines: const MajorTickLines(size: 0),
+                      ),
+                      series: <CartesianSeries<dynamic, dynamic>>[
+                        ColumnSeries<dynamic, dynamic>(
+                          dataSource: weekData,
+                          xValueMapper: (d, _) => d.day,
+                          yValueMapper: (d, _) => d.count,
+                          pointColorMapper: (d, _) =>
+                              _getColumnColor(d.count, theme),
+                          borderRadius: BorderRadius.circular(4),
+                          dataLabelSettings: DataLabelSettings(
+                            isVisible: true,
+                            labelAlignment: ChartDataLabelAlignment.top,
+                            textStyle: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            labelPosition: ChartDataLabelPosition.outside,
+                            builder: (dynamic data,
+                                dynamic point,
+                                dynamic series,
+                                int pointIndex,
+                                int seriesIndex) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 2),
+                                child: Text(
+                                  '${data.count}%',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          animationDuration: 800,
+                          animationDelay: 100,
+                          width: 0.7,
+                        ),
+                      ],
+                      tooltipBehavior: TooltipBehavior(
+                        enable: true,
+                        format: 'point.x: point.y%',
+                        header: '',
+                      ),
+                      plotAreaBorderWidth: 0,
                     ),
-                    plotAreaBorderWidth: 0,
                   ),
                 ),
               )
             else
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Center(
-                  child: Text('No weekly data to display.',
-                      style: theme.textTheme.bodyMedium),
-                ),
+              const RxEmptyState(
+                title: 'No weekly data',
+                message: 'Complete tasks to see weekly compliance trends.',
+                icon: Icons.bar_chart_rounded,
+                wellColor: ThemeTokens.blue50,
               ),
-            const SizedBox(height: 24),
+            const SizedBox(height: ThemeTokens.spacingLg),
             if (pieData.isNotEmpty)
               Semantics(
                 label:
                     'Overall compliance chart showing completed, pending, and overdue tasks',
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.shadow.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                child: RxCard(
+                  radius: ThemeTokens.radiusMd,
+                  padding: const EdgeInsets.all(ThemeTokens.spacingLg),
                   child: Column(
                     children: [
                       Text(
@@ -697,7 +688,7 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                                     'Health Score',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: theme.colorScheme.onSurface
-                                          .withOpacity(0.7),
+                                          .withValues(alpha: 0.7),
                                     ),
                                   ),
                                 ],
@@ -706,7 +697,7 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: ThemeTokens.spacingLg),
                       // Legend
                       Wrap(
                         alignment: WrapAlignment.center,
@@ -716,19 +707,19 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                           _buildLegendItem(
                             context,
                             'Completed',
-                            Colors.green,
+                            ThemeTokens.brandEmerald,
                             '${pieData.isNotEmpty ? pieData[0].value : 0}%',
                           ),
                           _buildLegendItem(
                             context,
                             'Pending',
-                            Colors.amber,
+                            ThemeTokens.brandAmber,
                             '${pieData.length > 1 ? pieData[1].value : 0}%',
                           ),
                           _buildLegendItem(
                             context,
                             'Overdue',
-                            Colors.red,
+                            ThemeTokens.brandRose,
                             '${pieData.length > 2 ? pieData[2].value : 0}%',
                           ),
                         ],
@@ -738,92 +729,94 @@ class ComplianceStatsScreenState extends State<ComplianceStatsScreen>
                 ),
               )
             else
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Center(
-                  child: Text('No compliance data to display.',
-                      style: theme.textTheme.bodyMedium),
-                ),
+              const RxEmptyState(
+                title: 'No compliance data',
+                message: 'Add tasks or medications to track compliance.',
+                icon: Icons.pie_chart_outline_rounded,
+                wellColor: ThemeTokens.emerald50,
               ),
-            const SizedBox(height: 24),
+            const SizedBox(height: ThemeTokens.spacingLg),
             // Health glossary moved to Medications tab
-            const SizedBox(height: 24),
+            const SizedBox(height: ThemeTokens.spacingLg),
             Semantics(
               label: 'Data export and import section',
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Semantics(
-                        button: true,
-                        label: 'Export your health data',
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            try {
-                              // Show loading indicator
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
+              child: RxCard(
+                radius: ThemeTokens.radiusMd,
+                padding: const EdgeInsets.all(ThemeTokens.spacingMd),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Semantics(
+                      button: true,
+                      label: 'Export your health data',
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            // Show loading indicator
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
 
-                              // Generate PDF
-                              final pdfFile =
-                                  await PdfExportService.generateHealthReport();
+                            // Generate PDF
+                            final pdfFile =
+                                await PdfExportService.generateHealthReport();
 
-                              // Close loading dialog
-                              if (!mounted) return;
+                            // Close loading dialog
+                            if (!mounted) return;
+                            Navigator.of(context).pop();
+
+                            // Navigate to preview screen
+                            if (!mounted) return;
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    PdfPreviewScreen(pdfFile: pdfFile),
+                              ),
+                            );
+                          } catch (e) {
+                            // Close loading dialog if still open
+                            if (mounted && Navigator.of(context).canPop()) {
                               Navigator.of(context).pop();
-
-                              // Navigate to preview screen
-                              if (!mounted) return;
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      PdfPreviewScreen(pdfFile: pdfFile),
-                                ),
-                              );
-                            } catch (e) {
-                              // Close loading dialog if still open
-                              if (mounted && Navigator.of(context).canPop()) {
-                                Navigator.of(context).pop();
-                              }
-
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Error exporting PDF: $e'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
                             }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Error exporting PDF: $e',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onError,
+                                  ),
+                                ),
+                                backgroundColor: theme.colorScheme.error,
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(ThemeTokens.radiusSm),
                           ),
-                          child: Text(
-                            'Export Data',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          'Export Data',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onPrimary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      // Removed Import Data button
-                    ],
-                  ),
+                    ),
+                    // Removed Import Data button
+                  ],
                 ),
               ),
             ),

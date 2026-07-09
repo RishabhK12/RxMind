@@ -10,6 +10,7 @@ import 'package:rxmind_app/screens/ai/assistant_message_bubble.dart';
 import 'package:rxmind_app/screens/ai/emergency_static_screen.dart';
 import 'package:rxmind_app/screens/ai/report_output_sheet.dart';
 import 'package:rxmind_app/services/discharge_data_manager.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -134,10 +135,14 @@ class _AiChatScreenState extends State<AiChatScreen> {
         _isTyping = false;
       });
       if (mounted) {
+        final scheme = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(errorMsg, style: const TextStyle(color: Colors.red)),
-            backgroundColor: Colors.white,
+            content: Text(
+              errorMsg,
+              style: TextStyle(color: scheme.onError),
+            ),
+            backgroundColor: scheme.error,
           ),
         );
       }
@@ -224,6 +229,18 @@ class _AiChatScreenState extends State<AiChatScreen> {
     );
   }
 
+  Color _userBubbleFill(ThemeData theme) {
+    if (theme.brightness == Brightness.dark) {
+      return theme.colorScheme.primary.withValues(alpha: 0.2);
+    }
+    return ThemeTokens.blue50;
+  }
+
+  Color _borderColor(BuildContext context) {
+    return Theme.of(context).extension<RxMindThemeExtension>()?.border ??
+        ThemeTokens.brandBorder;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -235,7 +252,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        elevation: 0,
         title: GestureDetector(
           onTap: () {
             _showRenameDialog(
@@ -248,14 +265,15 @@ class _AiChatScreenState extends State<AiChatScreen> {
             children: [
               Text(_chatManager.activeChatName,
                   style: theme.textTheme.titleLarge),
-              const SizedBox(width: 8),
+              const SizedBox(width: ThemeTokens.spacingSm),
               const Icon(Icons.edit, size: 18),
             ],
           ),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: ThemeTokens.spacingSm),
             child: Chip(
               label: const Text('AI · On-Device'),
               visualDensity: VisualDensity.compact,
@@ -277,7 +295,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
           : !_dischargeUploaded
               ? Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(ThemeTokens.spacingLg),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -287,13 +305,13 @@ class _AiChatScreenState extends State<AiChatScreen> {
                           color:
                               theme.colorScheme.primary.withValues(alpha: 0.5),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: ThemeTokens.spacingLg),
                         Text(
                           'Upload a Discharge Paper First',
                           style: theme.textTheme.titleLarge,
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: ThemeTokens.spacingMd - 4),
                         Text(
                           'The wellness guide works best after you upload a discharge document. '
                           'Please scan or upload your discharge paper first.',
@@ -311,8 +329,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
                         Container(
                           color: theme.colorScheme.surfaceContainerHighest,
                           padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 12,
+                            vertical: ThemeTokens.spacingSm,
+                            horizontal: ThemeTokens.spacingMd - 4,
                           ),
                           child: Row(
                             children: [
@@ -330,7 +348,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                                                 'Chat ${i + 1}';
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
-                                            horizontal: 4,
+                                            horizontal: ThemeTokens.spacingXs,
                                           ),
                                           child: GestureDetector(
                                             onLongPress: () {
@@ -372,7 +390,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
                           Semantics(
                             label: 'Structured context loaded',
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding:
+                                  const EdgeInsets.all(ThemeTokens.spacingSm),
                               child: Text(
                                 'Structured context loaded',
                                 style: theme.textTheme.bodySmall,
@@ -392,14 +411,17 @@ class _AiChatScreenState extends State<AiChatScreen> {
                                     alignment: Alignment.centerRight,
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
-                                        vertical: 4,
-                                        horizontal: 12,
+                                        vertical: ThemeTokens.spacingXs,
+                                        horizontal: ThemeTokens.spacingMd - 4,
                                       ),
-                                      padding: const EdgeInsets.all(12),
+                                      padding: const EdgeInsets.all(
+                                        ThemeTokens.spacingMd - 4,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: theme.colorScheme.primary
-                                            .withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(12),
+                                        color: _userBubbleFill(theme),
+                                        borderRadius: BorderRadius.circular(
+                                          ThemeTokens.radiusMd,
+                                        ),
                                       ),
                                       child: Text(msg['content'] ?? ''),
                                     ),
@@ -423,14 +445,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
                           Semantics(
                             label: 'Assistant is typing',
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding:
+                                  const EdgeInsets.all(ThemeTokens.spacingSm),
                               child: Row(
                                 children: [
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: ThemeTokens.spacingSm),
                                   const CircularProgressIndicator(
                                     strokeWidth: 2,
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(
+                                      width: ThemeTokens.spacingMd - 4),
                                   Text(
                                     'Assistant is typing...',
                                     style: theme.textTheme.bodySmall,
@@ -440,7 +464,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                             ),
                           ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(ThemeTokens.spacingSm),
                           child: Row(
                             children: [
                               Expanded(
@@ -451,23 +475,70 @@ class _AiChatScreenState extends State<AiChatScreen> {
                                     controller: _controller,
                                     enabled: _chatManager
                                         .activeDisclosureAcknowledged,
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                       hintText: 'Type your message...',
-                                      border: OutlineInputBorder(),
+                                      filled: true,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: ThemeTokens.spacingMd,
+                                        vertical: ThemeTokens.spacingMd - 4,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          ThemeTokens.radiusPill,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          ThemeTokens.radiusPill,
+                                        ),
+                                        borderSide: BorderSide(
+                                          color: _borderColor(context),
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          ThemeTokens.radiusPill,
+                                        ),
+                                        borderSide: BorderSide(
+                                          color: theme.colorScheme.primary,
+                                          width: ThemeTokens.focusRingWidth,
+                                        ),
+                                      ),
+                                      disabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          ThemeTokens.radiusPill,
+                                        ),
+                                        borderSide: BorderSide(
+                                          color: _borderColor(context),
+                                        ),
+                                      ),
                                     ),
                                     onSubmitted: (_) => _sendMessage(),
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: ThemeTokens.spacingSm),
                               Semantics(
                                 label: 'Send message',
                                 button: true,
-                                child: IconButton(
-                                  icon: const Icon(Icons.send),
-                                  onPressed:
+                                child: Material(
+                                  color:
                                       _chatManager.activeDisclosureAcknowledged
-                                          ? _sendMessage
-                                          : null,
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.primary
+                                              .withValues(alpha: 0.38),
+                                  shape: const CircleBorder(),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.send,
+                                      color: theme.colorScheme.onPrimary,
+                                    ),
+                                    onPressed: _chatManager
+                                            .activeDisclosureAcknowledged
+                                        ? _sendMessage
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],

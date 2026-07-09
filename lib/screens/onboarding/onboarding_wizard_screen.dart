@@ -3,6 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rxmind_app/main.dart';
 import 'package:rxmind_app/screens/onboarding/disclaimer_gate_screen.dart';
 import 'package:rxmind_app/screens/settings/privacy_terms_screen.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_app_bar_logo.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
+import 'package:rxmind_app/widgets/rx_secondary_button.dart';
 
 /// Unified 5-step onboarding wizard integrating disclaimer, CHD consent,
 /// feature carousel, and profile setup entry.
@@ -48,6 +52,7 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       title: 'Welcome to RxMind',
       description:
           'Your on-device guide to safe hospital discharge. All your instructions, meds, and reminders in one secure place.',
+      wellColor: ThemeTokens.blue50,
     ),
     _CarouselSlide(
       asset: 'assets/illus/onboard2.svg',
@@ -55,6 +60,7 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       title: 'Offline & Private',
       description:
           'Everything stays on your device. No cloud, no tracking. Your health data is stored locally on your device.',
+      wellColor: ThemeTokens.emerald50,
     ),
     _CarouselSlide(
       asset: 'assets/illus/onboard3.svg',
@@ -62,14 +68,16 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       title: 'Organized Recovery',
       description:
           'Log, organize, and remind yourself about discharge instructions with tasks, glossary, and more.',
+      wellColor: ThemeTokens.violet50,
     ),
   ];
 
   bool get _reducedMotion {
     try {
-      return RxMindSettings.of(context).reducedMotion;
+      return RxMindSettings.of(context).reducedMotion ||
+          MediaQuery.disableAnimationsOf(context);
     } catch (_) {
-      return false;
+      return MediaQuery.disableAnimationsOf(context);
     }
   }
 
@@ -114,7 +122,7 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: theme.colorScheme.surface,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -128,15 +136,23 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      LinearProgressIndicator(
-                        value: _progress,
-                        minHeight: 6,
-                        borderRadius: BorderRadius.circular(3),
+                      ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(ThemeTokens.radiusPill),
+                        child: LinearProgressIndicator(
+                          value: _progress,
+                          minHeight: 8,
+                          backgroundColor: ThemeTokens.brandMuted,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Step ${_currentStep + 1} of ${OnboardingWizardScreen.totalSteps}',
-                        style: theme.textTheme.labelLarge,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.7),
+                        ),
                       ),
                     ],
                   ),
@@ -170,14 +186,13 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
         children: [
           Semantics(
             label: 'RxMind logo',
-            child: SvgPicture.asset(
-              'assets/illus/logo.svg',
-              height: 120,
-              errorBuilder: (_, __, ___) => Icon(
-                Icons.medical_services_rounded,
-                size: 80,
-                color: theme.colorScheme.primary,
+            child: Container(
+              padding: const EdgeInsets.all(ThemeTokens.spacingLg),
+              decoration: BoxDecoration(
+                color: ThemeTokens.blue50,
+                borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
               ),
+              child: const RxAppBarLogo(showWordmark: false, height: 96),
             ),
           ),
           const SizedBox(height: 32),
@@ -194,7 +209,11 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
             textAlign: TextAlign.center,
           ),
           const Spacer(),
-          _primaryButton('Continue', _nextStep),
+          Semantics(
+            label: 'Continue',
+            button: true,
+            child: RxPrimaryButton(label: 'Continue', onPressed: _nextStep),
+          ),
         ],
       ),
     );
@@ -222,7 +241,11 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
             textAlign: TextAlign.center,
           ),
           const Spacer(),
-          _primaryButton('I Understand', _nextStep),
+          Semantics(
+            label: 'I Understand',
+            button: true,
+            child: RxPrimaryButton(label: 'I Understand', onPressed: _nextStep),
+          ),
         ],
       ),
     );
@@ -270,7 +293,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
               ),
             ),
           ),
-          OutlinedButton(
+          RxSecondaryButton(
+            label: 'View Privacy Policy',
             onPressed: () {
               Navigator.push(
                 context,
@@ -279,10 +303,13 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
                 ),
               );
             },
-            child: const Text('View Privacy Policy'),
           ),
           const SizedBox(height: 8),
-          _primaryButton('I Agree', _nextStep),
+          Semantics(
+            label: 'I Agree',
+            button: true,
+            child: RxPrimaryButton(label: 'I Agree', onPressed: _nextStep),
+          ),
         ],
       ),
     );
@@ -305,13 +332,21 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
                   children: [
                     Semantics(
                       label: slide.semanticsLabel,
-                      child: SvgPicture.asset(
-                        slide.asset,
-                        height: 180,
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.image_outlined,
-                          size: 100,
-                          color: theme.colorScheme.primary,
+                      child: Container(
+                        padding: const EdgeInsets.all(ThemeTokens.spacingLg),
+                        decoration: BoxDecoration(
+                          color: slide.wellColor,
+                          borderRadius:
+                              BorderRadius.circular(ThemeTokens.radiusLg),
+                        ),
+                        child: SvgPicture.asset(
+                          slide.asset,
+                          height: 160,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.image_outlined,
+                            size: 100,
+                            color: theme.colorScheme.primary,
+                          ),
                         ),
                       ),
                     ),
@@ -338,22 +373,28 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
         ),
         Padding(
           padding: const EdgeInsets.all(24),
-          child: _primaryButton(
-            _carouselIndex < _carouselSlides.length - 1
+          child: Semantics(
+            label: _carouselIndex < _carouselSlides.length - 1
                 ? 'Next Slide'
                 : 'Continue',
-            () {
-              if (_carouselIndex < _carouselSlides.length - 1) {
-                _carouselController.nextPage(
-                  duration: _reducedMotion
-                      ? Duration.zero
-                      : const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              } else {
-                _nextStep();
-              }
-            },
+            button: true,
+            child: RxPrimaryButton(
+              label: _carouselIndex < _carouselSlides.length - 1
+                  ? 'Next Slide'
+                  : 'Continue',
+              onPressed: () {
+                if (_carouselIndex < _carouselSlides.length - 1) {
+                  _carouselController.nextPage(
+                    duration: _reducedMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                } else {
+                  _nextStep();
+                }
+              },
+            ),
           ),
         ),
       ],
@@ -382,25 +423,20 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
             textAlign: TextAlign.center,
           ),
           const Spacer(),
-          _primaryButton('Set Up Profile', widget.onComplete),
+          Semantics(
+            label: 'Set Up Profile',
+            button: true,
+            child: RxPrimaryButton(
+              label: 'Set Up Profile',
+              onPressed: widget.onComplete,
+            ),
+          ),
           const SizedBox(height: 12),
           TextButton(
             onPressed: widget.onComplete,
             child: const Text('Skip for now'),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _primaryButton(String label, VoidCallback onPressed) {
-    return Semantics(
-      label: label,
-      button: true,
-      child: FilledButton(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-        child: Text(label),
       ),
     );
   }
@@ -412,12 +448,14 @@ class _CarouselSlide {
     required this.semanticsLabel,
     required this.title,
     required this.description,
+    required this.wellColor,
   });
 
   final String asset;
   final String semanticsLabel;
   final String title;
   final String description;
+  final Color wellColor;
 }
 
 class _Bullet extends StatelessWidget {

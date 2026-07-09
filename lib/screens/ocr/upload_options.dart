@@ -5,6 +5,9 @@ import 'package:rxmind_app/core/storage/local_storage.dart';
 import 'package:rxmind_app/services/ocr/text_extraction_service.dart';
 import 'package:rxmind_app/core/permissions/permission_disclosure_store.dart';
 import 'package:rxmind_app/screens/permissions/permission_disclosure_dialog.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_card.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
 import 'package:path/path.dart' as path;
 
 class UploadOptionsScreen extends StatefulWidget {
@@ -62,9 +65,16 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      final theme = Theme.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Camera not available or permission denied.')),
+        SnackBar(
+          content: Text(
+            'Camera not available or permission denied.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onInverseSurface,
+            ),
+          ),
+        ),
       );
     }
   }
@@ -89,8 +99,17 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      final theme = Theme.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error selecting file: $e')),
+        SnackBar(
+          content: Text(
+            'Error selecting file: $e',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onError,
+            ),
+          ),
+          backgroundColor: theme.colorScheme.error,
+        ),
       );
     }
   }
@@ -125,8 +144,10 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
+        builder: (context) => Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
       );
 
@@ -139,10 +160,14 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
         try {
           // Show additional extraction status
           if (!mounted) return;
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 'Processing ${filePath.toLowerCase().endsWith('.pdf') ? 'PDF' : 'image'}: ${path.basename(filePath)}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onInverseSurface,
+                ),
               ),
               duration: const Duration(seconds: 2),
             ),
@@ -171,13 +196,18 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
         final String troubleshootingAdvice =
             TextExtractionService.getTroubleshootingAdvice(
                 errorFiles.first, errorMessage);
+        final theme = Theme.of(context);
+        final ext = RxMindThemeExtension.of(context);
 
         final shouldContinue = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            icon: const Icon(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+            ),
+            icon: Icon(
               Icons.error_outline,
-              color: Colors.orange,
+              color: ext.warning,
               size: 36,
             ),
             title: Text('Extraction Issue with ${errorFiles.length} file(s)'),
@@ -187,17 +217,17 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
               children: [
                 Text(
                   'Could not extract text from: ${errorFiles.join(', ')}.\n\nError: ${errorMessage ?? 'No text was found in the document.'}',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: theme.textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: ThemeTokens.spacingMd),
                 Text(
                   'Troubleshooting Tips:',
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: theme.textTheme.titleSmall,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: ThemeTokens.spacingSm),
                 Text(
                   troubleshootingAdvice,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: theme.textTheme.bodySmall,
                 ),
               ],
             ),
@@ -221,11 +251,16 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
       } else if (ocrText.isEmpty) {
         // All files processed, but no text found
         if (!mounted) return;
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content:
-                Text('No text could be extracted from the selected files.'),
-            duration: Duration(seconds: 3),
+          SnackBar(
+            content: Text(
+              'No text could be extracted from the selected files.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onInverseSurface,
+              ),
+            ),
+            duration: const Duration(seconds: 3),
           ),
         );
       } else {
@@ -236,20 +271,78 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
+      final theme = Theme.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error scanning document: $e')),
+        SnackBar(
+          content: Text(
+            'Error scanning document: $e',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onError,
+            ),
+          ),
+          backgroundColor: theme.colorScheme.error,
+        ),
       );
     }
+  }
+
+  Widget _optionCard({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required Color wellColor,
+    required Color iconColor,
+    required VoidCallback? onTap,
+    required String semanticsLabel,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    return Semantics(
+      label: semanticsLabel,
+      button: true,
+      child: RxCard(
+        onTap: onTap,
+        radius: ThemeTokens.radiusLg,
+        padding: const EdgeInsets.all(ThemeTokens.spacingLg),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: isDark ? ThemeTokens.darkMuted : wellColor,
+                borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+              ),
+              child: Icon(icon, size: 28, color: iconColor),
+            ),
+            const SizedBox(width: ThemeTokens.spacingMd),
+            Expanded(
+              child: Text(
+                label,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        elevation: 0,
         leading: Semantics(
           label: 'Back',
           button: true,
@@ -270,148 +363,138 @@ class _UploadOptionsScreenState extends State<UploadOptionsScreen> {
         child: AnimatedScale(
           scale: 1.0,
           duration: const Duration(milliseconds: 300),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Semantics(
-                label: _hasUsedCamera ? 'Take Another Photo' : 'Take Photo',
-                button: true,
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.camera_alt,
-                      size: 24, color: theme.colorScheme.onPrimary),
-                  label: Text(
-                    _hasUsedCamera ? 'Take Another Photo' : 'Take Photo',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    minimumSize: const Size(0, 60),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                  ),
-                  onPressed: _uploading ? null : _captureFromCamera,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: ThemeTokens.spacingLg,
+              vertical: ThemeTokens.spacingMd,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _optionCard(
+                  context: context,
+                  icon: Icons.camera_alt,
+                  label: _hasUsedCamera ? 'Take Another Photo' : 'Take Photo',
+                  wellColor: ThemeTokens.blue50,
+                  iconColor: theme.colorScheme.primary,
+                  onTap: _uploading ? null : _captureFromCamera,
+                  semanticsLabel:
+                      _hasUsedCamera ? 'Take Another Photo' : 'Take Photo',
                 ),
-              ),
-              const SizedBox(height: 24),
-              Semantics(
-                label: _hasUsedFilePicker
-                    ? 'Select Another PDF or Image'
-                    : 'Select File',
-                button: true,
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.insert_drive_file,
-                      size: 24, color: theme.colorScheme.onPrimary),
-                  label: Text(
-                    _hasUsedFilePicker
-                        ? 'Select Another PDF or Image'
-                        : 'Select PDF or Image',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.secondary,
-                    minimumSize: const Size(0, 60),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                  ),
-                  onPressed: _uploading ? null : _pickFromLibrary,
+                const SizedBox(height: ThemeTokens.spacingMd),
+                _optionCard(
+                  context: context,
+                  icon: Icons.insert_drive_file,
+                  label: _hasUsedFilePicker
+                      ? 'Select Another PDF or Image'
+                      : 'Select PDF or Image',
+                  wellColor: ThemeTokens.emerald50,
+                  iconColor: theme.colorScheme.secondary,
+                  onTap: _uploading ? null : _pickFromLibrary,
+                  semanticsLabel: _hasUsedFilePicker
+                      ? 'Select Another PDF or Image'
+                      : 'Select File',
                 ),
-              ),
-              if (_selectedFilePaths.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.symmetric(horizontal: 32),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withAlpha(77),
-                    ),
-                  ),
-                  child: Column(
-                    children: _selectedFilePaths.map((filePath) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              filePath.toLowerCase().endsWith('.pdf')
-                                  ? Icons.picture_as_pdf
-                                  : Icons.image,
-                              color: theme.colorScheme.primary,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    path.basename(filePath),
-                                    style: theme.textTheme.bodyMedium,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    filePath.toLowerCase().endsWith('.pdf')
-                                        ? 'PDF Document'
-                                        : 'Image File',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onSurface
-                                            .withAlpha(153)),
-                                  ),
-                                ],
+                if (_selectedFilePaths.isNotEmpty) ...[
+                  const SizedBox(height: ThemeTokens.spacingLg),
+                  RxCard(
+                    radius: ThemeTokens.radiusMd,
+                    padding: const EdgeInsets.all(ThemeTokens.spacingMd),
+                    child: Column(
+                      children: _selectedFilePaths.map((filePath) {
+                        final isPdf = filePath.toLowerCase().endsWith('.pdf');
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: theme.brightness == Brightness.dark
+                                      ? ThemeTokens.darkMuted
+                                      : ThemeTokens.amber50,
+                                  borderRadius: BorderRadius.circular(
+                                      ThemeTokens.radiusSm),
+                                ),
+                                child: Icon(
+                                  isPdf ? Icons.picture_as_pdf : Icons.image,
+                                  color:
+                                      RxMindThemeExtension.of(context).warning,
+                                  size: 22,
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () {
-                                setState(() {
-                                  _selectedFilePaths.remove(filePath);
-                                  if (_selectedFilePaths.isEmpty) {
-                                    _uploadProgress = 0.0;
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                              const SizedBox(width: ThemeTokens.spacingMd),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      path.basename(filePath),
+                                      style: theme.textTheme.bodyMedium,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      isPdf ? 'PDF Document' : 'Image File',
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.close,
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedFilePaths.remove(filePath);
+                                    if (_selectedFilePaths.isEmpty) {
+                                      _uploadProgress = 0.0;
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ),
-              ],
-              if (_uploading) ...[
-                const SizedBox(height: 16),
-                LinearProgressIndicator(
-                  value: _uploadProgress,
-                  backgroundColor: theme.colorScheme.surfaceContainerLowest,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                ),
-              ],
-              const SizedBox(height: 32),
-              if (_selectedFilePaths.isNotEmpty && !_uploading)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.document_scanner_outlined),
-                    label: const Text('Scan Document'),
-                    onPressed: _scanDocument,
+                ],
+                if (_uploading) ...[
+                  const SizedBox(height: ThemeTokens.spacingMd),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                    child: LinearProgressIndicator(
+                      value: _uploadProgress,
+                      minHeight: 8,
+                      backgroundColor: ThemeTokens.brandMuted,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          theme.colorScheme.primary),
+                    ),
                   ),
-                ),
-            ],
+                ],
+                if (_selectedFilePaths.isNotEmpty && !_uploading) ...[
+                  const SizedBox(height: ThemeTokens.spacingXl),
+                  Semantics(
+                    label: 'Scan Document',
+                    button: true,
+                    child: RxPrimaryButton(
+                      label: 'Scan Document',
+                      icon: Icons.document_scanner_outlined,
+                      onPressed: _scanDocument,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),

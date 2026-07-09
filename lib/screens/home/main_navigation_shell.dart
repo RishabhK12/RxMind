@@ -6,6 +6,7 @@ import 'package:rxmind_app/screens/tracker/medications_screen.dart';
 import 'package:rxmind_app/screens/tracker/tasks_screen.dart';
 import 'package:rxmind_app/screens/settings/settings_screen.dart';
 import 'package:rxmind_app/screens/ai/ai_chat_screen.dart';
+import 'package:rxmind_app/theme/brand_shadows.dart';
 import 'package:rxmind_app/theme/theme_tokens.dart';
 
 class MainNavigationShell extends StatefulWidget {
@@ -67,13 +68,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
               color: colorScheme.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 8,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+              boxShadow: BrandShadows.navTop(theme.brightness),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -142,7 +137,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           icon: icon,
           label: label,
           active: active,
-          activeColor: colorScheme.secondary,
+          activeColor: colorScheme.primary,
           inactiveColor: ext.navInactive,
           onTap: () => setState(() => _currentIndex = index),
         ),
@@ -170,32 +165,43 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final color = active ? activeColor : inactiveColor;
     return InkWell(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 2),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: ThemeTokens.fontFamily,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 11,
-                  color: color,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: active
+                      ? activeColor.withValues(alpha: 0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(ThemeTokens.radiusSm),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  child: Icon(icon, color: color, size: 24),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.labelSmall?.copyWith(color: color),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

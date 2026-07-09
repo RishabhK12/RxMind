@@ -44,11 +44,11 @@ class _GlossaryDetailScreenState extends State<GlossaryDetailScreen> {
       appBar: AppBar(
         title: Text(widget.term),
         backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        elevation: 0,
       ),
       body: Center(
         child: loading
-            ? const CircularProgressIndicator()
+            ? CircularProgressIndicator(color: theme.colorScheme.primary)
             : SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(24),

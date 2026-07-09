@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
 
 class WelcomeCarousel extends StatefulWidget {
   const WelcomeCarousel({super.key});
@@ -18,18 +21,21 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
       title: 'Welcome to RxMind',
       description:
           'Your on-device guide to safe hospital discharge. All your instructions, meds, and reminders in one secure place.',
+      wellColor: ThemeTokens.blue50,
     ),
     _CarouselPage(
       illustration: 'assets/illus/onboard2.svg',
       title: 'Offline & Private',
       description:
           'Everything stays on your device. No cloud, no tracking. Your health data is stored locally on your device.',
+      wellColor: ThemeTokens.emerald50,
     ),
     _CarouselPage(
       illustration: 'assets/illus/onboard3.svg',
       title: 'Organized Recovery',
       description:
           'Log, organize, and remind yourself about discharge instructions with tasks, glossary, and more.',
+      wellColor: ThemeTokens.violet50,
     ),
   ];
 
@@ -52,8 +58,12 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -64,6 +74,53 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                 itemCount: _pages.length,
                 itemBuilder: (context, i) {
                   final page = _pages[i];
+                  final pageContent = Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 32),
+                        padding: const EdgeInsets.all(ThemeTokens.spacingXl),
+                        decoration: BoxDecoration(
+                          color: page.wellColor,
+                          borderRadius:
+                              BorderRadius.circular(ThemeTokens.radiusLg),
+                        ),
+                        child: SvgPicture.asset(
+                          page.illustration,
+                          height: 160,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.image_outlined,
+                            size: 72,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: ThemeTokens.spacingXl),
+                      Text(
+                        page.title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontSize: 24,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: ThemeTokens.spacingMd),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          page.description,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.7),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  );
+
+                  if (reduceMotion) return pageContent;
+
                   return AnimatedBuilder(
                     animation: _pageController,
                     builder: (context, child) {
@@ -78,50 +135,11 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                         opacity: value,
                         child: Transform.translate(
                           offset: Offset(0, 40 * (1 - value)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // SVG illustrations have been removed for simplicity.
-                              // const SizedBox(height: 32),
-                              // SvgPicture.asset(
-                              //   page.illustration,
-                              //   height: 200,
-                              //   width: 200,
-                              //   placeholderBuilder: (context) =>
-                              //       const Icon(Icons.image, size: 100),
-                              // ),
-                              // const SizedBox(height: 48),
-                              const SizedBox(height: 32),
-                              Text(
-                                page.title,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(fontSize: 24),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 32),
-                                child: Text(
-                                  page.description,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withValues(alpha: 0.7)),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
+                          child: child,
                         ),
                       );
                     },
+                    child: pageContent,
                   );
                 },
               ),
@@ -132,13 +150,9 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color:
-                        Theme.of(context).colorScheme.outline.withOpacity(0.3),
-                    width: 1.5,
-                  ),
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(ThemeTokens.radiusPill),
+                  border: Border.all(color: ext.border, width: 1.5),
                 ),
                 child: SmoothPageIndicator(
                   controller: _pageController,
@@ -147,9 +161,8 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                     dotHeight: 10,
                     dotWidth: 10,
                     spacing: 8,
-                    dotColor:
-                        Theme.of(context).colorScheme.outline.withOpacity(0.4),
-                    activeDotColor: Theme.of(context).colorScheme.secondary,
+                    dotColor: ThemeTokens.brandMuted,
+                    activeDotColor: theme.colorScheme.primary,
                   ),
                 ),
               ),
@@ -163,24 +176,23 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                       child: TextButton(
                         onPressed: () {
                           _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
+                            duration: reduceMotion
+                                ? Duration.zero
+                                : const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                           );
                         },
                         child: const Text('Next'),
                       ),
                     )
-                  : SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/permissionsPrompt',
-                          );
-                        },
-                        child: const Text('Get Started'),
-                      ),
+                  : RxPrimaryButton(
+                      label: 'Get Started',
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(
+                          context,
+                          '/permissionsPrompt',
+                        );
+                      },
                     ),
             ),
           ],
@@ -194,9 +206,11 @@ class _CarouselPage {
   final String illustration;
   final String title;
   final String description;
+  final Color wellColor;
   const _CarouselPage({
     required this.illustration,
     required this.title,
     required this.description,
+    required this.wellColor,
   });
 }

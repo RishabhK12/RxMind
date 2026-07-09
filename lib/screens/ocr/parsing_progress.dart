@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rxmind_app/core/ai/ai_parser.dart';
 import 'package:rxmind_app/core/ai/safety_pipeline.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
 
 class ParsingProgressScreen extends StatefulWidget {
   const ParsingProgressScreen({super.key});
@@ -43,10 +44,14 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
 
       if (!mounted) return;
       if (!hasData || result.rateLimited) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
               'Automatic parsing unavailable — review and edit manually',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onInverseSurface,
+              ),
             ),
           ),
         );
@@ -69,8 +74,9 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.5),
+      backgroundColor: theme.colorScheme.scrim.withValues(alpha: 0.5),
       body: Center(
         child: AnimatedScale(
           scale: 1.0,
@@ -80,30 +86,38 @@ class _ParsingProgressScreenState extends State<ParsingProgressScreen> {
             liveRegion: true,
             child: Container(
               width: 280,
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(ThemeTokens.spacingLg),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(ThemeTokens.radiusLg),
+                border: Border.all(color: ext.border),
+                boxShadow: ext.softShadow,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SvgPicture.asset(
-                    'assets/illus/logo.svg',
-                    width: 48,
-                    height: 48,
+                  Container(
+                    width: 64,
+                    height: 64,
+                    padding: const EdgeInsets.all(ThemeTokens.spacingSm),
+                    decoration: BoxDecoration(
+                      color: theme.brightness == Brightness.dark
+                          ? ThemeTokens.darkMuted
+                          : ThemeTokens.emerald50,
+                      borderRadius: BorderRadius.circular(ThemeTokens.radiusMd),
+                    ),
+                    child: SvgPicture.asset(
+                      'assets/illus/logo.svg',
+                      width: 48,
+                      height: 48,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: ThemeTokens.spacingMd),
                   if (_error == null) ...[
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 16),
+                    CircularProgressIndicator(
+                      color: theme.colorScheme.secondary,
+                    ),
+                    const SizedBox(height: ThemeTokens.spacingMd),
                     Text(
                       'Organizing your document...',
                       style: theme.textTheme.titleMedium,

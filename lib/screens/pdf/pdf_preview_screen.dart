@@ -4,6 +4,10 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:path/path.dart' as path;
+import 'package:rxmind_app/theme/brand_shadows.dart';
+import 'package:rxmind_app/theme/theme_tokens.dart';
+import 'package:rxmind_app/widgets/rx_primary_button.dart';
+import 'package:rxmind_app/widgets/rx_secondary_button.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
   final File pdfFile;
@@ -63,19 +67,32 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     try {
       await Clipboard.setData(ClipboardData(text: widget.pdfFile.path));
       if (mounted) {
+        final theme = Theme.of(context);
+        final ext = RxMindThemeExtension.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PDF file path copied to clipboard'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text(
+              'PDF file path copied to clipboard',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSecondary,
+              ),
+            ),
+            backgroundColor: ext.success,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error copying path: $e'),
-            backgroundColor: Colors.red,
+            content: Text(
+              'Error copying path: $e',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onError,
+              ),
+            ),
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -85,30 +102,41 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ext = RxMindThemeExtension.of(context);
     final fileName = path.basename(widget.pdfFile.path);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Health Report Preview'),
+        title: Text(
+          'Health Report Preview',
+          style: theme.textTheme.titleLarge,
+        ),
         backgroundColor: theme.colorScheme.surface,
-        elevation: 1,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.share),
+            icon: Icon(Icons.share, color: theme.colorScheme.primary),
             tooltip: 'Share PDF',
             onPressed: _sharePdf,
           ),
           IconButton(
-            icon: const Icon(Icons.download),
+            icon: Icon(Icons.download, color: theme.colorScheme.secondary),
             tooltip: 'File saved',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('PDF saved: $fileName'),
-                  backgroundColor: Colors.green,
+                  content: Text(
+                    'PDF saved: $fileName',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSecondary,
+                    ),
+                  ),
+                  backgroundColor: ext.success,
                   action: SnackBarAction(
                     label: 'OK',
-                    textColor: Colors.white,
+                    textColor: theme.colorScheme.onSecondary,
                     onPressed: () {},
                   ),
                 ),
@@ -125,31 +153,39 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 ? 'Error loading PDF: $_error'
                 : 'PDF preview ready',
         child: _isLoading
-            ? const Center(
+            ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('Loading PDF...'),
+                    CircularProgressIndicator(
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(height: ThemeTokens.spacingMd),
+                    Text(
+                      'Loading PDF...',
+                      style: theme.textTheme.bodyLarge,
+                    ),
                   ],
                 ),
               )
             : _error != null
                 ? Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(ThemeTokens.spacingMd),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline,
-                              size: 64, color: Colors.red),
-                          const SizedBox(height: 16),
+                          Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: theme.colorScheme.error,
+                          ),
+                          const SizedBox(height: ThemeTokens.spacingMd),
                           Text(
                             'Error loading PDF',
                             style: theme.textTheme.titleLarge,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: ThemeTokens.spacingSm),
                           Text(
                             _error!,
                             textAlign: TextAlign.center,
@@ -162,11 +198,25 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 : Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16),
-                        color: theme.colorScheme.primaryContainer,
+                        padding: const EdgeInsets.all(ThemeTokens.spacingMd),
+                        color:
+                            isDark ? ThemeTokens.darkMuted : ThemeTokens.blue50,
                         child: Row(
                           children: [
-                            const Icon(Icons.picture_as_pdf, size: 32),
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surface,
+                                borderRadius:
+                                    BorderRadius.circular(ThemeTokens.radiusSm),
+                              ),
+                              child: Icon(
+                                Icons.picture_as_pdf,
+                                size: 28,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
@@ -196,12 +246,21 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                           scrollDirection: Axis.vertical,
                           builders: PdfViewBuilders<DefaultBuilderOptions>(
                             options: const DefaultBuilderOptions(),
-                            documentLoaderBuilder: (_) => const Center(
-                                child: CircularProgressIndicator()),
-                            pageLoaderBuilder: (_) => const Center(
-                                child: CircularProgressIndicator()),
+                            documentLoaderBuilder: (_) => Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            pageLoaderBuilder: (_) => Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                             errorBuilder: (_, error) => Center(
-                              child: Text('Error: $error'),
+                              child: Text(
+                                'Error: $error',
+                                style: theme.textTheme.bodyMedium,
+                              ),
                             ),
                           ),
                         ),
@@ -211,41 +270,31 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       ),
       bottomNavigationBar: !_isLoading && _error == null
           ? Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(ThemeTokens.spacingMd),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
+                boxShadow: BrandShadows.navTop(theme.brightness),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close),
-                      label: const Text('Close'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+              child: SafeArea(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: RxSecondaryButton(
+                        label: 'Close',
+                        icon: Icons.close,
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _sharePdf,
-                      icon: const Icon(Icons.share),
-                      label: const Text('Share'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: RxPrimaryButton(
+                        label: 'Share',
+                        icon: Icons.share,
+                        onPressed: _sharePdf,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             )
           : null,

@@ -1,0 +1,331 @@
+﻿Master Compliance and Architectural Report for 2026 Mobile Healthcare Applications
+1. Mobile App Store Policies
+Executive Summary
+The deployment of mobile health and medical software to major digital distribution platforms in 2026 is governed by a strict, two-tiered system of organizational validation and post-launch automated enforcement1. Both the Google Play Store and iOS App Store have transitioned from basic developer self-declarations to mandatory, verified corporate entity structures and platform-mediated product labeling1. The regulatory line distinguishing generic fitness and wellness applications from Software as a Medical Device (SaMD) is determined strictly by the software's intended use, marketing assertions, and biometric signal processing capabilities4. Under this framework, platforms utilize automated crawling engines to analyze metadata, screenshots, and embedded app store optimization keywords, issuing automated rejections or post-launch bans for uncertified diagnostic claims2.
+Technical & Product Mandates
+To maintain compliance during submission and throughout the product lifecycle, applications must satisfy exact, platform-specific administrative and textual declarations.
+
+
+Compliance Parameter
+	Google Play Store 2026 Requirements
+	iOS App Store 2026 Requirements
+	Account Ownership
+	Verified Organization Account mandatory; individual developer registrations are strictly barred from the Health/Medical categories1.
+	Submission must be executed by a legally registered corporate entity; individual developer accounts are prohibited from hosting medical apps3.
+	Console Declarations
+	Complete the "Health Apps Declaration" via Policy > App Content, explaining supported features (e.g., Disease Management, Clinical Decision Support) and justifying each permission6.
+	Complete the Age Rating questionnaire and indicate "Regulated Medical Device" status in App Store Connect with verified regulatory markings11.
+	Platform-Sourced Badge
+	Displays a verified "Medical Device" store badge to the public upon verified clearance or regulatory certification1.
+	Lists localized registration details (e.g., EU Manufacturer SRN, FDA Operator Number, Intended Use Statement) on the product page12.
+	Non-Certified Disclaimers
+	Mandatory first-paragraph disclaimer: "This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition." Must direct users to a doctor1.
+	Visually prominent disclaimer in-app and in the app description declaring non-medical status and directing users to seek professional clinical advice15.
+	Hardware Dependencies
+	Mandatory explicit disclosure of external dependent hardware (e.g., Bluetooth glucometer) in the description; cannot imply standalone function6.
+	Disclose external sensor dependencies in the app's promotional material, UI, and App Store metadata3.
+	Must-Do Product Rules
+* Implement the non-medical device disclaimer in the first paragraph of the App Store and Google Play description using standard, unformatted text to guarantee immediate visibility to users prior to download1.
+* Provide a clear compatibility matrix in the store description for apps utilizing device-native sensors (e.g., using the camera for heart rate tracking or oximetry), specifying which tested hardware models support the feature6.
+* Post a privacy policy URL in App Store Connect and the Google Play Console that links to an active, publicly accessible, non-geofenced, non-editable web page; PDF formats or localized files are strictly rejected1.
+Must-Avoid Product Rules
+* Do not publish any application under an individual developer account if the product uses health permissions or is listed in the Health & Fitness or Medical categories1.
+* Do not use diagnostic verbs or absolute statements in metadata (e.g., "detects heart anomalies" vs. "logs pulse rate variations") to avoid triggering automated SaMD classifications and rejections by platform crawlers4.
+* Do not imply that an application can operate independently if its core metric collection relies on third-party hardware or external wearable sensors6.
+Architecture Impact
+The structural division between unregulated wellness functionality and regulated SaMD features requires strict modular isolation within the codebase. Developers must separate core data entry, user personalization, and local dashboard code from any advanced analytical, parsing, or algorithmic models that process raw data inputs. If the application utilizes local camera frameworks to perform text extraction (such as scanning physical prescription labels via OCR), the underlying processing pipeline must operate in a strictly ephemeral manner.
+
+
+
+
+
+
+                                  [ ON-DEVICE COMPLIANCE BOUNDARY ]
+                                 
++---------------------+           +--------------------------+           +--------------------------+
+|  Camera OCR Buffer  |---------->|   Ephemeral Volatile RAM |---------->|  Symmetric Encrypted Log |
+|  (Raw Prescription) |           |  (Zeroed Post-Extraction)|           |   (No Cloud Sync Path)   |
++---------------------+           +--------------------------+           +--------------------------+
+                                                                                      |
+                                                                                      | Local Loop
+                                                                                      v
++---------------------+           +--------------------------+           +--------------------------+
+|  Clinical Diagnosis |<----------| User Disallowed Action   |<----------| Display Neutral String   |
+| (Triggers SaMD Reg) |           | (Bypasses Local Sandbox) |           |  ("Biometric Log Added") |
++---------------------+           +--------------------------+           +--------------------------+
+
+Raw frame buffers must reside solely in temporary, volatile RAM segments that are programmatically zeroed out immediately after extracting structured text. No raw image data may write to local flash memory or external caches, preserving the local-only data boundary. Additionally, the application's local notification scheduler must be isolated from raw clinical logs. Notification triggers must be executed using neutral, system-defined strings stored locally (e.g., "Your daily biometric entry has been saved"), rather than evaluating real-time diagnostic parameters, which prevents uncertified diagnostic notifications from executing on the device lock-screen4.
+Risk Assessment
+Violating platform developer policies in 2026 exposes the publishing organization to immediate and severe consequences1. Automated post-launch sweeps by platform security engines check live apps against updated health policies, resulting in silent app store delisting and immediate developer account termination for unverified accounts1. Under regulatory consumer protection frameworks, marketing an unregulated wellness app with clinical claims constitutes false advertising, opening the legal entity to investigations by the Federal Trade Commission (FTC) and State Attorneys General, which can carry civil penalties exceeding $50,000 per violation17.
+2. Generative AI & Healthcare Guidance
+Executive Summary
+Integrating Generative AI, Large Language Models (LLMs), or interactive conversational agents within a mobile healthcare application introduces a complex matrix of platform restrictions and evolving international legislation19. Platform guidelines mandate real-time moderation, strict content filtering, and active user reporting systems to prevent the dissemination of misleading health advice20. Concurrently, corporate AI foundation policies prohibit developers from using pre-trained medical models to automate clinical decision-making or engage in the unlicensed practice of medicine19. Internationally, the European Union Artificial Intelligence Act (EU AI Act) establishes mandatory horizontal requirements for transparency, dataset verification, and risk-management alignment that take full effect for high-risk and limited-risk systems in 202621.
+Technical & Product Mandates
+Developing and integrating conversational AI or automated clinical reasoning tools requires adherence to precise product controls and platform constraints.
+
+
+Compliance Framework
+	Technical Requirement
+	Product Implementation Target
+	Google Play AI Policy
+	Real-time Moderation
+	Integrate a mandatory, persistent in-app user flagging and reporting mechanism for every AI-generated message20.
+	Google Play AI Policy
+	Content Filtering
+	Implement active server-side and local content filters to block hate speech, deepfakes, and inaccurate medical advice20.
+	HAI-DEF Prohibited Use
+	Vocation Boundary
+	Ban any model use that automates patient-specific diagnostics, prescriptions, or clinical decision support19.
+	HAI-DEF Prohibited Use
+	Device Status
+	Prohibit integration patterns that classify the pre-trained foundation provider as a "medical device manufacturer"23.
+	EU AI Act (August 2026)
+	Article 50 Transparency
+	Clearly label all interactive sessions as AI-driven and embed machine-readable watermarks in generated media21.
+	EU AI Act (August 2026)
+	Bias Testing & Training
+	Document dataset representation and audit local weights for systemic demographic biases (age, sex, ethnicity)24.
+	Must-Do Product Rules
+* Integrate a real-time, single-tap "Report Output" mechanism on all chat bubbles to allow instant user reporting of factually incorrect AI-generated health metrics or advice20.
+* Configure a localized parser that inspects all AI outputs before they are displayed to the user, stripping out any formatting or text that mimics a formalized medical prescription or direct medical order19.
+* Maintain a separate validation dataset representing localized demographic variations (age, biological sex, and ethnicity) to demonstrate bias testing compliance during audits by national supervisory authorities24.
+Must-Avoid Product Rules
+* Do not allow the chatbot engine to generate diagnostic or treatment suggestions based on direct user queries (e.g., interpreting laboratory values or recommending specific pharmaceutical dosages)19.
+* Do not represent AI-generated suggestions or medical text summaries as original human clinical reviews or expert opinions19.
+* Do not bypass the mandatory AI identification screens; the user must be explicitly notified that they are communicating with an automated machine learning model before the first message prompt is accepted21.
+Architecture Impact
+Deploying generative AI under a strict local-storage and local-processing paradigm requires a highly resilient, isolated mobile architecture. The mobile application must run a quantized open-weight model (e.g., MedGemma or Gemma 4 variants) executed directly on the device's native neural engine using hardware-accelerated runtimes3. Under this local boundary, the chat interface state machine must interact with a double-layered local validation interface.
+
+
+
+
+
+
+                                [ LOCAL GENERATIVE AI ENGINE ]
+                               
++------------------+     Query     +-------------------+     Process     +-------------------+
+|  User TextInput  |-------------->| Local Model Input |---------------->|  Quantized LLM    |
+|                  |               |  (Inference Run)  |                 | (On-Device Core)  |
++------------------+               +-------------------+                 +-------------------+
+        ^                                                                         |
+        | Intercept                                                               | Generate
+        |                                                                         v
++------------------+               +-------------------+     Parsed      +-------------------+
+| Fallback Static  |<--------------| Block / Intercept |<----------------| Local Safety Filter|
+|  Reference UI    |               |  (Regex / Check)  |                 |  Output Parsing   |
++------------------+               +-------------------+                 +-------------------+
+
+Prior to executing model inference, the user's input query must pass through a local regex and keyword validation parser that blocks queries containing high-risk, acute clinical terms (e.g., "heart attack," "overdose," or specific suicide ideation strings). If an acute clinical trigger is identified, the application must immediately bypass model execution, degrade to a local static user interface, and display pre-loaded, standard emergency phone lines or institutional clinical contacts22. For non-emergency queries, the generated output must run through a localized safety filter before rendering, checking for clinical commands, specific pharmaceutical brand names, or dose instructions22.
+Risk Assessment
+Integrating unmoderated or clinical-reasoning AI models exposes the developer to immense regulatory and platform risk16. Platform validation scanners actively flag applications containing generic web-wrapped chatbots that do not feature localized reporting and safety containment, resulting in immediate app removal20. Under the EU AI Act, deploying non-compliant, high-risk AI medical software in the European market can result in severe administrative fines21. Furthermore, under the revised Product Liability Directive (PLD), AI-enabled software is subject to strict liability, meaning any injury caused by incorrect clinical advice generated by an unvalidated local model exposes the company to direct damages without requiring proof of developer negligence28.
+3. HIPAA, Health Data Privacy, & Secure Architecture
+Executive Summary
+Implementing a zero-cloud mobile healthcare architecture eliminates federal HIPAA liability associated with the transmission and cloud storage of Protected Health Information (PHI)30. Under federal guidance, an application downloaded and managed solely on-device by an individual consumer for personal use does not make the developer a Business Associate (BA)30. However, storing sensitive biometric, physical, or mental health logs locally triggers compliance requirements under state-level consumer health privacy acts, notably Washington’s My Health My Data Act (WA MHMDA) and Nevada’s SB 37032. These state statutes define Consumer Health Data (CHD) extremely broadly, capturing any local, user-entered log that identifies health conditions, bodily functions, symptoms, or precise location history indicative of seeking healthcare services32.
+Technical & Product Mandates
+A local-only, secure mobile architecture must secure all on-device data-at-rest using hardware-bound cryptographic structures, explicit tracking restrictions, and unified privacy policies6.
+
+
+Storage Domain
+	Android Implementation (Kotlin / C++)
+	iOS Implementation (Swift / Objective-C)
+	Key Generation
+	Use KeyGenParameterSpec to generate a 256-bit AES master key inside the Android Keystore system36.
+	Use Apple CryptoKit or Security APIs to generate a 256-bit NIST P-256 ECC master key37.
+	Hardware Isolation
+	Set setIsStrongBoxBacked(true) to isolate the master key within the physical StrongBox KeyMint36.
+	Force master key generation inside the hardware Secure Enclave coprocessor (kSecAttrTokenIDSecureEnclave)37.
+	Database Encryption
+	Compile the database with SQLCipher using a key derived from the hardware master key43.
+	Integrate SmartStore or local SQLCipher databases bound to the Secure Enclave key41.
+	Key Derivation
+	Pass the raw key to PBKDF2 with a minimum iteration count of 100,000 to derive database passphrases48.
+	Use ECDH (Elliptic Curve Diffie-Hellman) directly on the coprocessor to derive local encryption keys37.
+	Access Policy
+	Configure cryptographic key access to require user active biometric or device PIN authentication36.
+	Set the keychain access flag to kSecAttrAccessibleWhenUnlockedThisDeviceOnly to prevent disk backups37.
+	Platform Porting
+	Set android:allowBackup="false" in the application manifest to block ADB filesystem extractions43.
+	Disable iCloud backup synchronization for directories containing encrypted local databases50.
+	Must-Do Product Rules
+* Obtain prior, explicit, opt-in consent for the collection and processing of Consumer Health Data (CHD) using a dedicated, standalone screening panel that is separated from general marketing or user licensing terms33.
+* Implement a native, verifiable "Erase All My Data" button within the app settings that executes a multi-pass cryptographic wipe, destroying local database instances, temporary caches, and system directory keys32.
+* Disclose the categories of third-party entities with whom the application shares data, the precise sources of collection, and how to withdraw consent inside the privacy policy38.
+Must-Avoid Product Rules
+* Do not execute any virtual geofencing (spatial location detection via GPS, cellular data, or Wi-Fi triangulation) within a 2,000-foot perimeter of any physical healthcare or clinic facility33.
+* Do not write or cache biometric identifiers, medical OCR extractions, or health log metrics to unencrypted system directories, public shared filesystems, or cloud-backed configuration services (e.g., standard iOS UserDefaults)43.
+* Do not include web tracking SDKs, analytical pixels, or third-party behavioral libraries (e.g., standard advertising SDKs) that process device identifiers or IP addresses on pages displaying health logs4.
+Architecture Impact
+Transitioning to a local, zero-cloud architecture fundamentally restructures data processing and storage pipelines. The application cannot transmit raw biometric, diagnostic, or image files to cloud endpoints for scaling or inference3. If the application utilizes the camera for document OCR scanning, raw image frames must be processed ephemerally in RAM32.
+For example, on-device OCR must utilize native device machine learning frameworks, passing camera buffers to memory-only structures that are explicitly destroyed via garbage collection or memory-zeroing APIs immediately after text-string extraction. Voice diarization or audio input processing must use similar on-device libraries (e.g., localized ASR runtimes)57. No voiceprints, acoustic models, or raw waveform files may write to persistent databases unless secured inside SQLCipher, using unique salt values and hardware-wrapped keys32.
+Risk Assessment
+Securing local data-at-rest against unauthorized physical extraction or tracking leaks is critical43. Under the Washington My Health My Data Act, any violation of the data-at-rest, consent, or geofencing requirements is classified as an unfair business practice under the state’s general consumer protection laws32. This enables a private right of action, allowing individual consumers to sue the application publisher for statutory civil damages of up to $7,500 per violation32. Furthermore, under the FTC's Health Breach Notification Rule (HBNR), failing to report a localized leak of unencrypted consumer health logs to users and federal regulators constitutes a direct breach of federal law, exposing the corporate entity to substantial civil financial penalties17.
+4. Permissions & Background Services Minimization
+Executive Summary
+The security architecture of 2026 mobile operating systems strictly enforces the principle of least privilege, blocking applications from acquiring access privileges beyond those required for core user functions6. Platforms monitor the registration of background execution types, sensor frameworks, and location services to optimize system battery life and protect sensitive data58. Standard system permissions (including Precise Location, Background Execution, and Physical Sensors) are treated as elevated health permissions when requested within health or fitness applications58. Platforms actively analyze permission usage profiles, rejecting or delisting applications that use broad permissions where native pickers or localized workflows are available6.
+Technical & Product Mandates
+Software engineering and architecture teams must configure, invoke, and justify permission requests using standard operating system parameters.
+
+
+Permission Domain
+	Android Manifest / API Configuration
+	iOS Plist / Core APIs
+	Compliance Action Required
+	Physical Vital Sensors
+	uses-permission android:name="android.permission.health.READ_HEART_RATE"
+[cite: 61]
+	Call HKHealthStore and configure active permissions for specific read/write metrics62.
+	Must only request granular physical metrics; generic sensor access is blocked61.
+	Background Data Read
+	uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"
+[cite: 61, 63, 64]
+	Configure Background processing and Background fetch flags in capabilities65.
+	Android requires separate Play Console approval; iOS requires strict system budgeting1.
+	Precise Location
+	uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+[cite: 61, 67]
+	Instantiate CLBackgroundActivitySession and require explicit user prompt60.
+	Only permitted for active, real-time exercise tracking; otherwise coarse coordinates are used58.
+	Device Notifications
+	uses-permission android:name="android.permission.POST_NOTIFICATIONS"
+	Request authorization using UNUserNotificationCenter with localized options.
+	Notifications must use neutral language and avoid displaying raw patient diagnostics4.
+	Background Retrieval
+	Trigger ScheduleWorker using WorkManager API to execute background tasks64.
+	Register background identifier string co.tryterra.data.post.request65.
+	Tasks must execute within platform-allotted execution time budgets66.
+	Must-Do Product Rules
+* Programmatically verify that the device operating system supports specific background APIs (e.g., checking platform features via the local health connector) prior to executing any runtime permission requests69.
+* Implement an in-context prominent disclosure modal explaining the specific data type to be accessed, how it directly benefits the user, and that the data is stored locally prior to displaying any system runtime permission sheets6.
+* Audit the application build configurations prior to every submission, removing unused dangerous permissions and stripping auto-imported permissions generated by third-party libraries6.
+Must-Avoid Product Rules
+* Do not request broad write or read access to the device contacts list (READ_CONTACTS); instead, integrate native platform Contact Pickers to allow the user to select specific recipients6.
+* Do not access, read, or process device-native location vectors or geolocations in the background unless the application's core, user-activated feature is actively tracking an ongoing outdoor physical exercise59.
+* Do not utilize accessibility or overlay APIs to automate consent flows, simulate user interactions, or bypass the platform permissions sandbox15.
+Architecture Impact
+Executing background operations while maintaining a minimal local footprint requires implementing platform-specific background managers.
+On Android, periodic data checks or local data maintenance must use the WorkManager API, scheduling a CoroutineWorker that validates health client availability64. When executing background tasks, developers must configure retry and backoff strategies to handle service disruptions or locked device states64.
+On iOS, background queries must use BGTaskScheduler to queue background data tasks65.
+
+
+
+
+
+
+                                     [ RUNTIME LIFE CYCLE STATES ]
+                                    
++-------------------------+     Lock      +-------------------------+     Launch      +-------------------------+
+|     Active Foreground   |-------------->|  Device Locked State    |---------------->|   Background Resume     |
+|   (Direct Database RW)  |               | (Sec Key Access Blocked)|                 | (Read / Write Allowed)  |
++-------------------------+               +-------------------------+                 +-------------------------+
+                                                      |                                           |
+                                                      | Try Background Write                      | Recreate Session
+                                                      v                                           v
+                                         +-------------------------+                 +-------------------------+
+                                         | Temp RAM Cache Buffer   |---------------->| Recreate App Session    |
+                                         |  (Lock-Safe Storage)    |                 |   (Key Store Open)      |
+                                         +-------------------------+                 +-------------------------+
+
+Because the OS encrypts the physical data store when the device is locked, cryptographic keys must use appropriate lock-safe storage options62. If a background task runs while the device is locked, write operations must write to a temporary, lock-safe RAM cache buffer, which HealthKit or KeyStore caches internally before committing to the encrypted database when the device is unlocked62. If the application process is terminated during background execution, background download sessions must be re-registered immediately at launch using consistent session identifiers to allow the OS to bind background completions56.
+Risk Assessment
+Requesting permissions that are not strictly necessary for the application's core functionality is a primary cause for app store rejection during pre-flight checks and human reviews2. If an application is found to be accessing location data, contact details, or sensor logs in a manner unrelated to its documented use cases, platform operators can execute a remote app termination, disabling access for existing users6. Furthermore, collecting precise user coordinates without explicit consent or utilizing spatial tracking within healthcare perimeters triggers direct statutory liability under state consumer protection acts, exposing the developer to class-action litigation and regulatory fines32.
+5. Master Compliance Architecture Design Matrix
+The following comprehensive matrix maps each compliance domain to its primary legal drivers, platform requirements, and verified technical implementation paths.
+
+
+Functional Domain
+	Legal & Regulatory Drivers
+	Platform Console Requirements
+	Core Architectural Controls
+	Critical Mobile APIs & Packages
+	App Store Policies
+	FDA FDCA Guidance, EU MDR 2017/745, Google/Apple Developer Agreements5
+	Verified Organization Account; Regulated Medical Device status declaration1
+	Modular separation of SaMD and wellness code paths; unformatted first-paragraph disclaimers1
+	App Store Connect regulatory inputs, Google Play App Content declarations6
+	Generative AI
+	EU AI Act (August 2026), GDPR Article 22, Google Health AI "HAI-DEF" Policy19
+	AI-Generated Content Policy questionnaire; dataset bias disclosures20
+	Localized regex query blocking; safety output parsing; on-device neural model runtimes22
+	Quantized Edge Models, local keyword validation filters22
+	Health Data Privacy
+	HIPAA HITECH, WA My Health My Data Act, NV SB 37017
+	Non-geofenced, non-editable, public-facing web Privacy Policy URL1
+	Hardware-backed Master Key encryption; PBKDF2 database hashing; temporary RAM buffer OCR processing32
+	SQLCipher, Android Keystore (StrongBox), iOS Keychains (Secure Enclave)36
+	Permission Limits
+	Principle of Least Privilege, OS Background Budgets, WA MHMDA Geofence Restrictions6
+	Context-specific prominent disclosure screens; explicit background permission justification6
+	Programmatic Contact Pickers; lock-safe memory caching; WorkManager background scheduling6
+	Android WorkManager API, iOS BGTaskScheduler, Wear OS api-level 36 structures61
+	Works cited
+1. Google Play Health Apps Update: New January 2026 Requirements | My App Monitor Blog, https://myappmonitor.com/blog/google-play-health-apps-update-2026-requirements
+2. App Store Rejection Reasons Index (2026) - Push My App, https://pushmyapp.ai/blog/app-store-rejection-reasons
+3. Health and fitness apps - Apple Developer, https://developer.apple.com/health-fitness/
+4. When does a HealthKit app become a regulated medical app, and when do you need a HealthKit developer who knows the difference? | Vadim Drobinin, https://drobinin.com/consulting/healthkit-medical/building-medical-and-healthkit-apps-on-ios/
+5. Does My Mobile Health App Need FDA Approval or Clearance? When Your iOS/Android App Is a Medical Device Explained | Complizen, https://www.complizen.ai/post/does-my-mobile-health-app-need-fda-approval-or-clearance-when-your-ios-android-app-is-a-medical-dev
+6. Developer Program Policy - Play Console Help - Google Help, https://support.google.com/googleplay/android-developer/answer/17105854?hl=en
+7. App Review Guidelines - Apple Developer, https://developer.apple.com/app-store/review/guidelines/
+8. Publish your health app on Google Play | Android health & fitness - Android Developers, https://developer.android.com/health-and-fitness/health-connect/publish
+9. Where do I go to fill out the Google App Health Declaration Form - Stack Overflow, https://stackoverflow.com/questions/79580041/where-do-i-go-to-fill-out-the-google-app-health-declaration-form
+10. Health Content and Services - Play Console Help - Google Help, https://support.google.com/googleplay/android-developer/answer/16679511?hl=en
+11. Update on regulated medical device apps in the European Economic Area, United Kingdom, and United States - Latest News - Apple Developer, https://developer.apple.com/news/?id=nyqbfz1y
+12. Apple Requires App Developers to Declare Regulated Medical Device Status in EEA, UK, and U.S. - MacRumors, https://www.macrumors.com/2026/03/26/app-store-medical-device-status/
+13. New App Store policy requires medical device disclosures for some health apps - 9to5Mac, https://9to5mac.com/2026/03/26/new-app-store-policy-requires-medical-device-disclosures-for-some-health-apps/
+14. Apple's App Store will show if an app is classified as a regulated medical device, https://appleinsider.com/articles/26/03/27/apples-app-store-will-show-if-an-app-is-classified-as-a-regulated-medical-device
+15. Health app categories and additional information - Play Console Help - Google Help, https://support.google.com/googleplay/android-developer/answer/13996367?hl=en
+16. Privacy policy of healthcare app - Google Play Developer Community, https://support.google.com/googleplay/android-developer/thread/396928518?hl=en&msgid=396964333
+17. Digital Health Laws and Regulations Report 2026 USA - ICLG, https://iclg.com/practice-areas/digital-health-laws-and-regulations/usa/
+18. Global Data Privacy Laws: Your 2025 Guide (GDPR, CCPA, More) - Usercentrics, https://usercentrics.com/guides/data-privacy/data-privacy-laws/
+19. Health AI Developer Foundations Prohibited Use Policy, https://developers.google.com/health-ai-developer-foundations/prohibited-use-policy
+20. Google Play AI Content Policy: Rules for Developers - Chatboq, https://chatboq.com/blogs/google-play-ai-content-policy
+21. EU AI Act Omnibus Agreement — Postponed High-Risk Deadlines and Other Key Changes, https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/
+22. How to Build Production-Ready AI Features with Flutter [Full Handbook for Devs], https://www.freecodecamp.org/news/how-to-build-production-ready-ai-features-with-flutter-handbook-for-devs/
+23. Health AI Developer Foundations Terms of Use, https://developers.google.com/health-ai-developer-foundations/terms
+24. EU AI Act and Medical Devices: Compliance Guide 2026 - Educo Life Sciences, https://educolifesciences.com/the-eu-ai-act-and-medical-devices-what-medtech-companies-must-do-before-august-2026/
+25. AI based medical devices | International Bar Association, https://www.ibanet.org/ai-based-medical-devices
+26. AI Act: New Perspectives for the Healthcare Sector - Current implementation status - Unyer, https://www.unyer.com/ai-act-new-perspectives-for-the-healthcare-sector-current-implementation-status/
+27. Health AI Developer Foundations (HAI-DEF) - a google Collection - Hugging Face, https://huggingface.co/collections/google/health-ai-developer-foundations-hai-def
+28. EU AI Act for Healthcare: What Life Sciences Companies Need to Know before August 2026, https://www.iliomadhealthdata.com/post/eu-ai-act-for-healthcare-what-life-sciences-companies-need-to-know-before-august-2026
+29. Apple, Google point users to “undressing” apps used to make deepfake porn - Cybernews, https://cybernews.com/tech/apple-google-undressing-apps/
+30. Health Apps and HIPAA: OCR Publishes New Privacy Guidance for Health App Developers, https://www.ropesgray.com/en/insights/alerts/2016/02/health-apps-and-hipaa-ocr-publishes-new-privacy-guidance-for-health-app-developers
+31. OCR Provides Guidance on the Privacy of Data Stored on Health Apps and Mobile Devices, https://www.bakerdatacounsel.com/blogs/ocr-provides-guidance-on-the-privacy-of-data-stored-on-health-apps-and-mobile-devices/
+32. State-by-State Medical Recording Laws: The 2026 Compliance Playbook for Ambient AI Scribes, https://www.scribing.io/blog/state-by-state-guide-medical-recording-laws-ai-scribes
+33. My Health My Data Act (MHMD) - Ashurst Perkins Coie, https://perkinscoie.com/services/my-health-my-data-act-mhmd
+34. REMINDER: Washington's “My Health My Data” Act Now In Effect, https://www.datameetsworld.com/blog/reminder-washingtons-my-health-my-data-act-now-in-effect
+35. REMINDER: Washington's “My Health My Data” Act Now In Effect | Benesch Law, https://www.beneschlaw.com/insight/reminder-washingtons-my-health-my-data-act-now-in-effect/
+36. Android Keystore system | Security - Android Developers, https://developer.android.com/privacy-and-security/keystore
+37. Protecting keys with the Secure Enclave | Apple Developer Documentation, https://developer.apple.com/documentation/security/protecting-keys-with-the-secure-enclave
+38. The Washington My Health, My Data Act (WMHMDA) - TermsFeed, https://www.termsfeed.com/blog/washington-wmhmda-health-data-act/
+39. Cryptography | Security - Android Developers, https://developer.android.com/privacy-and-security/cryptography
+40. Secure Data Storage in Android: A DataStore-Based Encrypted Library - IIETA, https://www.iieta.org/sites/default/files/pdf/2026-03/ijsse_15.12_07.pdf
+41. Keychain vs Secure Enclave — A Complete, Practical Guide for iOS Developers - Medium, https://medium.com/@amitaswal87/keychain-vs-secure-enclave-a-complete-practical-guide-for-ios-developers-9b2c04ba7a6a
+42. Secure Key Storage in iOS | Authentication, Security, and Identity in Mobile Apps, https://developer.salesforce.com/docs/platform/mobile-sdk/guide/auth-secure-key-storage-ios.html
+43. How to Secure Android App Local Storage Against Hidden Risks - Appknox, https://www.appknox.com/blog/insecure-local-storage-android
+44. Securing End-to-End Encrypted Systems - University of Cambridge, https://www.repository.cam.ac.uk/bitstreams/44e37d33-9f0b-466a-a4f6-46c89710f8e7/download
+45. The Secure Enclave - Apple Support (IN), https://support.apple.com/en-in/guide/security/sec59b0b31ff/web
+46. Using the Secure Enclave to improve the integrity of iOS apps - Sngular, https://www.sngular.com/insights/315/using-the-secure-enclave-to-improve-the-integrity-of-ios-apps
+47. Secure Your Android Room Database with SQLCipher Encryption | by Sanjay Kushwaha, https://medium.com/@sanjaykushwaha_58217/secure-your-android-room-database-with-sqlcipher-encryption-c3aada5e58f2
+48. Plaid Bank Integration: Security and Data Handling 2026 - Whistl, https://www.whistl.app/plaid-bank-integration-security-2026.html
+49. How to Use Keychain for Secure Storage in Swift - OneUptime, https://oneuptime.com/blog/post/2026-02-02-swift-keychain-secure-storage/view
+50. Privacy Policy for iOS Apps, https://www.freeprivacypolicy.com/blog/privacy-policy-ios-apps/
+51. Washington My Health My Data Act: a Comprehensive Guide - Usercentrics, https://usercentrics.com/knowledge-hub/washington-my-health-my-data-act-guide/
+52. Washington My Health My Data Act Privacy Notice - Emergent BioSolutions U.S., https://www.emergentbiosolutions.com/washington-my-health-my-data-act-privacy-notice-post/
+53. Best Ways Secure Android for Business - Gaper.io, https://gaper.io/secure-android-app
+54. OCR Updates Guidance on Use of Online Tracking Technologies | Morrison Foerster, https://www.mofo.com/resources/insights/240329-ocr-updates-guidance-on-use-of-online-tracking-technologies
+55. Cookie Policy - LifeRx.md, https://liferx.md/cookie-policy
+56. Downloading files in the background | Apple Developer Documentation, https://developer.apple.com/documentation/foundation/downloading-files-in-the-background
+57. Health AI Developer Foundations, https://developers.google.com/health-ai-developer-foundations
+58. Android Health Permissions: Guidance and FAQs - Play Console Help - Google Help, https://support.google.com/googleplay/android-developer/answer/12991134?hl=en
+59. Manage Application Permissions for Privacy and Security | CISA, https://www.cisa.gov/resources-tools/training/manage-application-permissions-privacy-and-security
+60. Handling location updates in the background | Apple Developer Documentation, https://developer.apple.com/documentation/corelocation/handling-location-updates-in-the-background
+61. Declare appropriate permissions | Android health & fitness - Android Developers, https://developer.android.com/health-and-fitness/health-services/permissions
+62. Protecting user privacy | Apple Developer Documentation, https://developer.apple.com/documentation/healthkit/protecting-user-privacy
+63. Health Connect data types | Android health & fitness - Android Developers, https://developer.android.com/health-and-fitness/health-connect/data-types
+64. Read raw data | Android health & fitness, https://developer.android.com/health-and-fitness/health-connect/read-data
+65. iOS (Swift) - Terra Docs, https://docs.tryterra.co/health-and-fitness-api/mobile-only-sources/ios-swift
+66. Using background tasks | Apple Developer Documentation, https://developer.apple.com/documentation/watchkit/using-background-tasks
+67. https://support.google.com/googleplay/android-developer/answer/13996367?hl=en#:~:text=The%20following%20permissions%20are%20considered,ACCESS_FINE_LOCATION
+68. Pushing background updates to your App | Apple Developer Documentation, https://developer.apple.com/documentation/usernotifications/pushing-background-updates-to-your-app
+69. health_connector | Flutter package - Pub.dev, https://pub.dev/packages/health_connector
+70. Why Apps May Be Removed From the App Store and Google Play Store? - Orangesoft, https://orangesoft.co/blog/why-google-and-apple-may-remove-your-app
+71. Legal, Privacy & Terms of Service - RoarMD, https://roarmd.com/legal-center

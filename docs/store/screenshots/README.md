@@ -19,7 +19,8 @@
 - Use light, dark, and high-contrast theme variants across set
 - No medication names or real PHI in mock data
 - No "diagnose", "detect", "HIPAA-certified", or "medical device" claims
-- Poppins font matching in-app theme
+- Plus Jakarta Sans font matching in-app theme (soft canvas, blue `#3B82F6` / emerald `#10B981` accents, pill CTAs)
+- Screenshot 1 must still show the medical disclaimer overlay
 - Minimum 1080×1920 (phone) and 2048×2732 (tablet) export sizes per store requirements
 
 ## Screenshot 1 disclaimer text (verbatim)

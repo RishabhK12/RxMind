@@ -1,6 +1,6 @@
 # RxMind Engineering Roadmap (2026 Compliance)
 
-**Last audited:** 2026-07-08  
+**Last audited:** 2026-07-09  
 **Audience:** Cursor Agent / vibe-coding sessions  
 **Authority:** This file is the active task backlog. Read it first every session. Update checkboxes and the *Active Task* block when work completes.
 
@@ -10,11 +10,11 @@
 
 | Field | Value |
 | --- | --- |
-| **Phase** | — |
-| **Task ID** | — |
-| **Branch pattern** | — |
-| **Status** | Phase 5 complete |
-| **Prerequisites** | Phases 1–4 complete |
+| **Phase** | 6 — Brand & Marketing Site |
+| **Task ID** | **6.3** complete (Flutter app UI rebrand) |
+| **Branch pattern** | `feature/phase6-task6.3-app-rebrand` |
+| **Status** | App UI rebranded to brand tokens (Plus Jakarta Sans, blue/emerald, pills, soft cards) |
+| **Prerequisites** | 6.1–6.2 complete; `docs/design/app_rebrand_guide.md` |
 
 ---
 
@@ -721,6 +721,76 @@
 
 ---
 
+## Phase 6: Brand Identity & Marketing Landing Page
+
+**Goal:** Lock a shared brand from the AI Studio hero design; ship a lean public landing page with interactive hero, feature copy, and store download badges — consistent with Flutter app theming.
+
+**Prerequisites:** Phase 5 complete (static `docs/site/` stub may be replaced or restyled).
+
+---
+
+### 6.1 — Brand & website design docs (AI Studio hero) ✅
+
+**Acceptance Criteria:**
+- `docs/design/brand_identity.md` captures hero composition, color/type/motion tokens from `aistudio-ui.zip` + hero reference image.
+- `docs/design/app_ui.md` maps Flutter `ThemeTokens` → brand accents (migration target).
+- `docs/website/AGENT_BUILD_BRIEF.md` is sufficient for a separate agent to build the landing page without re-deriving brand rules.
+- AI Studio reference sources live under `docs/design/aistudio-reference/`; hero PNG under `docs/design/assets/`.
+- Non-compliant AI Studio draft elements documented as **omit**: email capture, clinic logo wall, dosing/diagnostic feature claims, real Login.
+
+**Impacted Files:**
+- `docs/design/brand_identity.md`
+- `docs/design/app_ui.md`
+- `docs/design/README.md`
+- `docs/website/AGENT_BUILD_BRIEF.md`
+- `docs/website/README.md`
+- `docs/design/aistudio-reference/**`
+- `docs/design/assets/hero-reference.png`
+- `AGENTS.md` (source-of-truth table)
+
+---
+
+### 6.2 — Implement branded landing page (interactive hero + Play download) ✅
+
+**Acceptance Criteria:**
+- Single landing page matches `docs/design/assets/hero-reference.png` composition; hero ornaments remain interactive; `prefers-reduced-motion` respected.
+- Sections: Features, How It Works, Privacy First, FAQ, Download (Google Play badge live-or-placeholder URL; App Store “coming soon”).
+- Mandatory medical disclaimer visible with JavaScript disabled.
+- No email waitlist, no clinic partnership logos, store-safe feature copy only.
+- Privacy / Terms / Data Safety linked; Lighthouse accessibility ≥ 90 on landing.
+- Implementing agent follows `docs/website/AGENT_BUILD_BRIEF.md` on branch `feature/website-landing-v1`.
+
+**Impacted Files:**
+- `website/**` (Next.js static export)
+- `.github/workflows/pages.yml` (builds `website/out`)
+- `website/README.md` (Play URL + `NEXT_PUBLIC_BASE_PATH` config)
+- `docs/site/**` retained as legacy stub (Pages now deploys from `website/`)
+
+---
+
+### 6.3 — Full Flutter app UI rebrand (brand-consistent with landing) ✅
+
+**Acceptance Criteria:**
+- Implementing agent follows `docs/design/app_rebrand_guide.md` end-to-end (phases A–H).
+- Light/dark UI matches `docs/design/brand_identity.md` (blue `#3B82F6`, emerald `#10B981`, soft canvas `#F9FAFB`, pill CTAs, soft cards).
+- Plus Jakarta Sans bundled; no third UI font family; HC palettes unchanged in intent.
+- No functionality regressions (routes, tabs, OCR, chat safety, wipe, settings toggles).
+- Hardcoded Material color literals purged from `lib/screens` / `lib/widgets` per guide grep gates.
+- `flutter analyze` clean; `flutter test` 100%; goldens updated for L/D/HC.
+
+**Impacted Files:**
+- `docs/design/app_rebrand_guide.md` (runbook)
+- `lib/theme/theme_tokens.dart`, `lib/theme/app_theme.dart`
+- `lib/widgets/**` (shared brand components)
+- `lib/screens/**` (visual only)
+- `assets/fonts/**`, `assets/illus/**`
+- `pubspec.yaml` (fonts)
+- `test/theme/**`, `test/goldens/**`, `test/widgets/**`
+
+**Branch:** `feature/phase6-task6.3-app-rebrand`
+
+---
+
 ## Cross-Phase Quality Gates
 
 Every task must pass before its checkbox is marked complete:
@@ -748,4 +818,8 @@ Every task must pass before its checkbox is marked complete:
 
 | Date | Author | Change |
 | --- | --- | --- |
+| 2026-07-09 | Cursor Agent | Task 6.3: full Flutter UI rebrand (tokens, Plus Jakarta Sans, pills, screen migration, goldens) |
+| 2026-07-09 | Cursor Agent | Task 6.2: Next.js landing under `website/` with interactive hero + Play badge; Active Task → 6.3 |
+| 2026-07-09 | Cursor Agent | Added `docs/design/app_rebrand_guide.md` full Flutter UI rebrand runbook; expanded task 6.3 |
+| 2026-07-09 | Cursor Agent | Phase 6: brand identity + website agent brief from AI Studio hero; Active Task → 6.2 |
 | 2026-07-08 | Cursor Agent | Initial roadmap from codebase audit + 2026 compliance report |

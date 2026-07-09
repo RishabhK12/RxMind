@@ -33,7 +33,7 @@ export function SiteNav() {
         <Link
           href="/"
           className="flex items-center gap-2 text-[#3B82F6]"
-          aria-label="RxMind home"
+          aria-label="rxmind home"
         >
           <LogoMark />
           <span className="text-2xl font-extrabold tracking-tight text-[#111827]">

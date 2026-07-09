@@ -6,8 +6,8 @@ import { ChevronDown } from "lucide-react";
 
 const FAQ_DATA = [
   {
-    q: "How does RxMind protect my privacy?",
-    a: "RxMind is built for on-device use. Recovery data is processed and stored in your phone’s local sandbox and is not uploaded to RxMind servers.",
+    q: "How does rxmind protect my privacy?",
+    a: "rxmind is built for on-device use. Recovery data is processed and stored in your phone’s local sandbox and is not uploaded to rxmind servers.",
   },
   {
     q: "Can I import discharge instructions?",
@@ -18,8 +18,8 @@ const FAQ_DATA = [
     a: "Yes. Core logging, reminders, and recovery plans work without an internet connection.",
   },
   {
-    q: "Is RxMind medical advice?",
-    a: "No. RxMind is not a medical device and does not diagnose, treat, or prescribe. Always consult licensed healthcare professionals for medical questions.",
+    q: "Is rxmind medical advice?",
+    a: "No. rxmind is not a medical device and does not diagnose, treat, or prescribe. Always consult licensed healthcare professionals for medical questions.",
   },
 ] as const;
 

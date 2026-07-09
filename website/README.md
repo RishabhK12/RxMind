@@ -1,6 +1,6 @@
-# RxMind Marketing Website
+# rxmind marketing website
 
-Public landing page + legal pages for RxMind (Task 6.2).
+Public landing page + legal pages for rxmind (Task 6.2).
 
 ## Stack
 

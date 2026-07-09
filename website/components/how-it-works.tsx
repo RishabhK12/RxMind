@@ -7,7 +7,7 @@ const STEPS = [
   {
     n: "01",
     title: "Bring your discharge papers",
-    body: "Photograph or import documents. Text is extracted on your phone — nothing is uploaded to RxMind servers.",
+    body: "Photograph or import documents. Text is extracted on your phone — nothing is uploaded to rxmind servers.",
   },
   {
     n: "02",
@@ -36,7 +36,7 @@ export function HowItWorks() {
             Healing doesn&apos;t have to feel like a hospital chore.
           </h2>
           <p className="mt-5 text-lg font-medium leading-relaxed text-slate-600">
-            RxMind turns discharge instructions into trackable tasks on your
+            rxmind turns discharge instructions into trackable tasks on your
             phone — private, offline-friendly, and designed for everyday
             recovery.
           </p>

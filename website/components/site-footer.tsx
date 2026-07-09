@@ -61,7 +61,7 @@ export function SiteFooter() {
         </div>
 
         <p className="text-sm font-medium text-slate-400">
-          &copy; 2026 RxMind
+          &copy; 2026 rxmind
         </p>
       </div>
     </footer>

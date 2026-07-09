@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: Colors.white,
       body: Center(
         child: Semantics(
-          label: 'Loading RxMind',
+          label: 'Loading rxmind',
           child: ScaleTransition(
             scale: Tween<double>(begin: 0.98, end: 1.08).animate(
                 CurvedAnimation(parent: _controller, curve: Curves.easeOut)),

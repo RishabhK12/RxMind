@@ -102,7 +102,7 @@ class _RxMindAppState extends State<RxMindApp> {
       child: Builder(
         builder: (context) => MaterialApp(
           navigatorKey: _navigatorKey,
-          title: 'RxMind',
+          title: 'rxmind',
           debugShowCheckedModeBanner: false,
           theme:
               _highContrast ? AppTheme.highContrastTheme : AppTheme.lightTheme,

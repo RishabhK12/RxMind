@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { SiteChrome } from "@/components/site-chrome";
 
 export const metadata: Metadata = {
-  title: "Data Safety — RxMind",
+  title: "Data Safety — rxmind",
   description:
-    "RxMind data safety summary for Google Play and App Store privacy labels.",
+    "rxmind data safety summary for Google Play and App Store privacy labels.",
 };
 
 export default function DataSafetyPage() {

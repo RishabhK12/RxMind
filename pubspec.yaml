@@ -1,5 +1,5 @@
 name: rxmind_app
-description: RxMind - Your On-Device Guide to Safe Hospital Discharge
+description: rxmind — private on-device recovery organizer
 publish_to: "none"
 version: 1.0.0+1
 environment:
@@ -52,6 +52,8 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
+    - assets/brand/rxmind-mark.svg
+    - assets/brand/rxmind-logo.svg
     - assets/illus/logo.svg
     - assets/illus/onboard1.svg
     - assets/illus/onboard2.svg

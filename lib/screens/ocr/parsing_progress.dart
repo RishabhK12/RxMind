@@ -354,7 +354,7 @@ Response (JSON only, with simple everyday language):''';
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Semantics(
-                    label: 'RxMind logo',
+                    label: 'rxmind logo',
                     child: SvgPicture.asset(
                       'assets/illus/logo.svg',
                       width: 120,

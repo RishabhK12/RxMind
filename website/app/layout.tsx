@@ -11,7 +11,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "RxMind — Private On-Device Recovery Organizer",
+  title: "rxmind — private on-device recovery organizer",
   description:
     "Organize post-hospital recovery on your phone — private recovery plans, medication schedules, and progress tracking that stay on-device.",
   icons: {

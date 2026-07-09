@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: #ffffff;
+  --color-soft: #f9fafb;
+  --color-muted-bg: #f3f4f6;
+  --color-fg: #111827;
+  --color-fg-secondary: #4b5563;
+  --color-fg-muted: #94a3b8;
+  --color-border-subtle: #e2e8f0;
+  --color-accent-blue: #3b82f6;
+  --color-accent-emerald: #10b981;
+  --color-accent-amber: #fbbf24;
+  --color-accent-violet: #a855f7;
+  --color-accent-rose: #f43f5e;
+  --color-accent-cyan: #67e8f9;
+  --color-cta-ink: #1e1e24;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: #ffffff;
+  color: #111827;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, #3b82f6 20%, white);
+}
+
+:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.legal-prose h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.legal-prose h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.legal-prose p,
+.legal-prose li {
+  color: #4b5563;
+  font-weight: 500;
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+.legal-prose ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.legal-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.legal-prose th,
+.legal-prose td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.legal-prose th {
+  background: #f9fafb;
+  font-weight: 700;
+  color: #111827;
+}

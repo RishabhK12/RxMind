@@ -1,6 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
-import { PLAY_STORE_URL } from "@/lib/config";
+import { PLAY_STORE_URL, assetPath } from "@/lib/config";
+
+/** Matched visual height for both store badges (official assets differ in padding). */
+const BADGE_HEIGHT_CLASS = "h-10 md:h-11";
 
 export function DownloadSection() {
   return (
@@ -25,38 +27,37 @@ export function DownloadSection() {
           stays on your device.
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-3 pt-2 sm:flex-row sm:gap-4">
+        <div className="flex flex-col items-center justify-center gap-4 pt-2 sm:flex-row sm:items-center sm:gap-5">
           <a
             href={PLAY_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
+            className="inline-flex items-center transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
           >
-            {/* Official Google Play badge asset */}
-            <Image
-              src="/badges/google-play.png"
+            {/* eslint-disable-next-line @next/next/no-img-element -- plain img so basePath is applied reliably on static export */}
+            <img
+              src={assetPath("/badges/google-play.png")}
               alt="Get it on Google Play"
-              width={180}
-              height={70}
-              className="h-[60px] w-auto"
-              unoptimized
-              priority
+              width={135}
+              height={40}
+              className={`${BADGE_HEIGHT_CLASS} w-auto`}
+              decoding="async"
             />
           </a>
 
           <div
-            className="relative inline-flex cursor-default"
+            className="relative inline-flex cursor-default items-center"
             aria-disabled="true"
             title="App Store listing coming soon"
           >
-            {/* Official App Store badge — not linked until listing is live */}
-            <Image
-              src="/badges/app-store.svg"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={assetPath("/badges/app-store.svg")}
               alt="Download on the App Store — Coming soon"
-              width={148}
-              height={50}
-              className="h-[50px] w-auto opacity-45 grayscale"
-              unoptimized
+              width={120}
+              height={40}
+              className={`${BADGE_HEIGHT_CLASS} w-auto opacity-50 grayscale`}
+              decoding="async"
             />
             <span className="pointer-events-none absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full whitespace-nowrap rounded-full bg-slate-200/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600">
               Coming soon

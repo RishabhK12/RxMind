@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" role="img" aria-label="rxmind">
+  <title>rxmind</title>
+  <!-- Speech bubble (brand accent blue #3B82F6) -->
+  <path
+    fill="#3B82F6"
+    d="M21 11.5C21 16.1944 16.9706 20 12 20C10.7424 20 9.5441 19.7618 8.44857 19.3323C8.10659 19.198 7.72895 19.2319 7.4116 19.4267L4.54226 21.1873C3.76639 21.6635 2.80216 21.011 2.94639 20.109L3.38575 17.3626C3.4542 16.9348 3.32831 16.5021 3.05374 16.1706C1.7825 14.6366 1 13.149 1 11.5C1 6.80558 5.02944 3 10 3C14.9706 3 19 6.80558 19 11.5Z"
+  />
+  <!-- Medical cross (recovery / care, non-clinical authority) -->
+  <rect x="10.25" y="7.5" width="3.5" height="9" rx="0.75" fill="#FFFFFF" />
+  <rect x="7.5" y="10.25" width="9" height="3.5" rx="0.75" fill="#FFFFFF" />
+</svg>

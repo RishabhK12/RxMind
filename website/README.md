@@ -68,4 +68,6 @@ Play URL is also readable from [`lib/config.ts`](lib/config.ts).
 
 ## Deploy
 
-GitHub Actions workflow [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) builds this package and deploys `website/out` to GitHub Pages.
+GitHub Actions workflow [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) builds this package and publishes static files to the `alternate-local-llm` branch under `docs/`. This uses **legacy branch-based GitHub Pages** (no repo-owner “GitHub Actions” Pages setting required).
+
+The live project URL is `https://rishabhk12.github.io/RxMind/` — keep `NEXT_PUBLIC_BASE_PATH=/RxMind` in CI.

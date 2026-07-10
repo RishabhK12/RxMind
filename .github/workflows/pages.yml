@@ -1,3 +1,5 @@
+# Legacy GitHub Pages deploy — pushes static export to alternate-local-llm/docs.
+# Does not require repo-owner "GitHub Actions" Pages source; works with branch/docs hosting.
 name: Deploy GitHub Pages
 
 on:
@@ -9,20 +11,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: pages-legacy
   cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -35,20 +32,23 @@ jobs:
       - name: Install and build
         working-directory: website
         env:
-          # Project Pages URL is https://rishabhk12.github.io/RxMind/
-          # Override via repo Variable NEXT_PUBLIC_BASE_PATH if needed.
-          # Set NEXT_PUBLIC_PLAY_STORE_URL when the Play listing is live.
+          # Project Pages URL: https://rishabhk12.github.io/RxMind/
           NEXT_PUBLIC_BASE_PATH: ${{ vars.NEXT_PUBLIC_BASE_PATH || '/RxMind' }}
           NEXT_PUBLIC_PLAY_STORE_URL: ${{ vars.NEXT_PUBLIC_PLAY_STORE_URL }}
         run: |
           npm ci
           npm run build
 
-      - uses: actions/configure-pages@v5
+      - name: Prepare legacy Pages tree (docs/)
+        run: |
+          mkdir -p _pages/docs
+          cp -r website/out/* _pages/docs/
+          touch _pages/docs/.nojekyll
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Publish to alternate-local-llm branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: website/out
-
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          branch: alternate-local-llm
+          folder: _pages
+          clean: true
+          single-commit: true
